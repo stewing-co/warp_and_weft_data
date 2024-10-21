@@ -125,7 +125,7 @@ enableEmoji = true
   # Configure header 
   [[menu.header]]
     name = "About"
-    title = "About Blogophonic"
+    title = "About Steve Ewing"
     url = "/about/"
     weight = 1
 #  [[menu.header]]

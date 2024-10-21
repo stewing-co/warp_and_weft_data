@@ -155,9 +155,6 @@
     <loc>http://localhost:4321/form/</loc>
     <lastmod>2019-02-25T13:38:41-06:00</lastmod>
   </url><url>
-    <loc>http://localhost:4321/elements/</loc>
-    <lastmod>2019-02-18T12:27:33-06:00</lastmod>
-  </url><url>
     <loc>http://localhost:4321/post/2016-12-30-hello-markdown/</loc>
     <lastmod>2016-12-30T21:49:57-07:00</lastmod>
   </url><url>
@@ -170,10 +167,6 @@
     <loc>http://localhost:4321/about/header/</loc>
   </url><url>
     <loc>http://localhost:4321/about/sidebar/</loc>
-  </url><url>
-    <loc>http://localhost:4321/contributors/</loc>
-  </url><url>
-    <loc>http://localhost:4321/license/</loc>
   </url><url>
     <loc>http://localhost:4321/about/main/</loc>
   </url>
