@@ -2,7 +2,7 @@
 title: "About"
 description: |
   Steve Ewing's about page
-show_header: true
+show_header: false
 sidebar_left: true
 # Keep this! Do not edit.
 headless: false

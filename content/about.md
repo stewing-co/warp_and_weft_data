@@ -2,18 +2,11 @@
 date: "2016-05-05T21:48:51-07:00"
 title: About
 ---
-
-![Steve Ewing](https://github.com/stewing-co/warp_and_weft_data/blob/main/content/about/sidebar/steve.jpg)
-
-
 # Steve Ewing
 **Email:** sewing@warpandweftdata.com  
 **Location:** Lilburn, GA  
-**Phone:** (973) 907-6713  
 
 ---
-
-## EXPERIENCE
 
 ### Central Garden and Pet – Lawrenceville, GA  
 **Business Intelligence Manager**  
