@@ -166,8 +166,8 @@
   </url><url>
     <loc>http://localhost:4321/about/header/</loc>
   </url><url>
-    <loc>http://localhost:4321/about/sidebar/</loc>
-  </url><url>
     <loc>http://localhost:4321/about/main/</loc>
+  </url><url>
+    <loc>http://localhost:4321/about/sidebar/</loc>
   </url>
 </urlset>

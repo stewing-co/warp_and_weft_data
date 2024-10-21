@@ -1,4 +1,4 @@
-baseURL = "https://www.warpandweftdata.com/"
+baseURL = "https://warpandweftdata.netlify.app/"
 theme = "hugo-apero"
 languageCode = "en"
 title = "Warp and Weft Data"
