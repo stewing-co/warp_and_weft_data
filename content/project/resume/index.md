@@ -12,7 +12,6 @@ categories:
 # layout options: single or single-sidebar
 layout: single
 ---
-![CV Icon](cv.png)
 
 # Steve Ewing
 **Email:** sewing@warpandweftdata.com  
