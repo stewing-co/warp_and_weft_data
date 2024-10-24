@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=4321&amp;path=livereload" data-no-instant defer></script>
+  
+                           
+     
+
+
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="generator" content="Hugo 0.136.2">
+<title>Ship Till X | Warp and Weft Data</title>
+
+
+<meta property="twitter:site" content="@blue_pibble">
+<meta property="twitter:creator" content="@blue_pibble">
+
+
+
+
+
+
+
+  
+    
+  
+<meta name="description" content="Shipping Orders Based on Cutoff Times and Shipping Days">
+
+
+<meta property="og:site_name" content="Warp and Weft Data">
+<meta property="og:title" content="Ship Till X | Warp and Weft Data">
+<meta property="og:description" content="Shipping Orders Based on Cutoff Times and Shipping Days" />
+<meta property="og:type" content="page" />
+<meta property="og:url" content="http://localhost:4321/project/ship_till_x/" />
+<meta property="og:locale" content="en">
+
+
+
+
+    
+        <meta property="og:image" content="http://localhost:4321/project/ship_till_x/featured_hex.png" >
+        <meta property="twitter:card" content="summary">
+        <meta name="twitter:image" content="http://localhost:4321/project/ship_till_x/featured_hex.png" >
+    
+    
+  
+  <meta itemprop="name" content="Ship Till X">
+  <meta itemprop="description" content="Business Question Take all the orders for the last fiscal year. For weeks 1-18 there is 5 day a week shipping and for weeks 19-52 there is 6 day a week shipping. Assuming we ship all orders that arrive before a given cutoff that day and all orders that arrive after the cutoff the next business day what percent of the weekly orders fall on each day of the week?">
+  <meta itemprop="datePublished" content="2024-10-24T00:00:00+00:00">
+  <meta itemprop="dateModified" content="2024-10-24T00:00:00+00:00">
+  <meta itemprop="wordCount" content="721">
+  <meta itemprop="image" content="http://localhost:4321/project/ship_till_x/featured_hex.png">
+  <meta itemprop="keywords" content="Hugo-Site">
+  
+  <!--[if IE]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  <link rel="shortcut icon" href="/img/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="/img/favicon.ico" type="image/x-icon">
+  
+  
+  <link rel="stylesheet" href="/style.main.min.0820a865770f259724d61d170adbb19db040647ecaa3b2023c16f04ada7fc7d2.css" integrity="sha256-CCCoZXcPJZck1h0XCtuxnbBAZH7Ko7ICPBbwStp/x9I=" media="screen">
+  
+  
+  <script src="/panelset.min.ed1ac24b6e16f4e2481e3d1d098ae66f5bc77438aef619e6e266d8ac5b00dc72.js" type="text/javascript"></script>
+  
+  
+  <script src="/main.min.f0b39b51e43cf3881368fb093708a9d3b3499e674af4b4e47e27e512a5d411e2.js" type="text/javascript"></script>
+</head>
+<body>
+      <div class="grid-container single">
+<header class="site-header pt4 pb2 mb4 bb b--transparent ph5 headroom z-max" role="banner">
+  <nav class="site-nav db dt-l w-100" role="navigation">
+    <a class="site-brand db dtc-l v-mid link no-underline w-100 w-33-l tc tl-l" href="http://localhost:4321/" title="Home">
+      <img src="/img/logo_leaf.png" class="dib db-l h2 w-auto" alt="Warp and Weft Data">
+    </a>
+    <div class="site-links db dtc-l v-mid w-100 w-47-l tc tr-l mt3 mt0-l ttu tracked">
+      
+        
+        
+        
+      <a class="link f6 f5-l dib pv1 ph2 " href="/about/" title="About Steve Ewing">About</a>
+      
+        
+        
+        
+      <a class="link f6 f5-l dib pv1 ph2 " href="/cv/" title="My Resume">Resume</a>
+      
+        
+        
+        
+      <a class="link f6 f5-l dib pv1 ph2 active" href="/project/" title="Project Portfolio">Projects</a>
+      
+      
+    </div>
+  </nav>
+</header>
+
+<main class="page-main pa4" role="main">
+  <section class="page-content mw7 center">
+    <article class="post-content pa0 ph4-l">
+      <header class="post-header">
+        <h1 class="f1 lh-solid measure-narrow mb3 fw4">Ship Till X</h1>
+        <h4 class="f4 mt0 mb4 lh-title measure">Shipping Orders Based on Cutoff Times and Shipping Days</h4>
+        <p class="f6 measure lh-copy mv1">By Steve Ewing in <a href="http://localhost:4321/categories/business">Business</a> </p>
+        <p class="f7 db mv0 ttu">October 24, 2024</p>
+
+      
+
+      </header>
+      <section class="post-body pt5 pb4">
+        
+
+
+
+<h2 id="business-question">Business Question
+  <a href="#business-question"><svg class="anchor-symbol" aria-hidden="true" height="26" width="26" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 0h24v24H0z" fill="currentColor"></path>
+      <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76.0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71.0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71.0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76.0 5-2.24 5-5s-2.24-5-5-5z"></path>
+    </svg></a>
+</h2>
+<p>Take all the orders for the last fiscal year. For weeks 1-18 there is
+5 day a week shipping and for weeks 19-52 there is 6 day a week shipping. Assuming
+we ship all orders that arrive before a given cutoff that day and all orders that arrive
+after the cutoff the next business day what percent of the weekly orders fall on each
+day of the week?</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#900;font-weight:bold">library</span>(tidyverse)
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">library</span>(arrow)
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">library</span>(hms)
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">library</span>(tinytable)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>orders <span style="color:#000;font-weight:bold">&lt;-</span> arrow<span style="color:#000;font-weight:bold">::</span><span style="color:#900;font-weight:bold">read_parquet</span>(<span style="color:#d14">&#34;./data/orders_recent.parquet&#34;</span>) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">mutate</span>(
+</span></span><span style="display:flex;"><span>    date_of_date_purchased <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">as.Date</span>(date_purchased),
+</span></span><span style="display:flex;"><span>    time_of_date_purchased <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">as_hms</span>(<span style="color:#900;font-weight:bold">format</span>(date_purchased, <span style="color:#d14">&#34;%H:%M:%S&#34;</span>))
+</span></span><span style="display:flex;"><span>  ) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">left_join</span>(fiscal_calendar, by <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">c</span>(<span style="color:#d14">&#34;date_of_date_purchased&#34;</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;date&#34;</span>)) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">filter</span>(fiscal_year <span style="color:#000;font-weight:bold">==</span> <span style="color:#099">2024</span>) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">select</span>(
+</span></span><span style="display:flex;"><span>    orders_id,
+</span></span><span style="display:flex;"><span>    date_of_date_purchased,
+</span></span><span style="display:flex;"><span>    time_of_date_purchased,
+</span></span><span style="display:flex;"><span>    fiscal_week <span style="color:#000;font-weight:bold">=</span> fiscl_week,
+</span></span><span style="display:flex;"><span>    day_of_week
+</span></span><span style="display:flex;"><span>  )
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">head</span>(orders)
+</span></span></code></pre></div><pre><code>## # A tibble: 6 × 5
+##   orders_id date_of_date_purchased time_of_date_purchased fiscal_week
+##       &lt;int&gt; &lt;date&gt;                 &lt;time&gt;                       &lt;dbl&gt;
+## 1  18519115 2023-10-01             20:11:14                         1
+## 2  18519117 2023-10-01             20:13:16                         1
+## 3  18519119 2023-10-01             20:13:35                         1
+## 4  18519121 2023-10-01             20:21:15                         1
+## 5  18519123 2023-10-01             20:21:47                         1
+## 6  18519125 2023-10-01             20:22:33                         1
+## # ℹ 1 more variable: day_of_week &lt;ord&gt;
+</code></pre>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Define the cutoff times for Weeks 1-18 (Monday to Friday)</span>
+</span></span><span style="display:flex;"><span>cutoff_times_1_18 <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">c</span>(
+</span></span><span style="display:flex;"><span>  <span style="color:#d14">&#34;08:00:00&#34;</span>,  <span style="color:#998;font-style:italic"># Monday (1)</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#d14">&#34;10:00:00&#34;</span>,  <span style="color:#998;font-style:italic"># Tuesday (2)</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#d14">&#34;12:00:00&#34;</span>,  <span style="color:#998;font-style:italic"># Wednesday (3)</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#d14">&#34;14:00:00&#34;</span>,  <span style="color:#998;font-style:italic"># Thursday (4)</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#d14">&#34;14:00:00&#34;</span>   <span style="color:#998;font-style:italic"># Friday (5)</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Define the cutoff times for Weeks 19-52 (Monday to Saturday)</span>
+</span></span><span style="display:flex;"><span>cutoff_times_19_52 <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">c</span>(
+</span></span><span style="display:flex;"><span>  <span style="color:#d14">&#34;08:00:00&#34;</span>,  <span style="color:#998;font-style:italic"># Monday (1)</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#d14">&#34;10:00:00&#34;</span>,  <span style="color:#998;font-style:italic"># Tuesday (2)</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#d14">&#34;12:00:00&#34;</span>,  <span style="color:#998;font-style:italic"># Wednesday (3)</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#d14">&#34;12:00:00&#34;</span>,  <span style="color:#998;font-style:italic"># Thursday (4)</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#d14">&#34;14:00:00&#34;</span>,  <span style="color:#998;font-style:italic"># Friday (5)</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#d14">&#34;14:00:00&#34;</span>   <span style="color:#998;font-style:italic"># Saturday (6)</span>
+</span></span><span style="display:flex;"><span>)
+</span></span></code></pre></div>
+
+
+
+<h2 id="munging">Munging
+  <a href="#munging"><svg class="anchor-symbol" aria-hidden="true" height="26" width="26" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 0h24v24H0z" fill="currentColor"></path>
+      <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76.0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71.0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71.0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76.0 5-2.24 5-5s-2.24-5-5-5z"></path>
+    </svg></a>
+</h2>
+<p>First write and apply the function to adjust the shipping day</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Adjust shipping day function with variable cutoff times for each period</span>
+</span></span><span style="display:flex;"><span>adjust_shipping_day <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#000;font-weight:bold">function</span>(day_of_week, time_of_day, fiscal_week) {
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Determine the shipping days and cutoff times based on fiscal week</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#000;font-weight:bold">if</span> (fiscal_week <span style="color:#000;font-weight:bold">&lt;=</span> <span style="color:#099">18</span>) {
+</span></span><span style="display:flex;"><span>    shipping_days <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#099">1</span><span style="color:#000;font-weight:bold">:</span><span style="color:#099">5</span>  <span style="color:#998;font-style:italic"># Monday to Friday</span>
+</span></span><span style="display:flex;"><span>    cutoff_times <span style="color:#000;font-weight:bold">&lt;-</span> cutoff_times_1_18
+</span></span><span style="display:flex;"><span>  } <span style="color:#000;font-weight:bold">else</span> {
+</span></span><span style="display:flex;"><span>    shipping_days <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#099">1</span><span style="color:#000;font-weight:bold">:</span><span style="color:#099">6</span>  <span style="color:#998;font-style:italic"># Monday to Saturday</span>
+</span></span><span style="display:flex;"><span>    cutoff_times <span style="color:#000;font-weight:bold">&lt;-</span> cutoff_times_19_52
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Check if the current day is a shipping day</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#000;font-weight:bold">if</span> (day_of_week <span style="color:#000;font-weight:bold">%in%</span> shipping_days) {
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic"># Get the cutoff time for the current day</span>
+</span></span><span style="display:flex;"><span>    cutoff_time <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">as_hms</span>(cutoff_times<span style="color:#900;font-weight:bold">[which</span>(shipping_days <span style="color:#000;font-weight:bold">==</span> day_of_week)])
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic"># If placed after the cutoff time, shift to the next day</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> (time_of_day <span style="color:#000;font-weight:bold">&gt;</span> cutoff_time) {
+</span></span><span style="display:flex;"><span>      next_day <span style="color:#000;font-weight:bold">&lt;-</span> day_of_week <span style="color:#000;font-weight:bold">+</span> <span style="color:#099">1</span>
+</span></span><span style="display:flex;"><span>    } <span style="color:#000;font-weight:bold">else</span> {
+</span></span><span style="display:flex;"><span>      next_day <span style="color:#000;font-weight:bold">&lt;-</span> day_of_week
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  } <span style="color:#000;font-weight:bold">else</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic"># If current day is not a shipping day, start from the next day</span>
+</span></span><span style="display:flex;"><span>    next_day <span style="color:#000;font-weight:bold">&lt;-</span> day_of_week <span style="color:#000;font-weight:bold">+</span> <span style="color:#099">1</span>
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Wrap around if next_day exceeds 7 (Sunday)</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#000;font-weight:bold">if</span> (next_day <span style="color:#000;font-weight:bold">&gt;</span> <span style="color:#099">7</span>) {
+</span></span><span style="display:flex;"><span>    next_day <span style="color:#000;font-weight:bold">&lt;-</span> next_day <span style="color:#000;font-weight:bold">-</span> <span style="color:#099">7</span>
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Find the next available shipping day</span>
+</span></span><span style="display:flex;"><span>  next_shipping_day <span style="color:#000;font-weight:bold">&lt;-</span> shipping_days[shipping_days <span style="color:#000;font-weight:bold">&gt;=</span> next_day][1]
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># If no shipping day is found, wrap around to the first shipping day</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#000;font-weight:bold">if</span> (<span style="color:#900;font-weight:bold">is.na</span>(next_shipping_day)) {
+</span></span><span style="display:flex;"><span>    next_shipping_day <span style="color:#000;font-weight:bold">&lt;-</span> shipping_days[1]
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#000;font-weight:bold">return</span>(next_shipping_day)
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Create a vector of day labels starting from Monday (1) to Sunday (7)</span>
+</span></span><span style="display:flex;"><span>day_labels <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">c</span>(<span style="color:#d14">&#34;Monday&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#d14">&#34;Tuesday&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#d14">&#34;Wednesday&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#d14">&#34;Thursday&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#d14">&#34;Friday&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#d14">&#34;Saturday&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#d14">&#34;Sunday&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Apply the adjusted shipping day function to orders</span>
+</span></span><span style="display:flex;"><span>orders <span style="color:#000;font-weight:bold">&lt;-</span> orders <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">mutate</span>(
+</span></span><span style="display:flex;"><span>    day_of_week <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">wday</span>(date_of_date_purchased, label <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">FALSE</span>, week_start <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">1</span>),
+</span></span><span style="display:flex;"><span>    time_of_date_purchased <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">as_hms</span>(time_of_date_purchased),
+</span></span><span style="display:flex;"><span>    adjusted_day <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">mapply</span>(
+</span></span><span style="display:flex;"><span>      adjust_shipping_day,
+</span></span><span style="display:flex;"><span>      day_of_week,
+</span></span><span style="display:flex;"><span>      time_of_date_purchased,
+</span></span><span style="display:flex;"><span>      fiscal_week
+</span></span><span style="display:flex;"><span>    ),
+</span></span><span style="display:flex;"><span>    adjusted_day_label <span style="color:#000;font-weight:bold">=</span> day_labels[adjusted_day]
+</span></span><span style="display:flex;"><span>  )
+</span></span></code></pre></div><p>Now, we group the orders by the adjusted shipping day and calculate the percentage distribution.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Calculate distributions for Weeks 1-18</span>
+</span></span><span style="display:flex;"><span>distribution_1_18 <span style="color:#000;font-weight:bold">&lt;-</span> orders <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">filter</span>(fiscal_week <span style="color:#000;font-weight:bold">&lt;=</span> <span style="color:#099">18</span>) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">mutate</span>(week_set <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;Weeks 1-18&#34;</span>) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">group_by</span>(adjusted_day, adjusted_day_label, week_set) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">summarize</span>(order_count <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">n</span>(), .groups <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;drop&#34;</span>) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">ungroup</span>() <span style="color:#000;font-weight:bold">|&gt;</span>  <span style="color:#998;font-style:italic"># Remove grouping to calculate total orders across all days</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">mutate</span>(
+</span></span><span style="display:flex;"><span>    total_orders <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">sum</span>(order_count),
+</span></span><span style="display:flex;"><span>    percentage <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">round</span>((order_count <span style="color:#000;font-weight:bold">/</span> total_orders) <span style="color:#000;font-weight:bold">*</span> <span style="color:#099">100</span>, <span style="color:#099">2</span>)
+</span></span><span style="display:flex;"><span>  )
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Calculate distributions for Weeks 19-52</span>
+</span></span><span style="display:flex;"><span>distribution_19_52 <span style="color:#000;font-weight:bold">&lt;-</span> orders <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">filter</span>(fiscal_week <span style="color:#000;font-weight:bold">&gt;=</span> <span style="color:#099">19</span>) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">mutate</span>(week_set <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;Weeks 19-52&#34;</span>) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">group_by</span>(adjusted_day, adjusted_day_label, week_set) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">summarize</span>(order_count <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">n</span>(), .groups <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;drop&#34;</span>) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">ungroup</span>() <span style="color:#000;font-weight:bold">|&gt;</span>  <span style="color:#998;font-style:italic"># Remove grouping</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">mutate</span>(
+</span></span><span style="display:flex;"><span>    total_orders <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">sum</span>(order_count),
+</span></span><span style="display:flex;"><span>    percentage <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">round</span>((order_count <span style="color:#000;font-weight:bold">/</span> total_orders) <span style="color:#000;font-weight:bold">*</span> <span style="color:#099">100</span>, <span style="color:#099">2</span>)
+</span></span><span style="display:flex;"><span>  )
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Combine the distributions</span>
+</span></span><span style="display:flex;"><span>combined_distribution <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">bind_rows</span>(distribution_1_18, distribution_19_52) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">select</span>(<span style="color:#000;font-weight:bold">!</span>total_orders) <span style="color:#000;font-weight:bold">|&gt;</span>  <span style="color:#998;font-style:italic"># Remove the total orders column</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">select</span>(<span style="color:#000;font-weight:bold">!</span>order_count) <span style="color:#998;font-style:italic"># Remove the order count column)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Display the final distribution</span>
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">tt</span>(combined_distribution,
+</span></span><span style="display:flex;"><span>   theme <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;striped&#34;</span>)
+</span></span></code></pre></div><!-- preamble start -->
+<p>
+    <script>
+function styleCell_z5yshz3k0d56yn6wsrf7(i, j, css_id) {
+var table = document.getElementById(&ldquo;tinytable_z5yshz3k0d56yn6wsrf7&rdquo;);
+table.rows[i].cells[j].classList.add(css_id);
+}
+function insertSpanRow(i, colspan, content) {
+var table = document.getElementById(&rsquo;tinytable_z5yshz3k0d56yn6wsrf7&rsquo;);
+var newRow = table.insertRow(i);
+var newCell = newRow.insertCell(0);
+newCell.setAttribute(&ldquo;colspan&rdquo;, colspan);
+// newCell.innerText = content;
+// this may be unsafe, but innerText does not interpret <br>
+newCell.innerHTML = content;
+}
+function spanCell_z5yshz3k0d56yn6wsrf7(i, j, rowspan, colspan) {
+var table = document.getElementById(&ldquo;tinytable_z5yshz3k0d56yn6wsrf7&rdquo;);
+const targetRow = table.rows[i];
+const targetCell = targetRow.cells[j];
+for (let r = 0; r &lt; rowspan; r++) {
+// Only start deleting cells to the right for the first row (r == 0)
+if (r === 0) {
+// Delete cells to the right of the target cell in the first row
+for (let c = colspan - 1; c &gt; 0; c&ndash;) {
+if (table.rows[i + r].cells[j + c]) {
+table.rows[i + r].deleteCell(j + c);
+}
+}
+}
+// For rows below the first, delete starting from the target column
+if (r &gt; 0) {
+for (let c = colspan - 1; c &gt;= 0; c&ndash;) {
+if (table.rows[i + r] &amp;&amp; table.rows[i + r].cells[j]) {
+table.rows[i + r].deleteCell(j);
+}
+}
+}
+}
+// Set rowspan and colspan of the target cell
+targetCell.rowSpan = rowspan;
+targetCell.colSpan = colspan;
+}
+</script>
+
+    <style>
+</style>
+<div class="container">
+<table class="table table-striped" id="tinytable_z5yshz3k0d56yn6wsrf7" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing='true'>
+<thead>
+
+              <tr>
+<th scope="col">adjusted_day</th>
+<th scope="col">adjusted_day_label</th>
+<th scope="col">week_set</th>
+<th scope="col">percentage</th>
+</tr>
+</thead>
+
+        <tbody>
+<tr>
+<td>1</td>
+<td>Monday   </td>
+<td>Weeks 1-18 </td>
+<td>29.72</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Tuesday  </td>
+<td>Weeks 1-18 </td>
+<td>18.91</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Wednesday</td>
+<td>Weeks 1-18 </td>
+<td>18.45</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Thursday </td>
+<td>Weeks 1-18 </td>
+<td>17.12</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Friday   </td>
+<td>Weeks 1-18 </td>
+<td>15.80</td>
+</tr>
+<tr>
+<td>1</td>
+<td>Monday   </td>
+<td>Weeks 19-52</td>
+<td>19.91</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Tuesday  </td>
+<td>Weeks 19-52</td>
+<td>18.37</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Wednesday</td>
+<td>Weeks 19-52</td>
+<td>18.22</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Thursday </td>
+<td>Weeks 19-52</td>
+<td>15.06</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Friday   </td>
+<td>Weeks 19-52</td>
+<td>16.85</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Saturday </td>
+<td>Weeks 19-52</td>
+<td>11.59</td>
+</tr>
+</tbody>
+</table>
+</div></p>
+<!-- hack to avoid NA insertion in last line -->
+
+        
+        <details closed class="f6 fw7 input-reset">
+  <dl class="f6 lh-copy">
+    <dt class="fw7">Posted on:</dt>
+    <dd class="fw5 ml0">October 24, 2024</dd>
+  </dl>
+  <dl class="f6 lh-copy">
+    <dt class="fw7">Length:</dt>
+    <dd class="fw5 ml0">4 minute read, 721 words</dd>
+  </dl>
+  
+  <dl class="f6 lh-copy">
+    <dt class="fw7">Categories:</dt>
+    <dd class="fw5 ml0"> <a href="http://localhost:4321/categories/business">Business</a> </dd>
+  </dl>
+  
+  
+  
+  <dl class="f6 lh-copy">
+    <dt class="fw7">Tags:</dt>
+    <dd class="fw5 ml0"> <a href="http://localhost:4321/tags/hugo-site">hugo-site</a> </dd>
+  </dl>
+  
+  <dl class="f6 lh-copy">
+    <dt class="fw7">See Also:</dt>
+    
+    <dd class="fw5 ml0"><a href="/project/dw_nominate/">Plotting average DW-NOMINATE Liberal-Conservative scores in the US Congress</a></dd>
+    
+    <dd class="fw5 ml0"><a href="/cv/resume/">My Resume</a></dd>
+    
+  </dl>
+</details>
+
+      </section>
+      <footer class="post-footer">
+        <div class="post-pagination dt w-100 mt4 mb2">
+  
+  
+  
+  
+    <a class="next dtc pl2 tr v-top fw6"
+    href="http://localhost:4321/project/dw_nominate/">Plotting average DW-NOMINATE Liberal-Conservative scores in the US Congress &rarr;</a>
+  
+</div>
+
+      </footer>
+    </article>
+    
+  </section>
+</main>
+<footer class="site-footer pv4 bt b--transparent ph5" role="contentinfo">
+  <nav class="db dt-l w-100">
+    <p class="site-copyright f7 db dtc-l v-mid w-100 w-33-l tc tl-l pv2 pv0-l mv0 lh-copy">
+      &copy; 2024 Warp and Weft Data, Atlanta, GA
+      <span class="middot-divider"></span>
+      Made with <span xmlns:dct="http://purl.org/dc/terms/" property="dct:title"><a xmlns:dct="http://purl.org/dc/terms/" href="https://github.com/hugo-apero/" rel="dct:source">Hugo Apéro</a></span>.
+      <br />
+      
+Based on <span xmlns:dct="http://purl.org/dc/terms/" property="dct:title"><a xmlns:dct="http://purl.org/dc/terms/" href="https://github.com/formspree/blogophonic-hugo" rel="dct:source">Blogophonic</a></span> by <a xmlns:cc="http://creativecommons.org/ns#" href="https://formspree.io" property="cc:attributionName" rel="cc:attributionURL">Formspree</a>.
+    </p>
+    
+    <div class="site-social-links db dtc-l v-mid w-100 w-33-l tc pv2 pv0-l mv0">
+      <div class="social-icon-links" aria-hidden="true">
+  
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <a class="link dib h1 w1 ml0 mr2 f6 o-90 glow" href="https://github.com/stewing-co" title="github" target="_blank" rel="me noopener">
+      <i class="fab fa-github fa-lg fa-fw"></i>
+    </a>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <a class="link dib h1 w1 ml0 mr2 f6 o-90 glow" href="https://bsky.app/profile/blue-pibble.bsky.social" title="bluesky" target="_blank" rel="me noopener">
+      <i class="fab fa-bluesky fa-lg fa-fw"></i>
+    </a>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <a class="link dib h1 w1 ml0 mr2 f6 o-90 glow" href="https://www.linkedin.com/in/stewing-in/" title="linkedin" target="_blank" rel="me noopener">
+      <i class="fab fa-linkedin fa-lg fa-fw"></i>
+    </a>
+  
+</div>
+
+    </div>
+    
+    <div class="site-links f6 db dtc-l v-mid w-100 w-67-l tc tr-l pv2 pv0-l mv0">
+      
+      <a class="dib pv1 ph2 link" href="/license/" title="License">License</a>
+      
+      <a class="dib pv1 ph2 link" href="/contact/" title="Contact form">Contact</a>
+      
+    </div>
+  </nav>
+  
+    <script>
+
+    var i, text, code, codes = document.getElementsByTagName('code');
+    for (let i = 0; i < codes.length;) {
+      code = codes[i];
+      if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+        text = code.textContent;
+        if (/^\$[^$]/.test(text) && /[^$]\$$/.test(text)) {
+          text = text.replace(/^\$/, '\\(').replace(/\$$/, '\\)');
+          code.textContent = text;
+        }
+        if (/^\\\((.|\s)+\\\)$/.test(text) ||
+            /^\\\[(.|\s)+\\\]$/.test(text) ||
+            /^\$(.|\s)+\$$/.test(text) ||
+            /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+          code.outerHTML = code.innerHTML;  
+          continue;
+        }
+      }
+      i++;
+    }
+</script>
+
+  
+    
+    
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.13/dist/katex.min.css" integrity="sha384-RZU/ijkSsFbcmivfdRBQDtwuwVqK7GMOw6IMvKyeWL2K5UAlyp6WonmB8m7Jd0Hn" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.13/dist/katex.min.js" integrity="sha384-pK1WpvzWVBQiP0/GjnvRxV4mOb0oxFuyRxJlk6vVw146n3egcN5C925NCP7a7BY8" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.13/dist/contrib/auto-render.min.js" integrity="sha384-vZTG03m+2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+
+
+
+    
+  
+  
+</footer>
+
+      </div>
+    </body>
+</html>

@@ -46,8 +46,8 @@
   
   <meta itemprop="name" content="Plotting average DW-NOMINATE Liberal-Conservative scores in the US Congress">
   <meta itemprop="description" content="This is from a vignette in the Ecfun package. Reproduced here with no modifications.
-#Use pacman to load and install dependencies.library(pacman)# Install `tidyverse`, ... if needed and then call `library` ... p_load(tidyverse, ggplot2, ggrepel)As of 2024-10-02, the readDW_NOMINATE function is available in the GitHub version of the Ecfun package but not in the CRAN version. Make sure we have that version of the package.
-notInstalled &lt;- (system.file(package=&#39;Ecfun&#39;) == &#39;&#39;)if(notInstalled || all(unclass(packageVersion(&#39;Ecfun&#39;))[[1]]&lt;=c(0, 3, 3))){ devtools::install_github(&#39;sbgraves237/Ecfun&#39;)}Create the polarization data and desired graphics similar to some documented on a web page created by Keith T. Poole, the Philip H. Alston Jr. Distinguished Professor in the Department of Political Science at the University of Georgia.">
+#Use pacman to load and install dependencies. library(pacman) # Install `tidyverse`, ... if needed and then call `library` ... p_load(tidyverse, ggplot2, ggrepel) As of 2024-10-02, the readDW_NOMINATE function is available in the GitHub version of the Ecfun package but not in the CRAN version. Make sure we have that version of the package.
+notInstalled &lt;- (system.file(package=&#39;Ecfun&#39;) == &#39;&#39;) if(notInstalled || all(unclass(packageVersion(&#39;Ecfun&#39;))[[1]]&lt;=c(0, 3, 3))){ devtools::install_github(&#39;sbgraves237/Ecfun&#39;) } Create the polarization data and desired graphics similar to some documented on a web page created by Keith T. Poole, the Philip H. Alston Jr. Distinguished Professor in the Department of Political Science at the University of Georgia.">
   <meta itemprop="datePublished" content="2024-10-21T00:00:00+00:00">
   <meta itemprop="dateModified" content="2024-10-21T00:00:00+00:00">
   <meta itemprop="wordCount" content="1045">
@@ -109,25 +109,28 @@ notInstalled &lt;- (system.file(package=&#39;Ecfun&#39;) == &#39;&#39;)if(notIn
 
       </header>
       <section class="post-body pt5 pb4">
-        
-
-
-<p>This is from a vignette in the <code>Ecfun</code> package. Reproduced here with no modifications.</p>
-<pre class="r"><code>#Use pacman to load and install dependencies.
-library(pacman)
-
-# Install `tidyverse`, ... if needed and then call `library` ... 
-p_load(tidyverse, ggplot2, ggrepel)</code></pre>
-<p>As of 2024-10-02, the <code>readDW_NOMINATE</code> function is available in the <code>GitHub</code> version of the <code>Ecfun</code> package but not in the <code>CRAN</code> version. Make sure we have that version of the package.</p>
-<pre class="r"><code>notInstalled &lt;- (system.file(package=&#39;Ecfun&#39;) == &#39;&#39;)
-if(notInstalled || 
-   all(unclass(packageVersion(&#39;Ecfun&#39;))[[1]]&lt;=c(0, 3, 3))){ 
-      devtools::install_github(&#39;sbgraves237/Ecfun&#39;)
-}</code></pre>
-<p>Create the polarization data and desired graphics similar to some documented on <a href="https://legacy.voteview.com/political_polarization_2015.htm">a web page</a> created by <a href="https://en.wikipedia.org/wiki/Keith_T._Poole">Keith T. Poole</a>, the Philip H. Alston Jr. Distinguished Professor in the Department of Political Science at the University of Georgia.</p>
-<p>This R Markdown vignette was inspired by a vignette by <a href="https://polisci.ucla.edu/person/jeffrey-b-lewis/">UCLA political science professor Jeff Lewis</a>; his <a href="https://github.com/voteview/articles/blob/master/docs/party_polarization/party_polarization.Rmd">vignette</a> is available on <a href="https://en.wikipedia.org/wiki/GitHub">GitHub</a></p>
-<p>This uses a polarization data set originally created by Keith T. Poole and <a href="https://en.wikipedia.org/wiki/Howard_Rosenthal_(political_scientist)">Howard Rosenthal</a> in 1989-1992 while at Carnegie Mellon University. It is maintained by Jeff Lewis. This data set included the following fields:</p>
-<pre><code>  0.  Chamber
+        <p>This is from a vignette in the <code>Ecfun</code> package. Reproduced here with no modifications.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic">#Use pacman to load and install dependencies.</span>
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">library</span>(pacman)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Install `tidyverse`, ... if needed and then call `library` ... </span>
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">p_load</span>(tidyverse, ggplot2, ggrepel)
+</span></span></code></pre></div><p>As of 2024-10-02, the <code>readDW_NOMINATE</code> function is available in the <code>GitHub</code> version of the <code>Ecfun</code> package but not in the <code>CRAN</code> version. Make sure we have that version of the package.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>notInstalled <span style="color:#000;font-weight:bold">&lt;-</span> (<span style="color:#900;font-weight:bold">system.file</span>(package<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#39;Ecfun&#39;</span>) <span style="color:#000;font-weight:bold">==</span> <span style="color:#d14">&#39;&#39;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">if</span>(notInstalled <span style="color:#000;font-weight:bold">||</span> 
+</span></span><span style="display:flex;"><span>   <span style="color:#900;font-weight:bold">all</span>(<span style="color:#900;font-weight:bold">unclass</span>(<span style="color:#900;font-weight:bold">packageVersion</span>(<span style="color:#d14">&#39;Ecfun&#39;</span>))[[1]]<span style="color:#000;font-weight:bold">&lt;=</span><span style="color:#900;font-weight:bold">c</span>(<span style="color:#099">0</span>, <span style="color:#099">3</span>, <span style="color:#099">3</span>))){ 
+</span></span><span style="display:flex;"><span>      devtools<span style="color:#000;font-weight:bold">::</span><span style="color:#900;font-weight:bold">install_github</span>(<span style="color:#d14">&#39;sbgraves237/Ecfun&#39;</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Create the polarization data and desired graphics similar to some documented on 
+<a href="https://legacy.voteview.com/political_polarization_2015.htm" target="_blank" rel="noopener">a web page</a> created by 
+<a href="https://en.wikipedia.org/wiki/Keith_T._Poole" target="_blank" rel="noopener">Keith T. Poole</a>, the Philip H. Alston Jr. Distinguished Professor in the Department of Political Science at the University of Georgia.</p>
+<p>This R Markdown vignette was inspired by a vignette by 
+<a href="https://polisci.ucla.edu/person/jeffrey-b-lewis/" target="_blank" rel="noopener">UCLA political science professor Jeff Lewis</a>; his 
+<a href="https://github.com/voteview/articles/blob/master/docs/party_polarization/party_polarization.Rmd" target="_blank" rel="noopener">vignette</a> is available on 
+<a href="https://en.wikipedia.org/wiki/GitHub" target="_blank" rel="noopener">GitHub</a></p>
+<p>This uses a polarization data set originally created by Keith T. Poole and 
+<a href="https://en.wikipedia.org/wiki/Howard_Rosenthal_%28political_scientist%29" target="_blank" rel="noopener">Howard Rosenthal</a> in 1989-1992 while at Carnegie Mellon University. It is maintained by Jeff Lewis. This data set included the following fields:</p>
+<pre tabindex="0"><code>  0.  Chamber
   1.  Congress Number
   2.  First Year of the Congress
   3.  Difference in Party Means - first dimension
@@ -148,61 +151,62 @@ if(notInstalled ||
  18.  Northern Democrat Mean - first dimension
  19.  Northern Democrat Mean - second dimension
  20.  Southern Democrat Mean - first dimension
- 21.  Southern Democrat Mean - second dimension</code></pre>
-<p>We begin by loading the data current nominate data from <a href="https://voteview.com">Voteview.com</a>:</p>
-<pre class="r"><code>#nom_dat &lt;- #read_csv(&quot;https://voteview.com/static/data/out/members/HSall_members.csv&quot;)
-
-nom_dat &lt;- Ecfun::readDW_NOMINATE()</code></pre>
-<p>To calculate the mean location of the Northern and Southern Democratic and Republican delegations, this follows <em>Congressional Quarterly</em> in defining the “Southern states” as the 11 states of the Confederacy plus Oklahoma and Kentucky. Democrats and Republicans are those using ICPSR party codes 100 and 200 respectively.</p>
+ 21.  Southern Democrat Mean - second dimension
+</code></pre><p>We begin by loading the data current nominate data from 
+<a href="https://voteview.com" target="_blank" rel="noopener">Voteview.com</a>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic">#nom_dat &lt;- #read_csv(&#34;https://voteview.com/static/data/out/members/HSall_members.csv&#34;)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>nom_dat <span style="color:#000;font-weight:bold">&lt;-</span> Ecfun<span style="color:#000;font-weight:bold">::</span><span style="color:#900;font-weight:bold">readDW_NOMINATE</span>()
+</span></span></code></pre></div><p>To calculate the mean location of the Northern and Southern Democratic and Republican delegations, this follows <em>Congressional Quarterly</em> in defining the &ldquo;Southern states&rdquo; as the 11 states of the Confederacy plus Oklahoma and Kentucky.  Democrats and Republicans are those using ICPSR party codes 100 and 200 respectively.</p>
 <p>The following code transforms the member-year NOMINATE data into the chamber-year data on polarization:</p>
-<pre class="r"><code>south &lt;- c(40:49,51,53)
-polar_dat &lt;- nom_dat %&gt;% 
-    filter(congress&gt;45 &amp; 
-           chamber != &quot;President&quot;) %&gt;%
-    mutate( 
-      year = 2*(congress-1) + 1789,
-    ) %&gt;%
-    group_by(chamber,congress,year) %&gt;% 
-    summarize(
-      party.mean.diff.d1 = mean(nominate_dim1[party_code==200],na.rm=T) - 
-                           mean(nominate_dim1[party_code==100],na.rm=T),
-      prop.moderate.d1 = mean(abs(nominate_dim1)&lt;0.25,na.rm=T),
-      prop.moderate.dem.d1 = mean(abs(nominate_dim1[party_code==100])&lt;0.25,na.rm=T),
-      prop.moderate.rep.d1 = mean(abs(nominate_dim1[party_code==200])&lt;0.25,na.rm=T),
-      overlap = (sum(nominate_dim1[party_code==200] &lt;
-                       max(nominate_dim1[party_code==100],na.rm=T),na.rm=T)  +
-                 sum(nominate_dim1[party_code==100] &gt;
-                       min(nominate_dim1[party_code==200],na.rm=T),na.rm=T))/
-                 (sum(!is.na(nominate_dim1[party_code==100]))+
-                  sum(!is.na(nominate_dim1[party_code==200]))),
-      chamber.mean.d1 = mean(nominate_dim1,na.rm=T),
-      chamber.mean.d2 = mean(nominate_dim2,na.rm=T),
-      dem.mean.d1 = mean(nominate_dim1[party_code==100],na.rm=T),
-      dem.mean.d2 = mean(nominate_dim2[party_code==100],na.rm=T),
-      rep.mean.d1 = mean(nominate_dim1[party_code==200],na.rm=T),
-      rep.mean.d2 = mean(nominate_dim2[party_code==200],na.rm=T),
-      north.rep.mean.d1 = mean(nominate_dim1[
-        party_code==200 &amp; !(state_icpsr %in% south)],na.rm=T),    
-      north.rep.mean.d2 = mean(nominate_dim2[
-        party_code==200 &amp; !(state_icpsr %in% south)],na.rm=T),    
-      south.rep.mean.d1 = mean(nominate_dim1[
-        party_code==200 &amp; (state_icpsr %in% south)],na.rm=T),    
-      south.rep.mean.d2 = mean(nominate_dim2[
-        party_code==200 &amp; (state_icpsr %in% south)],na.rm=T),    
-      north.dem.mean.d1 = mean(nominate_dim1[
-        party_code==100 &amp; !(state_icpsr %in% south)],na.rm=T),    
-      north.dem.mean.d2 = mean(nominate_dim2[
-        party_code==100 &amp; !(state_icpsr %in% south)],na.rm=T),    
-      south.dem.mean.d1 = mean(nominate_dim1[
-        party_code==100 &amp; (state_icpsr %in% south)],na.rm=T),    
-      south.dem.mean.d2 = mean(nominate_dim2[
-        party_code==100 &amp; (state_icpsr %in% south)],na.rm=T),    
-    ) </code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;chamber&#39;, &#39;congress&#39;. You can override
-## using the `.groups` argument.</code></pre>
-<p>Print the first 3 lines of the resulting dataset and create a local copy in <code>*.csv</code> format:</p>
-<pre class="r"><code>head(polar_dat, 3)</code></pre>
-<pre><code>## # A tibble: 3 × 22
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>south <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">c</span>(<span style="color:#099">40</span><span style="color:#000;font-weight:bold">:</span><span style="color:#099">49</span>,<span style="color:#099">51</span>,<span style="color:#099">53</span>)
+</span></span><span style="display:flex;"><span>polar_dat <span style="color:#000;font-weight:bold">&lt;-</span> nom_dat <span style="color:#000;font-weight:bold">%&gt;%</span> 
+</span></span><span style="display:flex;"><span>    <span style="color:#900;font-weight:bold">filter</span>(congress<span style="color:#000;font-weight:bold">&gt;</span><span style="color:#099">45</span> <span style="color:#000;font-weight:bold">&amp;</span> 
+</span></span><span style="display:flex;"><span>           chamber <span style="color:#000;font-weight:bold">!=</span> <span style="color:#d14">&#34;President&#34;</span>) <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#900;font-weight:bold">mutate</span>( 
+</span></span><span style="display:flex;"><span>      year <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">2</span><span style="color:#000;font-weight:bold">*</span>(congress<span style="color:#099">-1</span>) <span style="color:#000;font-weight:bold">+</span> <span style="color:#099">1789</span>,
+</span></span><span style="display:flex;"><span>    ) <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#900;font-weight:bold">group_by</span>(chamber,congress,year) <span style="color:#000;font-weight:bold">%&gt;%</span> 
+</span></span><span style="display:flex;"><span>    <span style="color:#900;font-weight:bold">summarize</span>(
+</span></span><span style="display:flex;"><span>      party.mean.diff.d1 <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">mean</span>(nominate_dim1[party_code<span style="color:#000;font-weight:bold">==</span><span style="color:#099">200</span>],na.rm<span style="color:#000;font-weight:bold">=</span><span style="color:#999">T</span>) <span style="color:#000;font-weight:bold">-</span> 
+</span></span><span style="display:flex;"><span>                           <span style="color:#900;font-weight:bold">mean</span>(nominate_dim1[party_code<span style="color:#000;font-weight:bold">==</span><span style="color:#099">100</span>],na.rm<span style="color:#000;font-weight:bold">=</span><span style="color:#999">T</span>),
+</span></span><span style="display:flex;"><span>      prop.moderate.d1 <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">mean</span>(<span style="color:#900;font-weight:bold">abs</span>(nominate_dim1)<span style="color:#000;font-weight:bold">&lt;</span><span style="color:#099">0.25</span>,na.rm<span style="color:#000;font-weight:bold">=</span><span style="color:#999">T</span>),
+</span></span><span style="display:flex;"><span>      prop.moderate.dem.d1 <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">mean</span>(<span style="color:#900;font-weight:bold">abs</span>(nominate_dim1[party_code<span style="color:#000;font-weight:bold">==</span><span style="color:#099">100</span>])<span style="color:#000;font-weight:bold">&lt;</span><span style="color:#099">0.25</span>,na.rm<span style="color:#000;font-weight:bold">=</span><span style="color:#999">T</span>),
+</span></span><span style="display:flex;"><span>      prop.moderate.rep.d1 <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">mean</span>(<span style="color:#900;font-weight:bold">abs</span>(nominate_dim1[party_code<span style="color:#000;font-weight:bold">==</span><span style="color:#099">200</span>])<span style="color:#000;font-weight:bold">&lt;</span><span style="color:#099">0.25</span>,na.rm<span style="color:#000;font-weight:bold">=</span><span style="color:#999">T</span>),
+</span></span><span style="display:flex;"><span>      overlap <span style="color:#000;font-weight:bold">=</span> (<span style="color:#900;font-weight:bold">sum</span>(nominate_dim1[party_code<span style="color:#000;font-weight:bold">==</span><span style="color:#099">200</span>] <span style="color:#000;font-weight:bold">&lt;</span>
+</span></span><span style="display:flex;"><span>                       <span style="color:#900;font-weight:bold">max</span>(nominate_dim1[party_code<span style="color:#000;font-weight:bold">==</span><span style="color:#099">100</span>],na.rm<span style="color:#000;font-weight:bold">=</span><span style="color:#999">T</span>),na.rm<span style="color:#000;font-weight:bold">=</span><span style="color:#999">T</span>)  <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>                 <span style="color:#900;font-weight:bold">sum</span>(nominate_dim1[party_code<span style="color:#000;font-weight:bold">==</span><span style="color:#099">100</span>] <span style="color:#000;font-weight:bold">&gt;</span>
+</span></span><span style="display:flex;"><span>                       <span style="color:#900;font-weight:bold">min</span>(nominate_dim1[party_code<span style="color:#000;font-weight:bold">==</span><span style="color:#099">200</span>],na.rm<span style="color:#000;font-weight:bold">=</span><span style="color:#999">T</span>),na.rm<span style="color:#000;font-weight:bold">=</span><span style="color:#999">T</span>))<span style="color:#000;font-weight:bold">/</span>
+</span></span><span style="display:flex;"><span>                 (<span style="color:#900;font-weight:bold">sum</span>(<span style="color:#000;font-weight:bold">!</span><span style="color:#900;font-weight:bold">is.na</span>(nominate_dim1[party_code<span style="color:#000;font-weight:bold">==</span><span style="color:#099">100</span>]))<span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>                  <span style="color:#900;font-weight:bold">sum</span>(<span style="color:#000;font-weight:bold">!</span><span style="color:#900;font-weight:bold">is.na</span>(nominate_dim1[party_code<span style="color:#000;font-weight:bold">==</span><span style="color:#099">200</span>]))),
+</span></span><span style="display:flex;"><span>      chamber.mean.d1 <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">mean</span>(nominate_dim1,na.rm<span style="color:#000;font-weight:bold">=</span><span style="color:#999">T</span>),
+</span></span><span style="display:flex;"><span>      chamber.mean.d2 <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">mean</span>(nominate_dim2,na.rm<span style="color:#000;font-weight:bold">=</span><span style="color:#999">T</span>),
+</span></span><span style="display:flex;"><span>      dem.mean.d1 <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">mean</span>(nominate_dim1[party_code<span style="color:#000;font-weight:bold">==</span><span style="color:#099">100</span>],na.rm<span style="color:#000;font-weight:bold">=</span><span style="color:#999">T</span>),
+</span></span><span style="display:flex;"><span>      dem.mean.d2 <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">mean</span>(nominate_dim2[party_code<span style="color:#000;font-weight:bold">==</span><span style="color:#099">100</span>],na.rm<span style="color:#000;font-weight:bold">=</span><span style="color:#999">T</span>),
+</span></span><span style="display:flex;"><span>      rep.mean.d1 <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">mean</span>(nominate_dim1[party_code<span style="color:#000;font-weight:bold">==</span><span style="color:#099">200</span>],na.rm<span style="color:#000;font-weight:bold">=</span><span style="color:#999">T</span>),
+</span></span><span style="display:flex;"><span>      rep.mean.d2 <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">mean</span>(nominate_dim2[party_code<span style="color:#000;font-weight:bold">==</span><span style="color:#099">200</span>],na.rm<span style="color:#000;font-weight:bold">=</span><span style="color:#999">T</span>),
+</span></span><span style="display:flex;"><span>      north.rep.mean.d1 <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">mean</span>(nominate_dim1[
+</span></span><span style="display:flex;"><span>        party_code<span style="color:#000;font-weight:bold">==</span><span style="color:#099">200</span> <span style="color:#000;font-weight:bold">&amp;</span> <span style="color:#000;font-weight:bold">!</span>(state_icpsr <span style="color:#000;font-weight:bold">%in%</span> south)],na.rm<span style="color:#000;font-weight:bold">=</span><span style="color:#999">T</span>),    
+</span></span><span style="display:flex;"><span>      north.rep.mean.d2 <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">mean</span>(nominate_dim2[
+</span></span><span style="display:flex;"><span>        party_code<span style="color:#000;font-weight:bold">==</span><span style="color:#099">200</span> <span style="color:#000;font-weight:bold">&amp;</span> <span style="color:#000;font-weight:bold">!</span>(state_icpsr <span style="color:#000;font-weight:bold">%in%</span> south)],na.rm<span style="color:#000;font-weight:bold">=</span><span style="color:#999">T</span>),    
+</span></span><span style="display:flex;"><span>      south.rep.mean.d1 <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">mean</span>(nominate_dim1[
+</span></span><span style="display:flex;"><span>        party_code<span style="color:#000;font-weight:bold">==</span><span style="color:#099">200</span> <span style="color:#000;font-weight:bold">&amp;</span> (state_icpsr <span style="color:#000;font-weight:bold">%in%</span> south)],na.rm<span style="color:#000;font-weight:bold">=</span><span style="color:#999">T</span>),    
+</span></span><span style="display:flex;"><span>      south.rep.mean.d2 <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">mean</span>(nominate_dim2[
+</span></span><span style="display:flex;"><span>        party_code<span style="color:#000;font-weight:bold">==</span><span style="color:#099">200</span> <span style="color:#000;font-weight:bold">&amp;</span> (state_icpsr <span style="color:#000;font-weight:bold">%in%</span> south)],na.rm<span style="color:#000;font-weight:bold">=</span><span style="color:#999">T</span>),    
+</span></span><span style="display:flex;"><span>      north.dem.mean.d1 <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">mean</span>(nominate_dim1[
+</span></span><span style="display:flex;"><span>        party_code<span style="color:#000;font-weight:bold">==</span><span style="color:#099">100</span> <span style="color:#000;font-weight:bold">&amp;</span> <span style="color:#000;font-weight:bold">!</span>(state_icpsr <span style="color:#000;font-weight:bold">%in%</span> south)],na.rm<span style="color:#000;font-weight:bold">=</span><span style="color:#999">T</span>),    
+</span></span><span style="display:flex;"><span>      north.dem.mean.d2 <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">mean</span>(nominate_dim2[
+</span></span><span style="display:flex;"><span>        party_code<span style="color:#000;font-weight:bold">==</span><span style="color:#099">100</span> <span style="color:#000;font-weight:bold">&amp;</span> <span style="color:#000;font-weight:bold">!</span>(state_icpsr <span style="color:#000;font-weight:bold">%in%</span> south)],na.rm<span style="color:#000;font-weight:bold">=</span><span style="color:#999">T</span>),    
+</span></span><span style="display:flex;"><span>      south.dem.mean.d1 <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">mean</span>(nominate_dim1[
+</span></span><span style="display:flex;"><span>        party_code<span style="color:#000;font-weight:bold">==</span><span style="color:#099">100</span> <span style="color:#000;font-weight:bold">&amp;</span> (state_icpsr <span style="color:#000;font-weight:bold">%in%</span> south)],na.rm<span style="color:#000;font-weight:bold">=</span><span style="color:#999">T</span>),    
+</span></span><span style="display:flex;"><span>      south.dem.mean.d2 <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">mean</span>(nominate_dim2[
+</span></span><span style="display:flex;"><span>        party_code<span style="color:#000;font-weight:bold">==</span><span style="color:#099">100</span> <span style="color:#000;font-weight:bold">&amp;</span> (state_icpsr <span style="color:#000;font-weight:bold">%in%</span> south)],na.rm<span style="color:#000;font-weight:bold">=</span><span style="color:#999">T</span>),    
+</span></span><span style="display:flex;"><span>    ) 
+</span></span></code></pre></div><pre tabindex="0"><code>## `summarise()` has grouped output by &#39;chamber&#39;, &#39;congress&#39;. You can override
+## using the `.groups` argument.
+</code></pre><p>Print the first 3 lines of the resulting dataset and create a local copy in <code>*.csv</code> format:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#900;font-weight:bold">head</span>(polar_dat, <span style="color:#099">3</span>)
+</span></span></code></pre></div><pre tabindex="0"><code>## # A tibble: 3 × 22
 ## # Groups:   chamber, congress [3]
 ##   chamber congress  year party.mean.diff.d1 prop.moderate.d1
 ##   &lt;chr&gt;      &lt;dbl&gt; &lt;dbl&gt;              &lt;dbl&gt;            &lt;dbl&gt;
@@ -214,105 +218,119 @@ polar_dat &lt;- nom_dat %&gt;%
 ## #   dem.mean.d1 &lt;dbl&gt;, dem.mean.d2 &lt;dbl&gt;, rep.mean.d1 &lt;dbl&gt;, rep.mean.d2 &lt;dbl&gt;,
 ## #   north.rep.mean.d1 &lt;dbl&gt;, north.rep.mean.d2 &lt;dbl&gt;, south.rep.mean.d1 &lt;dbl&gt;,
 ## #   south.rep.mean.d2 &lt;dbl&gt;, north.dem.mean.d1 &lt;dbl&gt;, north.dem.mean.d2 &lt;dbl&gt;,
-## #   south.dem.mean.d1 &lt;dbl&gt;, south.dem.mean.d2 &lt;dbl&gt;</code></pre>
-<pre class="r"><code>write_csv(polar_dat,file=&quot;voteview_polarization_data.csv&quot;)</code></pre>
-<p>This dataset is now available as a <code>csv</code> file <a href="voteview_polarization_data.csv">here</a>.</p>
-<div id="party-means-on-the-liberal-conservative-dimension-over-time-by-chamber" class="section level2">
-<h2>Party means on the liberal-conservative dimension over time by chamber</h2>
-<p>Convert to a long format used by <a href="https://cran.r-project.org/web/packages/ggplot2/index.html"><code>ggplot2</code></a>:</p>
-<pre class="r"><code>polar_dat_long &lt;- polar_dat %&gt;% gather(score,value,-chamber,-year,-congress)
-labels &lt;- c(&quot;dem.mean.d1&quot;=&quot;DEM&quot;,
-            &quot;rep.mean.d1&quot;=&quot;REP&quot;,
-            &quot;north.dem.mean.d1&quot;=&quot;N.DEM&quot;,
-            &quot;south.dem.mean.d1&quot;=&quot;S.DEM&quot;)</code></pre>
-<p>Jeff Lewis’ code created separate plots for the US House and Senate. The following allows plotting data for the House and Senate <em>on the same plot</em>.</p>
-<pre class="r"><code>PolarColor &lt;- data.frame(
-  chamber=rep(c(&quot;House&quot;, &quot;Senate&quot;), 4), 
-  party=rep(c(&#39;REP&#39;, &#39;DEM&#39;, &#39;S.DEM&#39;, &#39;N.DEM&#39;), 
-            e=2), 
-  party.chamber=c(&#39;REP.House&#39;, &#39;REP.Senate&#39;, 
-      &#39;DEM.House&#39;, &#39;DEM.Senate&#39;, &#39;S.DEM.House&#39;, 
-      &#39;S.DEM.Senate&#39;, &#39;N.DEM.House&#39;, &#39;N.DEM.Senate&#39;), 
-  year =c(1980, 1985, 1995, 1960, 
-          1976, 1950, 1879, 1905), 
-  value=c(.49, .26, -.44, -.25, 
-          -.1, -.05, -.2, -.1),  
-  Color=c(&#39;red&#39;, &#39;darkred&#39;, &#39;blue&#39;, &#39;darkblue&#39;, 
-      &#39;mediumpurple1&#39;, &#39;purple&#39;, &#39;green&#39;, &#39;darkgreen&#39;))
-rownames(PolarColor) &lt;- PolarColor$party.chamber</code></pre>
-<p>You can change the colors and where the lines are lines are labeled by, e.g., creating a different <a href="https://stat.ethz.ch/R-manual/R-devel/library/base/html/data.frame.html"><code>data.frame</code></a> with these same columns with different values for <code>Color</code>, <code>year</code> and <code>value</code> and use it as argument <code>PolarColors</code> in the following function, <code>polarizationPlot</code>:</p>
-<pre class="r"><code>polarizedPlot &lt;- function(chamb=c(&#39;House&#39;, &#39;Senate&#39;), 
-    parties=c(&#39;REP&#39;, &#39;DEM&#39;, &#39;S.DEM&#39;, &#39;N.DEM&#39;), 
-    PolarColors=PolarColor, 
-    x_breaks=seq(1880, max(pdatl$year), by=40), 
-    partySymbOffset=c(REP=-12, DEM=-13, S.DEM=-17, N.DEM=-17), 
-    symbolShape=c(House=1, Senate=2)) {
+## #   south.dem.mean.d1 &lt;dbl&gt;, south.dem.mean.d2 &lt;dbl&gt;
+</code></pre><div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#900;font-weight:bold">write_csv</span>(polar_dat,file<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;voteview_polarization_data.csv&#34;</span>)
+</span></span></code></pre></div><p>This dataset is now available as a <code>csv</code> file 
+<a href="voteview_polarization_data.csv">here</a>.</p>
 
-  scores &lt;- c(DEM=&quot;dem.mean.d1&quot;,REP=&quot;rep.mean.d1&quot;,
-        N.DEM=&quot;north.dem.mean.d1&quot;,S.DEM=&quot;south.dem.mean.d1&quot;)[
-          parties]
-  pdatl &lt;- polar_dat_long %&gt;% 
-          filter(chamber %in% chamb,
-              score %in% scores) %&gt;%
-          mutate(party=labels[score]) %&gt;%
-          ungroup()
-  pc &lt;- with(pdatl, paste(party, chamber, sep=&#39;.&#39;)) 
-  pdatl$party.chamber &lt;- pc
-    
-  partyCh &lt;- as.character(outer(parties, chamb, paste, sep=&#39;.&#39;))
-  polarCol &lt;- PolarColors[partyCh, , drop=FALSE]
-#  yearPch &lt;- with(polarCol, year + partySymbOffset[party])
 
-  Col &lt;- polarCol[pc, &#39;Color&#39;]
-  pdatl$Color &lt;- Col
 
-  g1 &lt;- ggplot(data = pdatl,
-       aes(x = year, y = value, group = 
-             party.chamber, color = Color)) +
-    geom_line() +
-    geom_point(aes(shape = factor(chamber))) 
-  
-  g2 &lt;- g1 + scale_color_identity() +
-      theme_bw() + theme(legend.position = &quot;none&quot;)
 
-  g3 &lt;- g2 + geom_point(polarCol, mapping = aes( 
-      x = year, y = value, color=Color, 
-      group=party.chamber, shape = factor(chamber))) 
-  
-  g4 &lt;- g3 + geom_text(polarCol, mapping=aes(
-        x=year, y=value, color=Color, 
-        group=party.chamber, label=party.chamber), 
-      hjust = 0, nudge_x = 2)
-  g5 &lt;- g4  + xlab(&#39;&#39;) + ylab(&quot;Liberal-Conservative&quot;) 
-  
-  g5 + theme(axis.text.x = element_text(size = 14),
-      axis.title.y = element_text(size = 16))
-}
-
-(Pol6 &lt;- polarizedPlot())</code></pre>
-<p><img src="/project/dw_nominate/index_files/figure-html/polarizedP2-1.png" width="672" /></p>
-<pre class="r"><code>(PolRepDem &lt;- polarizedPlot(parties = c(&#39;REP&#39;, &#39;DEM&#39;)))</code></pre>
-<p><img src="/project/dw_nominate/index_files/figure-html/polarizedP2-2.png" width="672" /></p>
-<pre class="r"><code>(PolHouse &lt;- polarizedPlot(chamb=&#39;House&#39;))</code></pre>
-<p><img src="/project/dw_nominate/index_files/figure-html/polarizedP2-3.png" width="672" /></p>
-<pre class="r"><code>(PolSenate &lt;- polarizedPlot(chamb=&#39;Senate&#39;))</code></pre>
-<p><img src="/project/dw_nominate/index_files/figure-html/polarizedP2-4.png" width="672" /></p>
+<h2 id="party-means-on-the-liberal-conservative-dimension-over-time-by-chamber">Party means on the liberal-conservative dimension over time by chamber
+  <a href="#party-means-on-the-liberal-conservative-dimension-over-time-by-chamber"><svg class="anchor-symbol" aria-hidden="true" height="26" width="26" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 0h24v24H0z" fill="currentColor"></path>
+      <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76.0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71.0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71.0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76.0 5-2.24 5-5s-2.24-5-5-5z"></path>
+    </svg></a>
+</h2>
+<p>Convert to a long format used by 
+<a href="https://cran.r-project.org/web/packages/ggplot2/index.html" target="_blank" rel="noopener"><code>ggplot2</code></a>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>polar_dat_long <span style="color:#000;font-weight:bold">&lt;-</span> polar_dat <span style="color:#000;font-weight:bold">%&gt;%</span> <span style="color:#900;font-weight:bold">gather</span>(score,value,<span style="color:#000;font-weight:bold">-</span>chamber,<span style="color:#000;font-weight:bold">-</span>year,<span style="color:#000;font-weight:bold">-</span>congress)
+</span></span><span style="display:flex;"><span>labels <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">c</span>(<span style="color:#d14">&#34;dem.mean.d1&#34;</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;DEM&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#d14">&#34;rep.mean.d1&#34;</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;REP&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#d14">&#34;north.dem.mean.d1&#34;</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;N.DEM&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#d14">&#34;south.dem.mean.d1&#34;</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;S.DEM&#34;</span>)
+</span></span></code></pre></div><p>Jeff Lewis&rsquo; code created separate plots for the US House and Senate. The following allows plotting data for the House and Senate <em>on the same plot</em>.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>PolarColor <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">data.frame</span>(
+</span></span><span style="display:flex;"><span>  chamber<span style="color:#000;font-weight:bold">=</span><span style="color:#900;font-weight:bold">rep</span>(<span style="color:#900;font-weight:bold">c</span>(<span style="color:#d14">&#34;House&#34;</span>, <span style="color:#d14">&#34;Senate&#34;</span>), <span style="color:#099">4</span>), 
+</span></span><span style="display:flex;"><span>  party<span style="color:#000;font-weight:bold">=</span><span style="color:#900;font-weight:bold">rep</span>(<span style="color:#900;font-weight:bold">c</span>(<span style="color:#d14">&#39;REP&#39;</span>, <span style="color:#d14">&#39;DEM&#39;</span>, <span style="color:#d14">&#39;S.DEM&#39;</span>, <span style="color:#d14">&#39;N.DEM&#39;</span>), 
+</span></span><span style="display:flex;"><span>            e<span style="color:#000;font-weight:bold">=</span><span style="color:#099">2</span>), 
+</span></span><span style="display:flex;"><span>  party.chamber<span style="color:#000;font-weight:bold">=</span><span style="color:#900;font-weight:bold">c</span>(<span style="color:#d14">&#39;REP.House&#39;</span>, <span style="color:#d14">&#39;REP.Senate&#39;</span>, 
+</span></span><span style="display:flex;"><span>      <span style="color:#d14">&#39;DEM.House&#39;</span>, <span style="color:#d14">&#39;DEM.Senate&#39;</span>, <span style="color:#d14">&#39;S.DEM.House&#39;</span>, 
+</span></span><span style="display:flex;"><span>      <span style="color:#d14">&#39;S.DEM.Senate&#39;</span>, <span style="color:#d14">&#39;N.DEM.House&#39;</span>, <span style="color:#d14">&#39;N.DEM.Senate&#39;</span>), 
+</span></span><span style="display:flex;"><span>  year <span style="color:#000;font-weight:bold">=</span><span style="color:#900;font-weight:bold">c</span>(<span style="color:#099">1980</span>, <span style="color:#099">1985</span>, <span style="color:#099">1995</span>, <span style="color:#099">1960</span>, 
+</span></span><span style="display:flex;"><span>          <span style="color:#099">1976</span>, <span style="color:#099">1950</span>, <span style="color:#099">1879</span>, <span style="color:#099">1905</span>), 
+</span></span><span style="display:flex;"><span>  value<span style="color:#000;font-weight:bold">=</span><span style="color:#900;font-weight:bold">c</span>(<span style="color:#099">.49</span>, <span style="color:#099">.26</span>, <span style="color:#099">-.44</span>, <span style="color:#099">-.25</span>, 
+</span></span><span style="display:flex;"><span>          <span style="color:#099">-.1</span>, <span style="color:#099">-.05</span>, <span style="color:#099">-.2</span>, <span style="color:#099">-.1</span>),  
+</span></span><span style="display:flex;"><span>  Color<span style="color:#000;font-weight:bold">=</span><span style="color:#900;font-weight:bold">c</span>(<span style="color:#d14">&#39;red&#39;</span>, <span style="color:#d14">&#39;darkred&#39;</span>, <span style="color:#d14">&#39;blue&#39;</span>, <span style="color:#d14">&#39;darkblue&#39;</span>, 
+</span></span><span style="display:flex;"><span>      <span style="color:#d14">&#39;mediumpurple1&#39;</span>, <span style="color:#d14">&#39;purple&#39;</span>, <span style="color:#d14">&#39;green&#39;</span>, <span style="color:#d14">&#39;darkgreen&#39;</span>))
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">rownames</span>(PolarColor) <span style="color:#000;font-weight:bold">&lt;-</span> PolarColor<span style="color:#000;font-weight:bold">$</span>party.chamber
+</span></span></code></pre></div><p>You can change the colors and where the lines are lines are labeled by, e.g., creating a different 
+<a href="https://stat.ethz.ch/R-manual/R-devel/library/base/html/data.frame.html" target="_blank" rel="noopener"><code>data.frame</code></a> with these same columns with different values for <code>Color</code>, <code>year</code> and <code>value</code> and use it as argument <code>PolarColors</code> in the following function, <code>polarizationPlot</code>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>polarizedPlot <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#000;font-weight:bold">function</span>(chamb<span style="color:#000;font-weight:bold">=</span><span style="color:#900;font-weight:bold">c</span>(<span style="color:#d14">&#39;House&#39;</span>, <span style="color:#d14">&#39;Senate&#39;</span>), 
+</span></span><span style="display:flex;"><span>    parties<span style="color:#000;font-weight:bold">=</span><span style="color:#900;font-weight:bold">c</span>(<span style="color:#d14">&#39;REP&#39;</span>, <span style="color:#d14">&#39;DEM&#39;</span>, <span style="color:#d14">&#39;S.DEM&#39;</span>, <span style="color:#d14">&#39;N.DEM&#39;</span>), 
+</span></span><span style="display:flex;"><span>    PolarColors<span style="color:#000;font-weight:bold">=</span>PolarColor, 
+</span></span><span style="display:flex;"><span>    x_breaks<span style="color:#000;font-weight:bold">=</span><span style="color:#900;font-weight:bold">seq</span>(<span style="color:#099">1880</span>, <span style="color:#900;font-weight:bold">max</span>(pdatl<span style="color:#000;font-weight:bold">$</span>year), by<span style="color:#000;font-weight:bold">=</span><span style="color:#099">40</span>), 
+</span></span><span style="display:flex;"><span>    partySymbOffset<span style="color:#000;font-weight:bold">=</span><span style="color:#900;font-weight:bold">c</span>(REP<span style="color:#000;font-weight:bold">=</span><span style="color:#099">-12</span>, DEM<span style="color:#000;font-weight:bold">=</span><span style="color:#099">-13</span>, S.DEM<span style="color:#000;font-weight:bold">=</span><span style="color:#099">-17</span>, N.DEM<span style="color:#000;font-weight:bold">=</span><span style="color:#099">-17</span>), 
+</span></span><span style="display:flex;"><span>    symbolShape<span style="color:#000;font-weight:bold">=</span><span style="color:#900;font-weight:bold">c</span>(House<span style="color:#000;font-weight:bold">=</span><span style="color:#099">1</span>, Senate<span style="color:#000;font-weight:bold">=</span><span style="color:#099">2</span>)) {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  scores <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">c</span>(DEM<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;dem.mean.d1&#34;</span>,REP<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;rep.mean.d1&#34;</span>,
+</span></span><span style="display:flex;"><span>        N.DEM<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;north.dem.mean.d1&#34;</span>,S.DEM<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;south.dem.mean.d1&#34;</span>)[
+</span></span><span style="display:flex;"><span>          parties]
+</span></span><span style="display:flex;"><span>  pdatl <span style="color:#000;font-weight:bold">&lt;-</span> polar_dat_long <span style="color:#000;font-weight:bold">%&gt;%</span> 
+</span></span><span style="display:flex;"><span>          <span style="color:#900;font-weight:bold">filter</span>(chamber <span style="color:#000;font-weight:bold">%in%</span> chamb,
+</span></span><span style="display:flex;"><span>              score <span style="color:#000;font-weight:bold">%in%</span> scores) <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#900;font-weight:bold">mutate</span>(party<span style="color:#000;font-weight:bold">=</span>labels[score]) <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#900;font-weight:bold">ungroup</span>()
+</span></span><span style="display:flex;"><span>  pc <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">with</span>(pdatl, <span style="color:#900;font-weight:bold">paste</span>(party, chamber, sep<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#39;.&#39;</span>)) 
+</span></span><span style="display:flex;"><span>  pdatl<span style="color:#000;font-weight:bold">$</span>party.chamber <span style="color:#000;font-weight:bold">&lt;-</span> pc
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>  partyCh <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">as.character</span>(<span style="color:#900;font-weight:bold">outer</span>(parties, chamb, paste, sep<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#39;.&#39;</span>))
+</span></span><span style="display:flex;"><span>  polarCol <span style="color:#000;font-weight:bold">&lt;-</span> PolarColors[partyCh, , drop<span style="color:#000;font-weight:bold">=</span><span style="color:#000;font-weight:bold">FALSE</span>]
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#  yearPch &lt;- with(polarCol, year + partySymbOffset[party])</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  Col <span style="color:#000;font-weight:bold">&lt;-</span> polarCol[pc, <span style="color:#d14">&#39;Color&#39;</span>]
+</span></span><span style="display:flex;"><span>  pdatl<span style="color:#000;font-weight:bold">$</span>Color <span style="color:#000;font-weight:bold">&lt;-</span> Col
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  g1 <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">ggplot</span>(data <span style="color:#000;font-weight:bold">=</span> pdatl,
+</span></span><span style="display:flex;"><span>       <span style="color:#900;font-weight:bold">aes</span>(x <span style="color:#000;font-weight:bold">=</span> year, y <span style="color:#000;font-weight:bold">=</span> value, group <span style="color:#000;font-weight:bold">=</span> 
+</span></span><span style="display:flex;"><span>             party.chamber, color <span style="color:#000;font-weight:bold">=</span> Color)) <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#900;font-weight:bold">geom_line</span>() <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#900;font-weight:bold">geom_point</span>(<span style="color:#900;font-weight:bold">aes</span>(shape <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">factor</span>(chamber))) 
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  g2 <span style="color:#000;font-weight:bold">&lt;-</span> g1 <span style="color:#000;font-weight:bold">+</span> <span style="color:#900;font-weight:bold">scale_color_identity</span>() <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#900;font-weight:bold">theme_bw</span>() <span style="color:#000;font-weight:bold">+</span> <span style="color:#900;font-weight:bold">theme</span>(legend.position <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;none&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  g3 <span style="color:#000;font-weight:bold">&lt;-</span> g2 <span style="color:#000;font-weight:bold">+</span> <span style="color:#900;font-weight:bold">geom_point</span>(polarCol, mapping <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">aes</span>( 
+</span></span><span style="display:flex;"><span>      x <span style="color:#000;font-weight:bold">=</span> year, y <span style="color:#000;font-weight:bold">=</span> value, color<span style="color:#000;font-weight:bold">=</span>Color, 
+</span></span><span style="display:flex;"><span>      group<span style="color:#000;font-weight:bold">=</span>party.chamber, shape <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">factor</span>(chamber))) 
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  g4 <span style="color:#000;font-weight:bold">&lt;-</span> g3 <span style="color:#000;font-weight:bold">+</span> <span style="color:#900;font-weight:bold">geom_text</span>(polarCol, mapping<span style="color:#000;font-weight:bold">=</span><span style="color:#900;font-weight:bold">aes</span>(
+</span></span><span style="display:flex;"><span>        x<span style="color:#000;font-weight:bold">=</span>year, y<span style="color:#000;font-weight:bold">=</span>value, color<span style="color:#000;font-weight:bold">=</span>Color, 
+</span></span><span style="display:flex;"><span>        group<span style="color:#000;font-weight:bold">=</span>party.chamber, label<span style="color:#000;font-weight:bold">=</span>party.chamber), 
+</span></span><span style="display:flex;"><span>      hjust <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">0</span>, nudge_x <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">2</span>)
+</span></span><span style="display:flex;"><span>  g5 <span style="color:#000;font-weight:bold">&lt;-</span> g4  <span style="color:#000;font-weight:bold">+</span> <span style="color:#900;font-weight:bold">xlab</span>(<span style="color:#d14">&#39;&#39;</span>) <span style="color:#000;font-weight:bold">+</span> <span style="color:#900;font-weight:bold">ylab</span>(<span style="color:#d14">&#34;Liberal-Conservative&#34;</span>) 
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  g5 <span style="color:#000;font-weight:bold">+</span> <span style="color:#900;font-weight:bold">theme</span>(axis.text.x <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">element_text</span>(size <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">14</span>),
+</span></span><span style="display:flex;"><span>      axis.title.y <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">element_text</span>(size <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">16</span>))
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>(Pol6 <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">polarizedPlot</span>())
+</span></span></code></pre></div><img src="/project/dw_nominate/index_files/figure-html/polarizedP2-1.png" width="672" />
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>(PolRepDem <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">polarizedPlot</span>(parties <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">c</span>(<span style="color:#d14">&#39;REP&#39;</span>, <span style="color:#d14">&#39;DEM&#39;</span>)))
+</span></span></code></pre></div><img src="/project/dw_nominate/index_files/figure-html/polarizedP2-2.png" width="672" />
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>(PolHouse <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">polarizedPlot</span>(chamb<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#39;House&#39;</span>))
+</span></span></code></pre></div><img src="/project/dw_nominate/index_files/figure-html/polarizedP2-3.png" width="672" />
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>(PolSenate <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">polarizedPlot</span>(chamb<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#39;Senate&#39;</span>))
+</span></span></code></pre></div><img src="/project/dw_nominate/index_files/figure-html/polarizedP2-4.png" width="672" />
 <p>Save plots.</p>
-<pre class="r"><code>library(svglite)
-ggsave(&quot;voteview_HouseSenateParties.svg&quot;, plot=Pol6)</code></pre>
-<pre><code>## Saving 7 x 5 in image</code></pre>
-<pre class="r"><code>ggsave(&quot;voteview_House_party_means.svg&quot;, plot=PolHouse)</code></pre>
-<pre><code>## Saving 7 x 5 in image</code></pre>
-<pre class="r"><code>ggsave(&quot;voteview_Senate_party_means.svg&quot;, plot=PolSenate)</code></pre>
-<pre><code>## Saving 7 x 5 in image</code></pre>
-<pre class="r"><code>ggsave(&quot;voteview_HouseSenate_party_means.svg&quot;, plot=PolRepDem)</code></pre>
-<pre><code>## Saving 7 x 5 in image</code></pre>
-<pre class="r"><code>ggsave(&quot;featured_hex.png&quot;, plot=PolRepDem)</code></pre>
-<pre><code>## Saving 7 x 5 in image</code></pre>
-<p>These graphics are now availabe in <code>svg</code> format as <a href="voteview_HouseSenateParties.svg">voteview_HouseSenateParties.svg</a>,
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#900;font-weight:bold">library</span>(svglite)
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">ggsave</span>(<span style="color:#d14">&#34;voteview_HouseSenateParties.svg&#34;</span>, plot<span style="color:#000;font-weight:bold">=</span>Pol6)
+</span></span></code></pre></div><pre tabindex="0"><code>## Saving 7 x 5 in image
+</code></pre><div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#900;font-weight:bold">ggsave</span>(<span style="color:#d14">&#34;voteview_House_party_means.svg&#34;</span>, plot<span style="color:#000;font-weight:bold">=</span>PolHouse)
+</span></span></code></pre></div><pre tabindex="0"><code>## Saving 7 x 5 in image
+</code></pre><div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#900;font-weight:bold">ggsave</span>(<span style="color:#d14">&#34;voteview_Senate_party_means.svg&#34;</span>, plot<span style="color:#000;font-weight:bold">=</span>PolSenate)
+</span></span></code></pre></div><pre tabindex="0"><code>## Saving 7 x 5 in image
+</code></pre><div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#900;font-weight:bold">ggsave</span>(<span style="color:#d14">&#34;voteview_HouseSenate_party_means.svg&#34;</span>, plot<span style="color:#000;font-weight:bold">=</span>PolRepDem)
+</span></span></code></pre></div><pre tabindex="0"><code>## Saving 7 x 5 in image
+</code></pre><div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#900;font-weight:bold">ggsave</span>(<span style="color:#d14">&#34;featured_hex.png&#34;</span>, plot<span style="color:#000;font-weight:bold">=</span>PolRepDem)
+</span></span></code></pre></div><pre tabindex="0"><code>## Saving 7 x 5 in image
+</code></pre><p>These graphics are now availabe in <code>svg</code> format as 
+<a href="voteview_HouseSenateParties.svg">voteview_HouseSenateParties.svg</a>,
+
 <a href="voteview_House_party_means.svg">voteview_House_party_means.svg</a>,
-<a href="voteview_senate_party_means.png">voteview_senate_party_means.png</a>, and <a href="voteview_HouseSenate_party_means.svg">voteview_HouseSenate_party_means.svg</a>.</p>
-</div>
+
+<a href="voteview_senate_party_means.png">voteview_senate_party_means.png</a>, and 
+<a href="voteview_HouseSenate_party_means.svg">voteview_HouseSenate_party_means.svg</a>.</p>
 
         
         <details closed class="f6 fw7 input-reset">
@@ -340,6 +358,8 @@ ggsave(&quot;voteview_HouseSenateParties.svg&quot;, plot=Pol6)</code></pre>
   <dl class="f6 lh-copy">
     <dt class="fw7">See Also:</dt>
     
+    <dd class="fw5 ml0"><a href="/project/ship_till_x/">Ship Till X</a></dd>
+    
     <dd class="fw5 ml0"><a href="/cv/resume/">My Resume</a></dd>
     
   </dl>
@@ -349,6 +369,9 @@ ggsave(&quot;voteview_HouseSenateParties.svg&quot;, plot=Pol6)</code></pre>
       <footer class="post-footer">
         <div class="post-pagination dt w-100 mt4 mb2">
   
+  
+    <a class="prev dtc pr2 tl v-top fw6"
+    href="http://localhost:4321/project/ship_till_x/">&larr; Ship Till X</a>
   
   
   

@@ -2,13 +2,28 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>http://localhost:4321/categories/by-others/</loc>
-    <lastmod>2024-10-21T00:00:00+00:00</lastmod>
+    <loc>http://localhost:4321/categories/business/</loc>
+    <lastmod>2024-10-24T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:4321/categories/</loc>
-    <lastmod>2024-10-21T00:00:00+00:00</lastmod>
+    <lastmod>2024-10-24T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:4321/tags/hugo-site/</loc>
+    <lastmod>2024-10-24T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:4321/project/</loc>
+    <lastmod>2024-10-24T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:4321/project/ship_till_x/</loc>
+    <lastmod>2024-10-24T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:4321/tags/</loc>
+    <lastmod>2024-10-24T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:4321/</loc>
+    <lastmod>2024-10-24T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:4321/categories/by-others/</loc>
     <lastmod>2024-10-21T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:4321/cv/resume/</loc>
@@ -17,19 +32,10 @@
     <loc>http://localhost:4321/project/dw_nominate/</loc>
     <lastmod>2024-10-21T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>http://localhost:4321/project/</loc>
-    <lastmod>2024-10-21T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>http://localhost:4321/categories/resume/</loc>
     <lastmod>2024-10-21T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:4321/cv/</loc>
-    <lastmod>2024-10-21T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>http://localhost:4321/tags/</loc>
-    <lastmod>2024-10-21T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>http://localhost:4321/</loc>
     <lastmod>2024-10-21T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:4321/contact/</loc>
