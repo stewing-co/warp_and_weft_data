@@ -1,7 +1,7 @@
 ---
-title: My Project Portfolio
-description: "A place for my projects to live online."
-author: "Steve Ewing"
+title: Project Portfolio
+description: "A place for me to host interesting projects by myself and others."
+author: "Various Authors"
 show_post_thumbnail: true
 show_author_byline: true
 show_post_date: false

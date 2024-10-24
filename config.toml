@@ -134,6 +134,11 @@ enableEmoji = true
 #    url = "/blog/"
 #    weight = 2
   [[menu.header]]
+    name = "Resume"
+    title = "My Resume"
+    url = "/cv/"
+    weight = 2
+  [[menu.header]]
     name = "Projects"
     title = "Project Portfolio"
     url = "/project/"

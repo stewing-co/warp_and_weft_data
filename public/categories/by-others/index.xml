@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>By Others on Warp and Weft Data</title>
+    <link>http://localhost:4321/categories/by-others/</link>
+    <description>Recent content in By Others on Warp and Weft Data</description>
+    <generator>Hugo</generator>
+    <language>en</language>
+    <lastBuildDate>Mon, 21 Oct 2024 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:4321/categories/by-others/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Plotting average DW-NOMINATE Liberal-Conservative scores in the US Congress</title>
+      <link>http://localhost:4321/project/dw_nominate/</link>
+      <pubDate>Mon, 21 Oct 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:4321/project/dw_nominate/</guid>
+      <description>&lt;p&gt;This is from a vignette in the &lt;code&gt;Ecfun&lt;/code&gt; package. Reproduced here with no modifications.&lt;/p&gt;&#xD;&#xA;&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;#Use pacman to load and install dependencies.&#xD;&#xA;library(pacman)&#xD;&#xA;&#xD;&#xA;# Install `tidyverse`, ... if needed and then call `library` ... &#xD;&#xA;p_load(tidyverse, ggplot2, ggrepel)&lt;/code&gt;&lt;/pre&gt;&#xD;&#xA;&lt;p&gt;As of 2024-10-02, the &lt;code&gt;readDW_NOMINATE&lt;/code&gt; function is available in the &lt;code&gt;GitHub&lt;/code&gt; version of the &lt;code&gt;Ecfun&lt;/code&gt; package but not in the &lt;code&gt;CRAN&lt;/code&gt; version. Make sure we have that version of the package.&lt;/p&gt;&#xD;&#xA;&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;notInstalled &amp;lt;- (system.file(package=&amp;#39;Ecfun&amp;#39;) == &amp;#39;&amp;#39;)&#xD;&#xA;if(notInstalled || &#xD;&#xA;   all(unclass(packageVersion(&amp;#39;Ecfun&amp;#39;))[[1]]&amp;lt;=c(0, 3, 3))){ &#xD;&#xA;      devtools::install_github(&amp;#39;sbgraves237/Ecfun&amp;#39;)&#xD;&#xA;}&lt;/code&gt;&lt;/pre&gt;&#xD;&#xA;&lt;p&gt;Create the polarization data and desired graphics similar to some documented on &lt;a href=&#34;https://legacy.voteview.com/political_polarization_2015.htm&#34;&gt;a web page&lt;/a&gt; created by &lt;a href=&#34;https://en.wikipedia.org/wiki/Keith_T._Poole&#34;&gt;Keith T. Poole&lt;/a&gt;, the Philip H. Alston Jr. Distinguished Professor in the Department of Political Science at the University of Georgia.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>
