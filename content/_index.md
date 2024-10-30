@@ -1,7 +1,7 @@
 ---
 title: "Warp and Weft Data"
 subtitle: "Steve Ewing's Personal Website"
-description: "A home for my thoughts, projects, and other things tech related."
+description: "Bult with [Hugo](https://gohugo.io/) and deployed using [Netlify](https://www.netlify.com/). Mostly for sewing at warpandweftdata dot com"
 images:
   - img/The_Korkosz_Croft_in_Czarna_Góra_01.jpg
 image_left: true

@@ -2,6 +2,15 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
+    <loc>http://localhost:4321/blog/spoonful-series/01-spoonful/</loc>
+    <lastmod>2021-01-01T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:4321/blog/spoonful-series/02-spoonful/</loc>
+    <lastmod>2021-01-02T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:4321/blog/spoonful-series/03-spoonful/</loc>
+    <lastmod>2021-01-03T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>http://localhost:4321/categories/business/</loc>
     <lastmod>2024-10-24T00:00:00+00:00</lastmod>
   </url><url>
@@ -38,6 +47,54 @@
     <loc>http://localhost:4321/cv/</loc>
     <lastmod>2024-10-21T00:00:00+00:00</lastmod>
   </url><url>
+    <loc>http://localhost:4321/blog/</loc>
+    <lastmod>2021-01-28T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:4321/blog/social/</loc>
+    <lastmod>2021-01-28T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:4321/categories/theme-features/</loc>
+    <lastmod>2021-01-28T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:4321/tags/style/</loc>
+    <lastmod>2021-01-27T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:4321/blog/color-themes/</loc>
+    <lastmod>2021-01-27T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:4321/blog/fonts/</loc>
+    <lastmod>2021-01-27T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:4321/blog/evergreen/</loc>
+    <lastmod>2021-01-20T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:4321/categories/evergreen/</loc>
+    <lastmod>2021-01-20T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:4321/series/a-spoonful-of-hugo/</loc>
+    <lastmod>2021-01-03T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:4321/blog/spoonful-series/</loc>
+    <lastmod>2021-01-03T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:4321/categories/r/</loc>
+    <lastmod>2021-01-03T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:4321/series/</loc>
+    <lastmod>2021-01-03T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:4321/blog/seedling/</loc>
+    <lastmod>2021-01-02T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:4321/blog/rmarkdown/</loc>
+    <lastmod>2020-12-30T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:4321/blog/css-grid-scaffold/</loc>
+    <lastmod>2019-07-02T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:4321/blog/built-in-contact-form/</loc>
+    <lastmod>2019-07-01T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>http://localhost:4321/contact/</loc>
     <lastmod>2019-02-25T13:38:41-06:00</lastmod>
   </url><url>
@@ -45,18 +102,7 @@
     <lastmod>2019-02-25T13:38:41-06:00</lastmod>
   </url><url>
     <loc>http://localhost:4321/about/</loc>
-    <lastmod>2016-05-05T21:48:51-07:00</lastmod>
-  </url><url>
-    <loc>http://localhost:4321/about/header/</loc>
-  </url><url>
-    <loc>http://localhost:4321/about/sidebar/</loc>
-  </url><url>
-    <loc>http://localhost:4321/about/main/</loc>
-  </url><url>
-    <loc>http://localhost:4321/contributors/</loc>
   </url><url>
     <loc>http://localhost:4321/license/</loc>
-  </url><url>
-    <loc>http://localhost:4321/series/</loc>
   </url>
 </urlset>

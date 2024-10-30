@@ -33,7 +33,7 @@ enableEmoji = true
   description = "Business Intelligence With R and Python"
   favicon = "/img/favicon.ico"
   logo = "/img/logo_leaf.png"
-  mainSections = ["blog", "project", "talk"]
+  mainSections = ["blog"]
   navallcaps = true
   # show/hide social icons in site header & footer
   # configure social icons and links below in [[params.social]]

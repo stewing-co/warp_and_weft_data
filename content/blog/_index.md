@@ -13,9 +13,9 @@ layout: list-sidebar # list, list-sidebar, list-grid
 
 # for list-sidebar layout
 sidebar: 
-  title: My blog and such
+  title: Code That Works
   description: |
-    Just messing around with continuous production 
+    Someday I might even write things that aren't for work! 
   author: "Steve Ewing"
   text_link_label: Subscribe via RSS
   text_link_url: /index.xml
@@ -26,7 +26,7 @@ sidebar:
 
 # set up common front matter for all pages inside blog/
 cascade:
-  author: "The R Markdown Team @RStudio"
+  author: "Steve Ewing"
   show_author_byline: true
   show_post_date: true
   show_comments: true # see site config to choose Disqus or Utterances
