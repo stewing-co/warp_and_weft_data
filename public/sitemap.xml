@@ -11,6 +11,15 @@
     <loc>http://localhost:4321/blog/spoonful-series/03-spoonful/</loc>
     <lastmod>2021-01-03T00:00:00+00:00</lastmod>
   </url><url>
+    <loc>http://localhost:4321/blog/</loc>
+    <lastmod>2024-11-01T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:4321/blog/duckdb_intro/</loc>
+    <lastmod>2024-11-01T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:4321/</loc>
+    <lastmod>2024-11-01T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>http://localhost:4321/categories/business/</loc>
     <lastmod>2024-10-24T00:00:00+00:00</lastmod>
   </url><url>
@@ -29,9 +38,6 @@
     <loc>http://localhost:4321/tags/</loc>
     <lastmod>2024-10-24T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>http://localhost:4321/</loc>
-    <lastmod>2024-10-24T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>http://localhost:4321/categories/by-others/</loc>
     <lastmod>2024-10-21T00:00:00+00:00</lastmod>
   </url><url>
@@ -46,9 +52,6 @@
   </url><url>
     <loc>http://localhost:4321/cv/</loc>
     <lastmod>2024-10-21T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>http://localhost:4321/blog/</loc>
-    <lastmod>2021-01-28T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:4321/blog/social/</loc>
     <lastmod>2021-01-28T00:00:00+00:00</lastmod>
@@ -102,6 +105,13 @@
     <lastmod>2019-02-25T13:38:41-06:00</lastmod>
   </url><url>
     <loc>http://localhost:4321/about/</loc>
+    <lastmod>2016-05-05T21:48:51-07:00</lastmod>
+  </url><url>
+    <loc>http://localhost:4321/about/header/</loc>
+  </url><url>
+    <loc>http://localhost:4321/about/sidebar/</loc>
+  </url><url>
+    <loc>http://localhost:4321/about/main/</loc>
   </url><url>
     <loc>http://localhost:4321/license/</loc>
   </url>

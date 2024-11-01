@@ -121,6 +121,34 @@
       <description>&lt;p&gt;** Contact page don&amp;rsquo;t contain a body, just the front matter above.&#xA;See form.html in the layouts folder.&lt;/p&gt;&#xA;&lt;p&gt;Formspree requires a (free) account and new form to be set up. The link is made on the final published url in the field: Restrict to Domain. It is possible to register up to 2 emails free and you can select which one you want the forms to go to within Formspree in the Settings tab.&#xA;**&lt;/p&gt;</description>
     </item>
     <item>
+      <title>About</title>
+      <link>http://localhost:4321/about/</link>
+      <pubDate>Thu, 05 May 2016 21:48:51 -0700</pubDate>
+      <guid>http://localhost:4321/about/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title></title>
+      <link>http://localhost:4321/about/header/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:4321/about/header/</guid>
+      <description>&lt;!-- this is a subheadline --&gt;</description>
+    </item>
+    <item>
+      <title></title>
+      <link>http://localhost:4321/about/sidebar/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:4321/about/sidebar/</guid>
+      <description>&lt;p&gt;** index doesn&amp;rsquo;t contain a body, just front matter above.&#xA;See about/list.html in the layouts folder **&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>About Me</title>
+      <link>http://localhost:4321/about/main/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:4321/about/main/</guid>
+      <description>&lt;p&gt;** index doesn&amp;rsquo;t contain a body, just front matter above.&#xA;See about/list.html in the layouts folder **&lt;/p&gt;</description>
+    </item>
+    <item>
       <title>License</title>
       <link>http://localhost:4321/license/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>

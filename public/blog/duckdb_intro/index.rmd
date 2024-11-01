@@ -7,7 +7,7 @@ author: "Steve Ewing"
 draft: false
 images:
 series:
-tags:
+tags: ["DuckDB", "MySQL", "R"]
 categories:
 layout: single
 ---
@@ -71,21 +71,21 @@ Let's retrieve data from a MySQL table:
 mysql_tables <- dbListTables(con_mysql)
 
 # View the list of tables
-print(mysql_tables)
+head(mysql_tables)
 ```
 
 If you want to load only specific tables, you can define them:
 
 ```{r}
 # Specify the tables you want to load
-tables_to_load <- c("orders", "products", "orders_products", "orders_products_pick", "orders_total", "shipments", "ups_import", "products_to_products_groups", "products_groups", "fees", "payments_charges", "payments_refunds", "payments_types", "wm_po_items", "wm_purchase_orders", "wm_boxes", "autoship_orders", "box_subscription_orders", "products_bundles", "products_inventory", "wm_inventory_transactions", "wm_suppliers", "wm_invoices", "wm_po_history", "shipments_status", "orders_status", "manufacturers", "customers", "customers_credit_accounts", "address_book", "wm_product_promos", "wm_product_promos_products", "wm_product_promos_tiers", "customers_groups", "suppliers_import", "wm_suppliers_to_products", "products_to_products_extra_fields", "products_extra_fields")
+tables_to_load <- c("orders", "products", "orders_products")
 ```
 
 ### Transfer Tables from MySQL to DuckDB
 
 We'll iterate over each table, read it from MySQL, and write it into DuckDB.
 
-```{r}
+```{r, echo=FALSE}
 # Use the full list or your specified list
 tables <- tables_to_load  # or use 'mysql_tables' for all tables
 
@@ -96,7 +96,7 @@ for (table_name in tables) {
   
   # Write data to DuckDB
   dbWriteTable(con_duckdb, table_name, data, overwrite = TRUE)
-}
+} 
 ```
 
 ### Disconnect From the Server

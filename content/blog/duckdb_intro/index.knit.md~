@@ -1,0 +1,89 @@
+---
+title: "Using DuckDB in R: A Walkthrough Starting with MySQL"
+subtitle: ""
+excerpt: ""
+date: 2024-11-01
+author: "Steve Ewing"
+draft: false
+images:
+series:
+tags: ["DuckDB", "MySQL", "R"]
+categories:
+layout: single
+---
+
+# Introduction
+
+In this walkthrough, we will demonstrate how to use DuckDB in R, starting by connecting to a MySQL server. By integrating MySQL and DuckDB, you can leverage the strengths of both databases within your data science workflows. This guide will help you retrieve data from MySQL, import it into DuckDB, and perform efficient analytical queries.
+
+## Prerequisites
+
+R and RStudio: Ensure you have R and RStudio installed.
+MySQL Server: Access to a MySQL server with the necessary permissions.
+Required R Packages: ```RMySQL```, ```DBI```, ```duckdb```, ```dplyr```, ```dbplyr```, ```ggplot2```
+
+## Loading Data into DuckDB From MySQL
+
+First, we need to connect to a MySQL database to retrieve data.
+
+### Installation
+
+
+``` r
+# install.packages("RMySQL")
+# install.packages("DBI")  # Database interface
+```
+
+Load the libraries:
+
+
+``` r
+library(RMySQL)
+```
+
+```
+## Warning: package 'RMySQL' was built under R version 4.4.1
+```
+
+```
+## Loading required package: DBI
+```
+
+```
+## Warning: package 'DBI' was built under R version 4.4.1
+```
+
+``` r
+library(DBI)
+```
+
+### Establishing a Connection
+
+Set up the connection to your MySQL server:
+
+
+``` r
+# Replace with your MySQL server details
+con_mysql <- dbConnect(RMySQL::MySQL(),
+                       dbname = Sys.getenv("DO_DB_NAME"),
+                       host = Sys.getenv("DO_DB_HOST"), 
+                       port = as.integer(Sys.getenv("DO_DB_PORT")),
+                       user = Sys.getenv("DO_DB_USER"),
+                       password = Sys.getenv("DO_DB_PASSWORD"))
+```
+
+### Connect to DuckDB
+
+
+
+
+
+
+
+
+
+
+
+
+
+
