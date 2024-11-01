@@ -28,6 +28,10 @@ First, we need to connect to a MySQL database to retrieve data.
 
 ### Installation
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE)
+```
+
 ```{r}
 # install.packages("RMySQL")
 # install.packages("DBI")  # Database interface
@@ -85,7 +89,7 @@ tables_to_load <- c("products", "products_inventory")
 
 We'll iterate over each table, read it from MySQL, and write it into DuckDB.
 
-```{r, echo=FALSE, messages=FALSE, warnings=FALSE}
+```{r, warning = FALSE}
 # Use the full list or your specified list
 tables <- tables_to_load  # or use 'mysql_tables' for all tables
 

@@ -28,6 +28,10 @@ First, we need to connect to a MySQL database to retrieve data.
 
 ### Installation
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE)
+```
+
 ```{r}
 # install.packages("RMySQL")
 # install.packages("DBI")  # Database interface
@@ -78,14 +82,14 @@ If you want to load only specific tables, you can define them:
 
 ```{r}
 # Specify the tables you want to load
-tables_to_load <- c("orders", "products", "orders_products")
+tables_to_load <- c("products", "products_inventory")
 ```
 
 ### Transfer Tables from MySQL to DuckDB
 
 We'll iterate over each table, read it from MySQL, and write it into DuckDB.
 
-```{r, echo=FALSE}
+```{r, warning = FALSE}
 # Use the full list or your specified list
 tables <- tables_to_load  # or use 'mysql_tables' for all tables
 
@@ -123,15 +127,13 @@ With the tables loaded into DuckDB, you can perform efficient queries using SQL 
 
 ```{r}
 result <- dbGetQuery(con_duckdb, "
-  SELECT op.products_id, 
-         COUNT(op.qty_returned) AS returns
-  FROM orders_products op
-  LEFT JOIN products p USING(products_id)
-  LEFT JOIN orders o USING(orders_id)
-  WHERE op.qty_returned > 0
-    AND op.qty_returned IS NOT NULL
-  GROUP BY op.products_id, p.name
-  ORDER BY returns DESC
+  SELECT p.products_id, 
+         sum(pi.products_quantity) as inventory
+  FROM products p
+  LEFT JOIN products_inventory pi USING(products_id)
+  WHERE products_accessory != 1
+  GROUP BY p.products_id
+  ORDER BY inventory
   LIMIT 10;
 ")
 
