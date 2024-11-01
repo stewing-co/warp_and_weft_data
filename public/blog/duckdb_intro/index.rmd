@@ -1,0 +1,140 @@
+---
+title: "Using DuckDB in R: A Walkthrough Starting with MySQL"
+subtitle: ""
+excerpt: ""
+date: 2024-11-01
+author: "Steve Ewing"
+draft: false
+images:
+series:
+tags:
+categories:
+layout: single
+---
+
+# Introduction
+
+In this walkthrough, we will demonstrate how to use DuckDB in R, starting by connecting to a MySQL server. By integrating MySQL and DuckDB, you can leverage the strengths of both databases within your data science workflows. This guide will help you retrieve data from MySQL, import it into DuckDB, and perform efficient analytical queries.
+
+## Prerequisites
+
+R and RStudio: Ensure you have R and RStudio installed.
+MySQL Server: Access to a MySQL server with the necessary permissions.
+Required R Packages: ```RMySQL```, ```DBI```, ```duckdb```, ```dplyr```, ```dbplyr```, ```ggplot2```
+
+## Loading Data into DuckDB From MySQL
+
+First, we need to connect to a MySQL database to retrieve data.
+
+### Installation
+
+```{r}
+# install.packages("RMySQL")
+# install.packages("DBI")  # Database interface
+```
+
+Load the libraries:
+
+```{r}
+library(RMySQL)
+library(DBI)
+```
+
+### Establishing a Connection
+
+Set up the connection to your MySQL server:
+
+```{r}
+# Replace with your MySQL server details
+con_mysql <- dbConnect(RMySQL::MySQL(),
+                       dbname = Sys.getenv("DO_DB_NAME"),
+                       host = Sys.getenv("DO_DB_HOST"), 
+                       port = as.integer(Sys.getenv("DO_DB_PORT")),
+                       user = Sys.getenv("DO_DB_USER"),
+                       password = Sys.getenv("DO_DB_PASSWORD"))
+
+```
+
+### Connect to DuckDB
+
+```{r}
+# DuckDB connection
+con_duckdb <- dbConnect(duckdb::duckdb(), dbdir = "dmo_data.duckdb")
+```
+
+### Retrieve the List of Tables from MySQL
+
+Let's retrieve data from a MySQL table:
+
+```{r}
+# List available tables
+mysql_tables <- dbListTables(con_mysql)
+
+# View the list of tables
+print(mysql_tables)
+```
+
+If you want to load only specific tables, you can define them:
+
+```{r}
+# Specify the tables you want to load
+tables_to_load <- c("orders", "products", "orders_products", "orders_products_pick", "orders_total", "shipments", "ups_import", "products_to_products_groups", "products_groups", "fees", "payments_charges", "payments_refunds", "payments_types", "wm_po_items", "wm_purchase_orders", "wm_boxes", "autoship_orders", "box_subscription_orders", "products_bundles", "products_inventory", "wm_inventory_transactions", "wm_suppliers", "wm_invoices", "wm_po_history", "shipments_status", "orders_status", "manufacturers", "customers", "customers_credit_accounts", "address_book", "wm_product_promos", "wm_product_promos_products", "wm_product_promos_tiers", "customers_groups", "suppliers_import", "wm_suppliers_to_products", "products_to_products_extra_fields", "products_extra_fields")
+```
+
+### Transfer Tables from MySQL to DuckDB
+
+We'll iterate over each table, read it from MySQL, and write it into DuckDB.
+
+```{r}
+# Use the full list or your specified list
+tables <- tables_to_load  # or use 'mysql_tables' for all tables
+
+for (table_name in tables) {
+  # Read data from MySQL
+  message("Loading table: ", table_name)
+  data <- dbReadTable(con_mysql, table_name)
+  
+  # Write data to DuckDB
+  dbWriteTable(con_duckdb, table_name, data, overwrite = TRUE)
+}
+```
+
+### Disconnect From the Server
+
+```{r}
+# Disconnect from MySQL
+dbDisconnect(con_mysql)
+```
+
+### Verify the Tables in DuckDB
+
+List the tables in DuckDB to confirm they have been loaded:
+
+```{r}
+duckdb_tables <- dbListTables(con_duckdb)
+print(duckdb_tables)
+```
+
+## Performing Queries in DuckDB
+
+With the tables loaded into DuckDB, you can perform efficient queries using SQL or dplyr.
+
+### Using SQL Queries
+
+```{r}
+result <- dbGetQuery(con_duckdb, "
+  SELECT op.products_id, 
+         COUNT(op.qty_returned) AS returns
+  FROM orders_products op
+  LEFT JOIN products p USING(products_id)
+  LEFT JOIN orders o USING(orders_id)
+  WHERE op.qty_returned > 0
+    AND op.qty_returned IS NOT NULL
+  GROUP BY op.products_id, p.name
+  ORDER BY returns DESC
+  LIMIT 10;
+")
+
+print(result)
+
+```

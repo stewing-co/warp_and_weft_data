@@ -1,0 +1,1495 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=4321&amp;path=livereload" data-no-instant defer></script>
+  
+                           
+     
+
+
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="generator" content="Hugo 0.136.2">
+<title>Using DuckDB in R: A Walkthrough Starting with MySQL | Warp and Weft Data</title>
+
+
+<meta property="twitter:site" content="@blue_pibble">
+<meta property="twitter:creator" content="@blue_pibble">
+
+
+
+
+
+
+
+  
+    
+  
+<meta name="description" content="Business Intelligence With R and Python">
+
+
+<meta property="og:site_name" content="Warp and Weft Data">
+<meta property="og:title" content="Using DuckDB in R: A Walkthrough Starting with MySQL | Warp and Weft Data">
+<meta property="og:description" content="Business Intelligence With R and Python" />
+<meta property="og:type" content="page" />
+<meta property="og:url" content="http://localhost:4321/blog/duckdb_intro/" />
+<meta property="og:locale" content="en">
+
+
+
+
+    
+        <meta property="og:image" content="http://localhost:4321/blog/sidebar-listing.jpg" >
+        <meta property="twitter:card" content="summary_large_image">
+        <meta name="twitter:image" content="http://localhost:4321/blog/sidebar-listing.jpg" >
+    
+    
+  
+  <meta itemprop="name" content="Using DuckDB in R: A Walkthrough Starting with MySQL">
+  <meta itemprop="description" content="Introduction In this walkthrough, we will demonstrate how to use DuckDB in R, starting by connecting to a MySQL server. By integrating MySQL and DuckDB, you can leverage the strengths of both databases within your data science workflows. This guide will help you retrieve data from MySQL, import it into DuckDB, and perform efficient analytical queries.
+Prerequisites R and RStudio: Ensure you have R and RStudio installed. MySQL Server: Access to a MySQL server with the necessary permissions. Required R Packages: RMySQL, DBI, duckdb, dplyr, dbplyr, ggplot2">
+  <meta itemprop="datePublished" content="2024-11-01T00:00:00+00:00">
+  <meta itemprop="dateModified" content="2024-11-01T00:00:00+00:00">
+  <meta itemprop="wordCount" content="5561">
+  
+  <!--[if IE]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  <link rel="shortcut icon" href="/img/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="/img/favicon.ico" type="image/x-icon">
+  
+  
+  <link rel="stylesheet" href="/style.main.min.0820a865770f259724d61d170adbb19db040647ecaa3b2023c16f04ada7fc7d2.css" integrity="sha256-CCCoZXcPJZck1h0XCtuxnbBAZH7Ko7ICPBbwStp/x9I=" media="screen">
+  
+  
+  <script src="/panelset.min.ed1ac24b6e16f4e2481e3d1d098ae66f5bc77438aef619e6e266d8ac5b00dc72.js" type="text/javascript"></script>
+  
+  
+  <script src="/main.min.f0b39b51e43cf3881368fb093708a9d3b3499e674af4b4e47e27e512a5d411e2.js" type="text/javascript"></script>
+</head>
+<body>
+      <div class="grid-container single">
+<header class="site-header pt4 pb2 mb4 bb b--transparent ph5 headroom z-max" role="banner">
+  <nav class="site-nav db dt-l w-100" role="navigation">
+    <a class="site-brand db dtc-l v-mid link no-underline w-100 w-33-l tc tl-l" href="http://localhost:4321/" title="Home">
+      <img src="/img/logo_leaf.png" class="dib db-l h2 w-auto" alt="Warp and Weft Data">
+    </a>
+    <div class="site-links db dtc-l v-mid w-100 w-47-l tc tr-l mt3 mt0-l ttu tracked">
+      
+        
+        
+        
+      <a class="link f6 f5-l dib pv1 ph2 " href="/about/" title="About Steve Ewing">About</a>
+      
+        
+        
+        
+      <a class="link f6 f5-l dib pv1 ph2 active" href="/blog/" title="Blog">Blog</a>
+      
+      
+    </div>
+  </nav>
+</header>
+
+<main class="page-main pa4" role="main">
+  <section class="page-content mw7 center">
+    <article class="post-content pa0 ph4-l">
+      <header class="post-header">
+        <h1 class="f1 lh-solid measure-narrow mb3 fw4">Using DuckDB in R: A Walkthrough Starting with MySQL</h1>
+        
+        <p class="f6 measure lh-copy mv1">By Steve Ewing</p>
+        <p class="f7 db mv0 ttu">November 1, 2024</p>
+
+      
+
+      </header>
+      <section class="post-body pt5 pb4">
+        
+
+
+
+<h1 id="introduction">Introduction
+  <a href="#introduction"></a>
+</h1>
+<p>In this walkthrough, we will demonstrate how to use DuckDB in R, starting by connecting to a MySQL server. By integrating MySQL and DuckDB, you can leverage the strengths of both databases within your data science workflows. This guide will help you retrieve data from MySQL, import it into DuckDB, and perform efficient analytical queries.</p>
+
+
+
+
+<h2 id="prerequisites">Prerequisites
+  <a href="#prerequisites"><svg class="anchor-symbol" aria-hidden="true" height="26" width="26" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 0h24v24H0z" fill="currentColor"></path>
+      <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76.0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71.0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71.0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76.0 5-2.24 5-5s-2.24-5-5-5z"></path>
+    </svg></a>
+</h2>
+<p>R and RStudio: Ensure you have R and RStudio installed.
+MySQL Server: Access to a MySQL server with the necessary permissions.
+Required R Packages: <code>RMySQL</code>, <code>DBI</code>, <code>duckdb</code>, <code>dplyr</code>, <code>dbplyr</code>, <code>ggplot2</code></p>
+
+
+
+
+<h2 id="loading-data-into-duckdb-from-mysql">Loading Data into DuckDB From MySQL
+  <a href="#loading-data-into-duckdb-from-mysql"><svg class="anchor-symbol" aria-hidden="true" height="26" width="26" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 0h24v24H0z" fill="currentColor"></path>
+      <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76.0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71.0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71.0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76.0 5-2.24 5-5s-2.24-5-5-5z"></path>
+    </svg></a>
+</h2>
+<p>First, we need to connect to a MySQL database to retrieve data.</p>
+
+
+
+
+<h3 id="installation">Installation
+  <a href="#installation"><svg class="anchor-symbol" aria-hidden="true" height="26" width="26" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 0h24v24H0z" fill="currentColor"></path>
+      <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76.0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71.0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71.0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76.0 5-2.24 5-5s-2.24-5-5-5z"></path>
+    </svg></a>
+</h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># install.packages(&#34;RMySQL&#34;)</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># install.packages(&#34;DBI&#34;)  # Database interface</span>
+</span></span></code></pre></div><p>Load the libraries:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#900;font-weight:bold">library</span>(RMySQL)
+</span></span></code></pre></div><pre tabindex="0"><code>## Warning: package &#39;RMySQL&#39; was built under R version 4.4.1
+</code></pre><pre tabindex="0"><code>## Loading required package: DBI
+</code></pre><pre tabindex="0"><code>## Warning: package &#39;DBI&#39; was built under R version 4.4.1
+</code></pre><div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#900;font-weight:bold">library</span>(DBI)
+</span></span></code></pre></div>
+
+
+
+<h3 id="establishing-a-connection">Establishing a Connection
+  <a href="#establishing-a-connection"><svg class="anchor-symbol" aria-hidden="true" height="26" width="26" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 0h24v24H0z" fill="currentColor"></path>
+      <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76.0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71.0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71.0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76.0 5-2.24 5-5s-2.24-5-5-5z"></path>
+    </svg></a>
+</h3>
+<p>Set up the connection to your MySQL server:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Replace with your MySQL server details</span>
+</span></span><span style="display:flex;"><span>con_mysql <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">dbConnect</span>(RMySQL<span style="color:#000;font-weight:bold">::</span><span style="color:#900;font-weight:bold">MySQL</span>(),
+</span></span><span style="display:flex;"><span>                       dbname <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">Sys.getenv</span>(<span style="color:#d14">&#34;DO_DB_NAME&#34;</span>),
+</span></span><span style="display:flex;"><span>                       host <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">Sys.getenv</span>(<span style="color:#d14">&#34;DO_DB_HOST&#34;</span>), 
+</span></span><span style="display:flex;"><span>                       port <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">as.integer</span>(<span style="color:#900;font-weight:bold">Sys.getenv</span>(<span style="color:#d14">&#34;DO_DB_PORT&#34;</span>)),
+</span></span><span style="display:flex;"><span>                       user <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">Sys.getenv</span>(<span style="color:#d14">&#34;DO_DB_USER&#34;</span>),
+</span></span><span style="display:flex;"><span>                       password <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">Sys.getenv</span>(<span style="color:#d14">&#34;DO_DB_PASSWORD&#34;</span>))
+</span></span></code></pre></div>
+
+
+
+<h3 id="connect-to-duckdb">Connect to DuckDB
+  <a href="#connect-to-duckdb"><svg class="anchor-symbol" aria-hidden="true" height="26" width="26" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 0h24v24H0z" fill="currentColor"></path>
+      <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76.0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71.0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71.0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76.0 5-2.24 5-5s-2.24-5-5-5z"></path>
+    </svg></a>
+</h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># DuckDB connection</span>
+</span></span><span style="display:flex;"><span>con_duckdb <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">dbConnect</span>(duckdb<span style="color:#000;font-weight:bold">::</span><span style="color:#900;font-weight:bold">duckdb</span>(), dbdir <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;dmo_data.duckdb&#34;</span>)
+</span></span></code></pre></div>
+
+
+
+<h3 id="retrieve-the-list-of-tables-from-mysql">Retrieve the List of Tables from MySQL
+  <a href="#retrieve-the-list-of-tables-from-mysql"><svg class="anchor-symbol" aria-hidden="true" height="26" width="26" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 0h24v24H0z" fill="currentColor"></path>
+      <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76.0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71.0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71.0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76.0 5-2.24 5-5s-2.24-5-5-5z"></path>
+    </svg></a>
+</h3>
+<p>Let&rsquo;s retrieve data from a MySQL table:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># List available tables</span>
+</span></span><span style="display:flex;"><span>mysql_tables <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">dbListTables</span>(con_mysql)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># View the list of tables</span>
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">print</span>(mysql_tables)
+</span></span></code></pre></div><pre tabindex="0"><code>##   [1] &#34;a_Comp_Price_Data&#34;                          
+##   [2] &#34;a_Comp_Store&#34;                               
+##   [3] &#34;a_Comp_URL&#34;                                 
+##   [4] &#34;a_Comp_URL_DNC&#34;                             
+##   [5] &#34;adcampaigns&#34;                                
+##   [6] &#34;address_book&#34;                               
+##   [7] &#34;address_format&#34;                             
+##   [8] &#34;adgroups&#34;                                   
+##   [9] &#34;admin&#34;                                      
+##  [10] &#34;admin_activity&#34;                             
+##  [11] &#34;admin_customer_searches&#34;                    
+##  [12] &#34;admin_files&#34;                                
+##  [13] &#34;admin_groups&#34;                               
+##  [14] &#34;admin_messages&#34;                             
+##  [15] &#34;admin_password_resets&#34;                      
+##  [16] &#34;admin_quotes&#34;                               
+##  [17] &#34;admin_sessions&#34;                             
+##  [18] &#34;admin_settings&#34;                             
+##  [19] &#34;admin_tasks&#34;                                
+##  [20] &#34;admin_widgets&#34;                              
+##  [21] &#34;affiliate_sales&#34;                            
+##  [22] &#34;affiliates&#34;                                 
+##  [23] &#34;api_auth&#34;                                   
+##  [24] &#34;article_collection_categories&#34;              
+##  [25] &#34;article_product_groups&#34;                     
+##  [26] &#34;article_reviews&#34;                            
+##  [27] &#34;article_reviews_description&#34;                
+##  [28] &#34;articles&#34;                                   
+##  [29] &#34;articles_collections&#34;                       
+##  [30] &#34;articles_description&#34;                       
+##  [31] &#34;articles_guides&#34;                            
+##  [32] &#34;articles_related&#34;                           
+##  [33] &#34;articles_templates&#34;                         
+##  [34] &#34;articles_to_topics&#34;                         
+##  [35] &#34;articles_types&#34;                             
+##  [36] &#34;articles_updates&#34;                           
+##  [37] &#34;articles_vote&#34;                              
+##  [38] &#34;articles_xml_schema&#34;                        
+##  [39] &#34;articles_xsell&#34;                             
+##  [40] &#34;attribute_options_groups&#34;                   
+##  [41] &#34;audit_log&#34;                                  
+##  [42] &#34;auth_codes&#34;                                 
+##  [43] &#34;authnet_payment_profiles&#34;                   
+##  [44] &#34;authors&#34;                                    
+##  [45] &#34;authors_info&#34;                               
+##  [46] &#34;autoship_orders&#34;                            
+##  [47] &#34;autoshippable_product_replacements&#34;         
+##  [48] &#34;autoships&#34;                                  
+##  [49] &#34;batch_jobs&#34;                                 
+##  [50] &#34;best_sellers&#34;                               
+##  [51] &#34;block_locations&#34;                            
+##  [52] &#34;block_schedules&#34;                            
+##  [53] &#34;block_template_zones&#34;                       
+##  [54] &#34;block_templates&#34;                            
+##  [55] &#34;block_zones&#34;                                
+##  [56] &#34;blocked_ip&#34;                                 
+##  [57] &#34;blocks&#34;                                     
+##  [58] &#34;bought_together&#34;                            
+##  [59] &#34;box_input_box_subscription&#34;                 
+##  [60] &#34;box_input_option_box_program&#34;               
+##  [61] &#34;box_input_options&#34;                          
+##  [62] &#34;box_inputs&#34;                                 
+##  [63] &#34;box_program_addons&#34;                         
+##  [64] &#34;box_program_step_products&#34;                  
+##  [65] &#34;box_program_step_windows&#34;                   
+##  [66] &#34;box_program_steps&#34;                          
+##  [67] &#34;box_programs&#34;                               
+##  [68] &#34;box_subscription_order_products&#34;            
+##  [69] &#34;box_subscription_orders&#34;                    
+##  [70] &#34;box_subscriptions&#34;                          
+##  [71] &#34;brands&#34;                                     
+##  [72] &#34;brands_recommended_products&#34;                
+##  [73] &#34;bulk_coupon_codes&#34;                          
+##  [74] &#34;bulk_pick&#34;                                  
+##  [75] &#34;cache&#34;                                      
+##  [76] &#34;cache_reports&#34;                              
+##  [77] &#34;calendar&#34;                                   
+##  [78] &#34;calendar_dates&#34;                             
+##  [79] &#34;call_center_agent_states&#34;                   
+##  [80] &#34;call_center_agent_status_histories&#34;         
+##  [81] &#34;call_center_contacts&#34;                       
+##  [82] &#34;call_center_dispositions&#34;                   
+##  [83] &#34;call_center_performance&#34;                    
+##  [84] &#34;call_center_skills_summary&#34;                 
+##  [85] &#34;call_notes&#34;                                 
+##  [86] &#34;call_notes_reasons&#34;                         
+##  [87] &#34;cancellation_reasons&#34;                       
+##  [88] &#34;cancellations&#34;                              
+##  [89] &#34;cashregister&#34;                               
+##  [90] &#34;categories&#34;                                 
+##  [91] &#34;categories_description&#34;                     
+##  [92] &#34;chemnames&#34;                                  
+##  [93] &#34;collection_templates&#34;                       
+##  [94] &#34;company_hours&#34;                              
+##  [95] &#34;configuration&#34;                              
+##  [96] &#34;configuration_group&#34;                        
+##  [97] &#34;contacts_list&#34;                              
+##  [98] &#34;conveyor_scan_log&#34;                          
+##  [99] &#34;cookies_disabled&#34;                           
+## [100] &#34;counter&#34;                                    
+## [101] &#34;counter_history&#34;                            
+## [102] &#34;countries&#34;                                  
+## [103] &#34;coupon_categories&#34;                          
+## [104] &#34;coupon_email_track&#34;                         
+## [105] &#34;coupon_gv_customer&#34;                         
+## [106] &#34;coupon_gv_queue&#34;                            
+## [107] &#34;coupon_redeem_track&#34;                        
+## [108] &#34;coupons&#34;                                    
+## [109] &#34;coupons_description&#34;                        
+## [110] &#34;credit_memo_items&#34;                          
+## [111] &#34;credit_memos&#34;                               
+## [112] &#34;currencies&#34;                                 
+## [113] &#34;customer_autoship_replacements&#34;             
+## [114] &#34;customer_box_program_schedules&#34;             
+## [115] &#34;customer_box_programs&#34;                      
+## [116] &#34;customer_fertilizer_lists&#34;                  
+## [117] &#34;customer_list_items&#34;                        
+## [118] &#34;customer_lists&#34;                             
+## [119] &#34;customer_partner_opt_ins&#34;                   
+## [120] &#34;customer_profile_sf_answers&#34;                
+## [121] &#34;customer_profile_sf_solutions&#34;              
+## [122] &#34;customers&#34;                                  
+## [123] &#34;customers_basket&#34;                           
+## [124] &#34;customers_basket_attributes&#34;                
+## [125] &#34;customers_business_info&#34;                    
+## [126] &#34;customers_checkout&#34;                         
+## [127] &#34;customers_credit_accounts&#34;                  
+## [128] &#34;customers_documents&#34;                        
+## [129] &#34;customers_documents_types&#34;                  
+## [130] &#34;customers_groups&#34;                           
+## [131] &#34;customers_history&#34;                          
+## [132] &#34;customers_history_types&#34;                    
+## [133] &#34;customers_info&#34;                             
+## [134] &#34;customers_pco_licenses&#34;                     
+## [135] &#34;customers_price_quotes&#34;                     
+## [136] &#34;customers_price_tiers&#34;                      
+## [137] &#34;customers_sms_blacklist&#34;                    
+## [138] &#34;customers_sms_subscriptions&#34;                
+## [139] &#34;customers_subscriptions&#34;                    
+## [140] &#34;customers_to_customers_price_tiers&#34;         
+## [141] &#34;deliveries&#34;                                 
+## [142] &#34;domo_product_groups&#34;                        
+## [143] &#34;domo_product_groups_old&#34;                    
+## [144] &#34;dropship_suppliers&#34;                         
+## [145] &#34;dropshipper_info&#34;                           
+## [146] &#34;dropshipper_notification_settings&#34;          
+## [147] &#34;dropshipper_notifications&#34;                  
+## [148] &#34;dropshipper_products&#34;                       
+## [149] &#34;email_banners&#34;                              
+## [150] &#34;email_hashes&#34;                               
+## [151] &#34;epa_expirations&#34;                            
+## [152] &#34;exit_ads&#34;                                   
+## [153] &#34;exit_ads_to_assets&#34;                         
+## [154] &#34;external_api_users&#34;                         
+## [155] &#34;external_orders&#34;                            
+## [156] &#34;failed_jobs&#34;                                
+## [157] &#34;fedex_tnt&#34;                                  
+## [158] &#34;fees&#34;                                       
+## [159] &#34;fertilizer_npk_ratios&#34;                      
+## [160] &#34;fertilizers&#34;                                
+## [161] &#34;field_types&#34;                                
+## [162] &#34;formulation&#34;                                
+## [163] &#34;found_us&#34;                                   
+## [164] &#34;fraud_scores&#34;                               
+## [165] &#34;geo_zipcodes&#34;                               
+## [166] &#34;geo_zones&#34;                                  
+## [167] &#34;hazmat_info&#34;                                
+## [168] &#34;hazmat_package_info&#34;                        
+## [169] &#34;history_types&#34;                              
+## [170] &#34;holiday_message&#34;                            
+## [171] &#34;import_cubiscan_temp&#34;                       
+## [172] &#34;incentive_programs_actions&#34;                 
+## [173] &#34;iot_products&#34;                               
+## [174] &#34;job_batches&#34;                                
+## [175] &#34;journal&#34;                                    
+## [176] &#34;label_info&#34;                                 
+## [177] &#34;languages&#34;                                  
+## [178] &#34;manufacturers&#34;                              
+## [179] &#34;manufacturers_info&#34;                         
+## [180] &#34;manufacturers_recommended_products&#34;         
+## [181] &#34;marketplace_orders_products&#34;                
+## [182] &#34;marketplace_pending_cancels&#34;                
+## [183] &#34;marketplace_pending_orders&#34;                 
+## [184] &#34;marketplace_products&#34;                       
+## [185] &#34;meta_tags&#34;                                  
+## [186] &#34;migrations&#34;                                 
+## [187] &#34;newsletters&#34;                                
+## [188] &#34;notifications&#34;                              
+## [189] &#34;optimize_check&#34;                             
+## [190] &#34;order_cancellation_reasons&#34;                 
+## [191] &#34;order_cancellations&#34;                        
+## [192] &#34;orders&#34;                                     
+## [193] &#34;orders_address_failures&#34;                    
+## [194] &#34;orders_data_tracking&#34;                       
+## [195] &#34;orders_exception&#34;                           
+## [196] &#34;orders_fees&#34;                                
+## [197] &#34;orders_hold_reasons&#34;                        
+## [198] &#34;orders_holds&#34;                               
+## [199] &#34;orders_products&#34;                            
+## [200] &#34;orders_products_attributes&#34;                 
+## [201] &#34;orders_products_download&#34;                   
+## [202] &#34;orders_products_fees&#34;                       
+## [203] &#34;orders_products_kit_parts&#34;                  
+## [204] &#34;orders_products_pick&#34;                       
+## [205] &#34;orders_products_removed&#34;                    
+## [206] &#34;orders_status&#34;                              
+## [207] &#34;orders_status_history&#34;                      
+## [208] &#34;orders_to_orders_exceptions&#34;                
+## [209] &#34;orders_total&#34;                               
+## [210] &#34;orders_total_original&#34;                      
+## [211] &#34;organization_type&#34;                          
+## [212] &#34;package_weight_variances&#34;                   
+## [213] &#34;pages&#34;                                      
+## [214] &#34;payments_charges&#34;                           
+## [215] &#34;payments_reconciliation_log&#34;                
+## [216] &#34;payments_refunds&#34;                           
+## [217] &#34;payments_refunds_products&#34;                  
+## [218] &#34;payments_types&#34;                             
+## [219] &#34;payments_void&#34;                              
+## [220] &#34;pending_autoship_order_products&#34;            
+## [221] &#34;personal_access_tokens&#34;                     
+## [222] &#34;pest_groups&#34;                                
+## [223] &#34;pests&#34;                                      
+## [224] &#34;pests_to_pest_groups&#34;                       
+## [225] &#34;pests_to_products&#34;                          
+## [226] &#34;pests_to_products_use_sites&#34;                
+## [227] &#34;pick_stats&#34;                                 
+## [228] &#34;pick_stats_3_week&#34;                          
+## [229] &#34;pick_stats_3_week_last&#34;                     
+## [230] &#34;pick_stats_last&#34;                            
+## [231] &#34;pick_stats_weekly&#34;                          
+## [232] &#34;press_releases&#34;                             
+## [233] &#34;previews&#34;                                   
+## [234] &#34;price_matches&#34;                              
+## [235] &#34;print_log&#34;                                  
+## [236] &#34;print_type&#34;                                 
+## [237] &#34;product_document_types&#34;                     
+## [238] &#34;product_documents&#34;                          
+## [239] &#34;product_features&#34;                           
+## [240] &#34;product_highlights&#34;                         
+## [241] &#34;product_loss_additional_losses&#34;             
+## [242] &#34;product_loss_events&#34;                        
+## [243] &#34;product_loss_items&#34;                         
+## [244] &#34;product_loss_reasons&#34;                       
+## [245] &#34;product_losses&#34;                             
+## [246] &#34;product_message_macros&#34;                     
+## [247] &#34;product_update_batches&#34;                     
+## [248] &#34;product_update_data&#34;                        
+## [249] &#34;product_update_notes&#34;                       
+## [250] &#34;product_updates&#34;                            
+## [251] &#34;products&#34;                                   
+## [252] &#34;products_actives&#34;                           
+## [253] &#34;products_addons&#34;                            
+## [254] &#34;products_alternate_descriptions&#34;            
+## [255] &#34;products_attributes&#34;                        
+## [256] &#34;products_attributes_download&#34;               
+## [257] &#34;products_attributes_vendors&#34;                
+## [258] &#34;products_barcodes&#34;                          
+## [259] &#34;products_barcodes_to_options&#34;               
+## [260] &#34;products_boxes&#34;                             
+## [261] &#34;products_bundles&#34;                           
+## [262] &#34;products_comments&#34;                          
+## [263] &#34;products_description&#34;                       
+## [264] &#34;products_dropshipper_feed&#34;                  
+## [265] &#34;products_editing&#34;                           
+## [266] &#34;products_export&#34;                            
+## [267] &#34;products_extra_fields&#34;                      
+## [268] &#34;products_extra_fields_options&#34;              
+## [269] &#34;products_groups&#34;                            
+## [270] &#34;products_history&#34;                           
+## [271] &#34;products_inventory&#34;                         
+## [272] &#34;products_label_data&#34;                        
+## [273] &#34;products_media&#34;                             
+## [274] &#34;products_media_types&#34;                       
+## [275] &#34;products_notifications&#34;                     
+## [276] &#34;products_notifications_history&#34;             
+## [277] &#34;products_options&#34;                           
+## [278] &#34;products_options_values&#34;                    
+## [279] &#34;products_options_values_to_products_options&#34;
+## [280] &#34;products_parts&#34;                             
+## [281] &#34;products_predictions&#34;                       
+## [282] &#34;products_pricing_history&#34;                   
+## [283] &#34;products_promotions&#34;                        
+## [284] &#34;products_properties&#34;                        
+## [285] &#34;products_properties_values&#34;                 
+## [286] &#34;products_questions&#34;                         
+## [287] &#34;products_questions_vote&#34;                    
+## [288] &#34;products_selected_options&#34;                  
+## [289] &#34;products_stock_status_emails&#34;               
+## [290] &#34;products_to_accessories&#34;                    
+## [291] &#34;products_to_article_product_groups&#34;         
+## [292] &#34;products_to_assets&#34;                         
+## [293] &#34;products_to_categories&#34;                     
+## [294] &#34;products_to_pests&#34;                          
+## [295] &#34;products_to_product_features&#34;               
+## [296] &#34;products_to_products_actives&#34;               
+## [297] &#34;products_to_products_extra_fields&#34;          
+## [298] &#34;products_to_products_groups&#34;                
+## [299] &#34;products_to_products_properties_values&#34;     
+## [300] &#34;products_to_products_uom&#34;                   
+## [301] &#34;products_to_projects&#34;                       
+## [302] &#34;products_to_sites&#34;                          
+## [303] &#34;products_to_use_locations&#34;                  
+## [304] &#34;products_to_vendors&#34;                        
+## [305] &#34;products_to_zones&#34;                          
+## [306] &#34;products_uom&#34;                               
+## [307] &#34;products_use_sites&#34;                         
+## [308] &#34;products_websites&#34;                          
+## [309] &#34;products_weight_log&#34;                        
+## [310] &#34;products_xsell&#34;                             
+## [311] &#34;products_xsell2&#34;                            
+## [312] &#34;program_region_exceptions&#34;                  
+## [313] &#34;projects&#34;                                   
+## [314] &#34;quickbooks_config&#34;                          
+## [315] &#34;quickbooks_log&#34;                             
+## [316] &#34;quickbooks_queue&#34;                           
+## [317] &#34;quickbooks_recur&#34;                           
+## [318] &#34;quickbooks_ticket&#34;                          
+## [319] &#34;quickbooks_user&#34;                            
+## [320] &#34;rebate_partners&#34;                            
+## [321] &#34;redemption_codes&#34;                           
+## [322] &#34;redemption_tracking&#34;                        
+## [323] &#34;referrals_emails_sent&#34;                      
+## [324] &#34;referrals_generation_history&#34;               
+## [325] &#34;referrals_usage_history&#34;                    
+## [326] &#34;regions&#34;                                    
+## [327] &#34;report_request&#34;                             
+## [328] &#34;reviews&#34;                                    
+## [329] &#34;reviews_description&#34;                        
+## [330] &#34;reviews_vote&#34;                               
+## [331] &#34;rewards_points_history&#34;                     
+## [332] &#34;rules&#34;                                      
+## [333] &#34;save_for_later_basket&#34;                      
+## [334] &#34;sb_accessories&#34;                             
+## [335] &#34;sb_box_input_box_subscription&#34;              
+## [336] &#34;sb_box_input_options&#34;                       
+## [337] &#34;sb_box_inputs&#34;                              
+## [338] &#34;sb_box_subscriptions&#34;                       
+## [339] &#34;sb_components&#34;                              
+## [340] &#34;sb_components_sb_versions&#34;                  
+## [341] &#34;sb_customer_box_program_program_groups&#34;     
+## [342] &#34;sb_discount_products&#34;                       
+## [343] &#34;sb_pricing_options&#34;                         
+## [344] &#34;sb_product_group_products&#34;                  
+## [345] &#34;sb_product_groups&#34;                          
+## [346] &#34;sb_program_groups&#34;                          
+## [347] &#34;sb_programs&#34;                                
+## [348] &#34;sb_programs_components&#34;                     
+## [349] &#34;sb_region_exceptions&#34;                       
+## [350] &#34;sb_schedules&#34;                               
+## [351] &#34;sb_shipping_frequencies&#34;                    
+## [352] &#34;sb_signup_pages&#34;                            
+## [353] &#34;sb_signup_trackbar_waypoints&#34;               
+## [354] &#34;sb_version_activations&#34;                     
+## [355] &#34;sb_versions&#34;                                
+## [356] &#34;sessions&#34;                                   
+## [357] &#34;sf_answers&#34;                                 
+## [358] &#34;sf_questions&#34;                               
+## [359] &#34;sf_rules&#34;                                   
+## [360] &#34;sf_wizards&#34;                                 
+## [361] &#34;shipment_assignments&#34;                       
+## [362] &#34;shipment_package_products&#34;                  
+## [363] &#34;shipment_package_queue&#34;                     
+## [364] &#34;shipment_packages&#34;                          
+## [365] &#34;shipments&#34;                                  
+## [366] &#34;shipments_packages_history&#34;                 
+## [367] &#34;shipments_status&#34;                           
+## [368] &#34;shipments_status_history&#34;                   
+## [369] &#34;shipping_audits&#34;                            
+## [370] &#34;shipping_differences&#34;                       
+## [371] &#34;shipping_events&#34;                            
+## [372] &#34;shipping_rate_records&#34;                      
+## [373] &#34;shopping_engines&#34;                           
+## [374] &#34;shopping_feeds_categories&#34;                  
+## [375] &#34;shopping_feeds_extra_fields&#34;                
+## [376] &#34;shopping_feeds_products_blocked&#34;            
+## [377] &#34;short_urls&#34;                                 
+## [378] &#34;site_groups&#34;                                
+## [379] &#34;site_options&#34;                               
+## [380] &#34;sites&#34;                                      
+## [381] &#34;sites_to_site_groups&#34;                       
+## [382] &#34;sli_product_data&#34;                           
+## [383] &#34;sli_product_types&#34;                          
+## [384] &#34;snippets&#34;                                   
+## [385] &#34;specials&#34;                                   
+## [386] &#34;step_products_email_content&#34;                
+## [387] &#34;stock_change_reasons&#34;                       
+## [388] &#34;store_credit_history&#34;                       
+## [389] &#34;subscription_coupon_subscriptions&#34;          
+## [390] &#34;subscription_coupons&#34;                       
+## [391] &#34;subscription_credit_history&#34;                
+## [392] &#34;subscription_discount_products&#34;             
+## [393] &#34;subscription_history&#34;                       
+## [394] &#34;subscription_order_addons&#34;                  
+## [395] &#34;subscription_orders&#34;                        
+## [396] &#34;suggestions&#34;                                
+## [397] &#34;suppliers_import&#34;                           
+## [398] &#34;suppliers_import_settings&#34;                  
+## [399] &#34;suppliers_import_temp&#34;                      
+## [400] &#34;tags&#34;                                       
+## [401] &#34;tags_to_assets&#34;                             
+## [402] &#34;talkdesk_actions&#34;                           
+## [403] &#34;talkdesk_actions_data&#34;                      
+## [404] &#34;talkdesk_inbound_call_starts&#34;               
+## [405] &#34;tax_capture_log&#34;                            
+## [406] &#34;tax_class&#34;                                  
+## [407] &#34;tax_rates&#34;                                  
+## [408] &#34;temp_admin_recounts&#34;                        
+## [409] &#34;temp_serialmagic&#34;                           
+## [410] &#34;testimonials&#34;                               
+## [411] &#34;tmp_tax_rates&#34;                              
+## [412] &#34;topics&#34;                                     
+## [413] &#34;topics_description&#34;                         
+## [414] &#34;tpb_accounts&#34;                               
+## [415] &#34;tracking&#34;                                   
+## [416] &#34;trusted_stores_feed&#34;                        
+## [417] &#34;ups_billing&#34;                                
+## [418] &#34;ups_billing_uploads&#34;                        
+## [419] &#34;ups_import&#34;                                 
+## [420] &#34;use_locations&#34;                              
+## [421] &#34;usps_mess&#34;                                  
+## [422] &#34;usps_regional_rates&#34;                        
+## [423] &#34;usps_tnt&#34;                                   
+## [424] &#34;usps_tnt_temp&#34;                              
+## [425] &#34;usps_zones&#34;                                 
+## [426] &#34;usps_zones_exceptions&#34;                      
+## [427] &#34;vendor_price_temp&#34;                          
+## [428] &#34;vendors&#34;                                    
+## [429] &#34;vendors_actions&#34;                            
+## [430] &#34;vendors_address_book&#34;                       
+## [431] &#34;vendors_admin&#34;                              
+## [432] &#34;vendors_customers&#34;                          
+## [433] &#34;vendors_invoice_status&#34;                     
+## [434] &#34;vendors_invoices&#34;                           
+## [435] &#34;vendors_orders&#34;                             
+## [436] &#34;vendors_orders_history&#34;                     
+## [437] &#34;vendors_orders_products&#34;                    
+## [438] &#34;vendors_products&#34;                           
+## [439] &#34;vendors_products_history&#34;                   
+## [440] &#34;vendors_roles&#34;                              
+## [441] &#34;vendors_to_vendors_actions&#34;                 
+## [442] &#34;video_collections&#34;                          
+## [443] &#34;videos&#34;                                     
+## [444] &#34;videos_categories&#34;                          
+## [445] &#34;videos_details&#34;                             
+## [446] &#34;videos_products&#34;                            
+## [447] &#34;videos_to_collections&#34;                      
+## [448] &#34;videos_to_entities&#34;                         
+## [449] &#34;visitor_logs&#34;                               
+## [450] &#34;votes&#34;                                      
+## [451] &#34;warehouse_actions&#34;                          
+## [452] &#34;warehouse_events&#34;                           
+## [453] &#34;warehouse_personnel&#34;                        
+## [454] &#34;warehouse_personnel_clockin_history&#34;        
+## [455] &#34;warehouse_personnel_types&#34;                  
+## [456] &#34;warehouse_zones&#34;                            
+## [457] &#34;warehouses&#34;                                 
+## [458] &#34;webhook_calls&#34;                              
+## [459] &#34;website_email_types&#34;                        
+## [460] &#34;website_emails&#34;                             
+## [461] &#34;websites&#34;                                   
+## [462] &#34;whos_online&#34;                                
+## [463] &#34;wm_achievements&#34;                            
+## [464] &#34;wm_boxes&#34;                                   
+## [465] &#34;wm_carriers&#34;                                
+## [466] &#34;wm_cart_locations&#34;                          
+## [467] &#34;wm_carts&#34;                                   
+## [468] &#34;wm_cycle_count_history&#34;                     
+## [469] &#34;wm_cycle_count_settings&#34;                    
+## [470] &#34;wm_cycle_count_warehouse_settings&#34;          
+## [471] &#34;wm_damages&#34;                                 
+## [472] &#34;wm_inventory_transactions&#34;                  
+## [473] &#34;wm_invoice_items&#34;                           
+## [474] &#34;wm_invoices&#34;                                
+## [475] &#34;wm_labor_tracking&#34;                          
+## [476] &#34;wm_labor_tracking_zones&#34;                    
+## [477] &#34;wm_lot_types&#34;                               
+## [478] &#34;wm_message_store&#34;                           
+## [479] &#34;wm_pack_stations&#34;                           
+## [480] &#34;wm_packer_stats&#34;                            
+## [481] &#34;wm_payment_terms&#34;                           
+## [482] &#34;wm_personnel_achievements&#34;                  
+## [483] &#34;wm_pick_waves&#34;                              
+## [484] &#34;wm_picker_stats&#34;                            
+## [485] &#34;wm_po_comments&#34;                             
+## [486] &#34;wm_po_history&#34;                              
+## [487] &#34;wm_po_item_check_history&#34;                   
+## [488] &#34;wm_po_item_stocking_assignments&#34;            
+## [489] &#34;wm_po_items&#34;                                
+## [490] &#34;wm_po_items_tracking&#34;                       
+## [491] &#34;wm_po_sent_via&#34;                             
+## [492] &#34;wm_po_status&#34;                               
+## [493] &#34;wm_printers&#34;                                
+## [494] &#34;wm_product_promos&#34;                          
+## [495] &#34;wm_product_promos_payments&#34;                 
+## [496] &#34;wm_product_promos_products&#34;                 
+## [497] &#34;wm_product_promos_tiers&#34;                    
+## [498] &#34;wm_promos_to_warehouses&#34;                    
+## [499] &#34;wm_purchase_orders&#34;                         
+## [500] &#34;wm_restock_log&#34;                             
+## [501] &#34;wm_rma_conditions&#34;                          
+## [502] &#34;wm_rma_history&#34;                             
+## [503] &#34;wm_rma_products&#34;                            
+## [504] &#34;wm_rma_products_status&#34;                     
+## [505] &#34;wm_rma_reasons&#34;                             
+## [506] &#34;wm_rma_resolutions&#34;                         
+## [507] &#34;wm_rma_status&#34;                              
+## [508] &#34;wm_rma_tracking&#34;                            
+## [509] &#34;wm_rmas&#34;                                    
+## [510] &#34;wm_shipment_buckets&#34;                        
+## [511] &#34;wm_shipments_rate_shop&#34;                     
+## [512] &#34;wm_stocking_assignments&#34;                    
+## [513] &#34;wm_stocking_issues&#34;                         
+## [514] &#34;wm_supplier_po_settings&#34;                    
+## [515] &#34;wm_supplier_split_po_warehouses&#34;            
+## [516] &#34;wm_suppliers&#34;                               
+## [517] &#34;wm_suppliers_contacts&#34;                      
+## [518] &#34;wm_suppliers_to_products&#34;                   
+## [519] &#34;wm_task_time_history&#34;                       
+## [520] &#34;wm_task_times&#34;                              
+## [521] &#34;wm_tasks&#34;                                   
+## [522] &#34;wm_totes&#34;                                   
+## [523] &#34;wm_zone_assignments&#34;                        
+## [524] &#34;wm_zone_bays&#34;                               
+## [525] &#34;wm_zones&#34;                                   
+## [526] &#34;zips_to_fips&#34;                               
+## [527] &#34;zones&#34;                                      
+## [528] &#34;zones_pest_regions&#34;                         
+## [529] &#34;zones_to_geo_zones&#34;
+</code></pre><p>If you want to load only specific tables, you can define them:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Specify the tables you want to load</span>
+</span></span><span style="display:flex;"><span>tables_to_load <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">c</span>(<span style="color:#d14">&#34;orders&#34;</span>, <span style="color:#d14">&#34;products&#34;</span>, <span style="color:#d14">&#34;orders_products&#34;</span>, <span style="color:#d14">&#34;orders_products_pick&#34;</span>, <span style="color:#d14">&#34;orders_total&#34;</span>, <span style="color:#d14">&#34;shipments&#34;</span>, <span style="color:#d14">&#34;ups_import&#34;</span>, <span style="color:#d14">&#34;products_to_products_groups&#34;</span>, <span style="color:#d14">&#34;products_groups&#34;</span>, <span style="color:#d14">&#34;fees&#34;</span>, <span style="color:#d14">&#34;payments_charges&#34;</span>, <span style="color:#d14">&#34;payments_refunds&#34;</span>, <span style="color:#d14">&#34;payments_types&#34;</span>, <span style="color:#d14">&#34;wm_po_items&#34;</span>, <span style="color:#d14">&#34;wm_purchase_orders&#34;</span>, <span style="color:#d14">&#34;wm_boxes&#34;</span>, <span style="color:#d14">&#34;autoship_orders&#34;</span>, <span style="color:#d14">&#34;box_subscription_orders&#34;</span>, <span style="color:#d14">&#34;products_bundles&#34;</span>, <span style="color:#d14">&#34;products_inventory&#34;</span>, <span style="color:#d14">&#34;wm_inventory_transactions&#34;</span>, <span style="color:#d14">&#34;wm_suppliers&#34;</span>, <span style="color:#d14">&#34;wm_invoices&#34;</span>, <span style="color:#d14">&#34;wm_po_history&#34;</span>, <span style="color:#d14">&#34;shipments_status&#34;</span>, <span style="color:#d14">&#34;orders_status&#34;</span>, <span style="color:#d14">&#34;manufacturers&#34;</span>, <span style="color:#d14">&#34;customers&#34;</span>, <span style="color:#d14">&#34;customers_credit_accounts&#34;</span>, <span style="color:#d14">&#34;address_book&#34;</span>, <span style="color:#d14">&#34;wm_product_promos&#34;</span>, <span style="color:#d14">&#34;wm_product_promos_products&#34;</span>, <span style="color:#d14">&#34;wm_product_promos_tiers&#34;</span>, <span style="color:#d14">&#34;customers_groups&#34;</span>, <span style="color:#d14">&#34;suppliers_import&#34;</span>, <span style="color:#d14">&#34;wm_suppliers_to_products&#34;</span>, <span style="color:#d14">&#34;products_to_products_extra_fields&#34;</span>, <span style="color:#d14">&#34;products_extra_fields&#34;</span>)
+</span></span></code></pre></div>
+
+
+
+<h3 id="transfer-tables-from-mysql-to-duckdb">Transfer Tables from MySQL to DuckDB
+  <a href="#transfer-tables-from-mysql-to-duckdb"><svg class="anchor-symbol" aria-hidden="true" height="26" width="26" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 0h24v24H0z" fill="currentColor"></path>
+      <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76.0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71.0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71.0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76.0 5-2.24 5-5s-2.24-5-5-5z"></path>
+    </svg></a>
+</h3>
+<p>We&rsquo;ll iterate over each table, read it from MySQL, and write it into DuckDB.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Use the full list or your specified list</span>
+</span></span><span style="display:flex;"><span>tables <span style="color:#000;font-weight:bold">&lt;-</span> tables_to_load  <span style="color:#998;font-style:italic"># or use &#39;mysql_tables&#39; for all tables</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">for</span> (table_name <span style="color:#000;font-weight:bold">in</span> tables) {
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Read data from MySQL</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">message</span>(<span style="color:#d14">&#34;Loading table: &#34;</span>, table_name)
+</span></span><span style="display:flex;"><span>  data <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">dbReadTable</span>(con_mysql, table_name)
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Write data to DuckDB</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">dbWriteTable</span>(con_duckdb, table_name, data, overwrite <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">TRUE</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><pre tabindex="0"><code>## Loading table: orders
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 1 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 42 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 44 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 45 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 46
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 47 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 48 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 49 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 50 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 53 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 56 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 89 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 115
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 118
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 119 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Loading table: products
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 29 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 30 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 31 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 32 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 36 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 37 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 46
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 61 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 62 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 63 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 64 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 65 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 66 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 67 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 68 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 87 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 88 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 91 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 92 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 93 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 97 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 98 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 100 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 105 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 136
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 139
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 150 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 152 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 153 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 155 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 157 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 158 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Loading table: orders_products
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 7 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 8 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 9 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 10 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 13 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 15
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 18 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 19 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 23
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 24
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 25
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 34 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 35 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Loading table: orders_products_pick
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 0
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 1
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 2
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 5
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 6 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 9
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 14 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 15 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Loading table: orders_total
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 0
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 4 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Loading table: shipments
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 0
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 1
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 2
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 3
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 4
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 17 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 19
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 20
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 26
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 27
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 28
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 29
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 30
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 31
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 32
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 33
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 34
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 35
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 36
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 37
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 38 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 39 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 40
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 47 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 52
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Loading table: ups_import
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 2 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 9 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 10 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 11 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 15 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 16 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 17 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 18 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): unrecognized MySQL field type 7
+## in column 20 imported as character
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 28 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 31 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 32 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 33 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 34 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 35 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 36 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Loading table: products_to_products_groups
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 0
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 1
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Loading table: products_groups
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 0
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 2
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 3
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Loading table: fees
+</code></pre><pre tabindex="0"><code>## Loading table: payments_charges
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 0
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 1
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 3
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 12
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Loading table: payments_refunds
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 0
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 1
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 4
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 8
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Loading table: payments_types
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 0
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Loading table: wm_po_items
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 0
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 1
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 2
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 3
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 8 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 12
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 15
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 17 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 18 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 20
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Loading table: wm_purchase_orders
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 0
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 1
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 2
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 6
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 10
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 11
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 14
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 22 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 23 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 24 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 25 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 37
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Loading table: wm_boxes
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 4 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 6 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 7 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 8 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 9 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 10 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 11 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 12 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 18 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Loading table: autoship_orders
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 0
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): unrecognized MySQL field type 7
+## in column 4 imported as character
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): unrecognized MySQL field type 7
+## in column 5 imported as character
+</code></pre><pre tabindex="0"><code>## Loading table: box_subscription_orders
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 0
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): unrecognized MySQL field type 7
+## in column 4 imported as character
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): unrecognized MySQL field type 7
+## in column 5 imported as character
+</code></pre><pre tabindex="0"><code>## Loading table: products_bundles
+</code></pre><pre tabindex="0"><code>## Loading table: products_inventory
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 0
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 1
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 17
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Loading table: wm_inventory_transactions
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 0
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 1
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 2
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 3
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 4 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 5 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 7 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 9 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 10 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Loading table: wm_suppliers
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 0
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 23
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 24
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 26
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Loading table: wm_invoices
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 0
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 3
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 4 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 5
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 7
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 10
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 11 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 12 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Loading table: wm_po_history
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 0
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 1
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 2
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Loading table: shipments_status
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 0
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Loading table: orders_status
+</code></pre><pre tabindex="0"><code>## Loading table: manufacturers
+</code></pre><pre tabindex="0"><code>## Loading table: customers
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 18
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 32 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 34 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 43
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 44
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 45
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 46
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 47
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Loading table: customers_credit_accounts
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 0
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Loading table: address_book
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 21 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 22 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Loading table: wm_product_promos
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 0
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 1
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 2
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 5 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 7
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 10
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 11
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 12
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 13
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Loading table: wm_product_promos_products
+</code></pre><pre tabindex="0"><code>## Loading table: wm_product_promos_tiers
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 3 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Loading table: customers_groups
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 0
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 4
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Loading table: suppliers_import
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): unrecognized MySQL field type 7
+## in column 5 imported as character
+</code></pre><pre tabindex="0"><code>## Loading table: wm_suppliers_to_products
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 0
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 1
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 2
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 6 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 11
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 13 imported
+## as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 14
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 15
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Warning in dbSendQuery(conn, statement, ...): Unsigned INTEGER in col 18
+## imported as numeric
+</code></pre><pre tabindex="0"><code>## Loading table: products_to_products_extra_fields
+</code></pre><pre tabindex="0"><code>## Loading table: products_extra_fields
+</code></pre>
+
+
+
+<h3 id="disconnect-from-the-server">Disconnect From the Server
+  <a href="#disconnect-from-the-server"><svg class="anchor-symbol" aria-hidden="true" height="26" width="26" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 0h24v24H0z" fill="currentColor"></path>
+      <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76.0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71.0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71.0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76.0 5-2.24 5-5s-2.24-5-5-5z"></path>
+    </svg></a>
+</h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Disconnect from MySQL</span>
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">dbDisconnect</span>(con_mysql)
+</span></span></code></pre></div><pre tabindex="0"><code>## [1] TRUE
+</code></pre>
+
+
+
+<h3 id="verify-the-tables-in-duckdb">Verify the Tables in DuckDB
+  <a href="#verify-the-tables-in-duckdb"><svg class="anchor-symbol" aria-hidden="true" height="26" width="26" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 0h24v24H0z" fill="currentColor"></path>
+      <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76.0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71.0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71.0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76.0 5-2.24 5-5s-2.24-5-5-5z"></path>
+    </svg></a>
+</h3>
+<p>List the tables in DuckDB to confirm they have been loaded:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>duckdb_tables <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">dbListTables</span>(con_duckdb)
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">print</span>(duckdb_tables)
+</span></span></code></pre></div><pre tabindex="0"><code>##  [1] &#34;address_book&#34;                      &#34;autoship_orders&#34;                  
+##  [3] &#34;box_subscription_orders&#34;           &#34;customers&#34;                        
+##  [5] &#34;customers_credit_accounts&#34;         &#34;customers_groups&#34;                 
+##  [7] &#34;fees&#34;                              &#34;manufacturers&#34;                    
+##  [9] &#34;orders&#34;                            &#34;orders_products&#34;                  
+## [11] &#34;orders_products_pick&#34;              &#34;orders_status&#34;                    
+## [13] &#34;orders_total&#34;                      &#34;payments_charges&#34;                 
+## [15] &#34;payments_refunds&#34;                  &#34;payments_types&#34;                   
+## [17] &#34;products&#34;                          &#34;products_bundles&#34;                 
+## [19] &#34;products_extra_fields&#34;             &#34;products_groups&#34;                  
+## [21] &#34;products_inventory&#34;                &#34;products_to_products_extra_fields&#34;
+## [23] &#34;products_to_products_groups&#34;       &#34;shipments&#34;                        
+## [25] &#34;shipments_status&#34;                  &#34;suppliers_import&#34;                 
+## [27] &#34;ups_import&#34;                        &#34;wm_boxes&#34;                         
+## [29] &#34;wm_inventory_transactions&#34;         &#34;wm_invoices&#34;                      
+## [31] &#34;wm_po_history&#34;                     &#34;wm_po_items&#34;                      
+## [33] &#34;wm_product_promos&#34;                 &#34;wm_product_promos_products&#34;       
+## [35] &#34;wm_product_promos_tiers&#34;           &#34;wm_purchase_orders&#34;               
+## [37] &#34;wm_suppliers&#34;                      &#34;wm_suppliers_to_products&#34;
+</code></pre>
+
+
+
+<h2 id="performing-queries-in-duckdb">Performing Queries in DuckDB
+  <a href="#performing-queries-in-duckdb"><svg class="anchor-symbol" aria-hidden="true" height="26" width="26" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 0h24v24H0z" fill="currentColor"></path>
+      <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76.0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71.0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71.0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76.0 5-2.24 5-5s-2.24-5-5-5z"></path>
+    </svg></a>
+</h2>
+<p>With the tables loaded into DuckDB, you can perform efficient queries using SQL or dplyr.</p>
+
+
+
+
+<h3 id="using-sql-queries">Using SQL Queries
+  <a href="#using-sql-queries"><svg class="anchor-symbol" aria-hidden="true" height="26" width="26" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 0h24v24H0z" fill="currentColor"></path>
+      <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76.0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71.0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71.0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76.0 5-2.24 5-5s-2.24-5-5-5z"></path>
+    </svg></a>
+</h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>result <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">dbGetQuery</span>(con_duckdb, <span style="color:#d14">&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">  SELECT op.products_id, 
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">         COUNT(op.qty_returned) AS returns
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">  FROM orders_products op
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">  LEFT JOIN products p USING(products_id)
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">  LEFT JOIN orders o USING(orders_id)
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">  WHERE op.qty_returned &gt; 0
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">    AND op.qty_returned IS NOT NULL
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">  GROUP BY op.products_id, p.name
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">  ORDER BY returns DESC
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">  LIMIT 10;
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">print</span>(result)
+</span></span></code></pre></div><pre tabindex="0"><code>##    products_id returns
+## 1          304    1469
+## 2          184    1348
+## 3         1813     728
+## 4         1877     519
+## 5          100     502
+## 6         1816     489
+## 7         1817     481
+## 8         3546     427
+## 9           40     398
+## 10          65     351
+</code></pre>
+        
+        <details closed class="f6 fw7 input-reset">
+  <dl class="f6 lh-copy">
+    <dt class="fw7">Posted on:</dt>
+    <dd class="fw5 ml0">November 1, 2024</dd>
+  </dl>
+  <dl class="f6 lh-copy">
+    <dt class="fw7">Length:</dt>
+    <dd class="fw5 ml0">27 minute read, 5561 words</dd>
+  </dl>
+  
+  
+  
+  <dl class="f6 lh-copy">
+    <dt class="fw7">See Also:</dt>
+    
+  </dl>
+</details>
+
+      </section>
+      <footer class="post-footer">
+        <div class="post-pagination dt w-100 mt4 mb2">
+  
+  
+  
+  
+    <a class="next dtc pl2 tr v-top fw6"
+    href="http://localhost:4321/blog/social/">Set up your social &rarr;</a>
+  
+</div>
+
+      </footer>
+    </article>
+    
+      <div class="post-comments pa0 pa4-l mt4">
+  
+    
+      <script src="https://utteranc.es/client.js"
+              repo="stewing-co/warp_and_weft_data"
+              issue-term="pathname"
+              theme="boxy-light"
+              label="comments :crystal_ball:"
+              crossorigin="anonymous"
+              async
+              type="text/javascript">
+      </script>
+    
+  
+</div>
+
+    
+  </section>
+</main>
+<footer class="site-footer pv4 bt b--transparent ph5" role="contentinfo">
+  <nav class="db dt-l w-100">
+    <p class="site-copyright f7 db dtc-l v-mid w-100 w-33-l tc tl-l pv2 pv0-l mv0 lh-copy">
+      &copy; 2024 Warp and Weft Data, Atlanta, GA
+      <span class="middot-divider"></span>
+      Made with <span xmlns:dct="http://purl.org/dc/terms/" property="dct:title"><a xmlns:dct="http://purl.org/dc/terms/" href="https://github.com/hugo-apero/" rel="dct:source">Hugo Apéro</a></span>.
+      <br />
+      
+Based on <span xmlns:dct="http://purl.org/dc/terms/" property="dct:title"><a xmlns:dct="http://purl.org/dc/terms/" href="https://github.com/formspree/blogophonic-hugo" rel="dct:source">Blogophonic</a></span> by <a xmlns:cc="http://creativecommons.org/ns#" href="https://formspree.io" property="cc:attributionName" rel="cc:attributionURL">Formspree</a>.
+    </p>
+    
+    <div class="site-social-links db dtc-l v-mid w-100 w-33-l tc pv2 pv0-l mv0">
+      <div class="social-icon-links" aria-hidden="true">
+  
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <a class="link dib h1 w1 ml0 mr2 f6 o-90 glow" href="https://github.com/stewing-co" title="github" target="_blank" rel="me noopener">
+      <i class="fab fa-github fa-lg fa-fw"></i>
+    </a>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <a class="link dib h1 w1 ml0 mr2 f6 o-90 glow" href="https://bsky.app/profile/blue-pibble.bsky.social" title="bluesky" target="_blank" rel="me noopener">
+      <i class="fab fa-bluesky fa-lg fa-fw"></i>
+    </a>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <a class="link dib h1 w1 ml0 mr2 f6 o-90 glow" href="https://www.linkedin.com/in/stewing-in/" title="linkedin" target="_blank" rel="me noopener">
+      <i class="fab fa-linkedin fa-lg fa-fw"></i>
+    </a>
+  
+</div>
+
+    </div>
+    
+    <div class="site-links f6 db dtc-l v-mid w-100 w-67-l tc tr-l pv2 pv0-l mv0">
+      
+      <a class="dib pv1 ph2 link" href="/license/" title="License">License</a>
+      
+      <a class="dib pv1 ph2 link" href="/contact/" title="Contact form">Contact</a>
+      
+    </div>
+  </nav>
+  
+    <script>
+
+    var i, text, code, codes = document.getElementsByTagName('code');
+    for (let i = 0; i < codes.length;) {
+      code = codes[i];
+      if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+        text = code.textContent;
+        if (/^\$[^$]/.test(text) && /[^$]\$$/.test(text)) {
+          text = text.replace(/^\$/, '\\(').replace(/\$$/, '\\)');
+          code.textContent = text;
+        }
+        if (/^\\\((.|\s)+\\\)$/.test(text) ||
+            /^\\\[(.|\s)+\\\]$/.test(text) ||
+            /^\$(.|\s)+\$$/.test(text) ||
+            /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+          code.outerHTML = code.innerHTML;  
+          continue;
+        }
+      }
+      i++;
+    }
+</script>
+
+  
+    
+    
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.13/dist/katex.min.css" integrity="sha384-RZU/ijkSsFbcmivfdRBQDtwuwVqK7GMOw6IMvKyeWL2K5UAlyp6WonmB8m7Jd0Hn" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.13/dist/katex.min.js" integrity="sha384-pK1WpvzWVBQiP0/GjnvRxV4mOb0oxFuyRxJlk6vVw146n3egcN5C925NCP7a7BY8" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.13/dist/contrib/auto-render.min.js" integrity="sha384-vZTG03m+2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+
+
+
+    
+  
+  
+</footer>
+
+      </div>
+    </body>
+</html>
