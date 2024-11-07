@@ -5,7 +5,6 @@ excerpt: ""
 date: 2024-11-07
 author: "Steve Ewing"
 draft: false
-images: "fuel_surcharges.png"
 series:
 tags: ["FedEx", "rvest", "R"]
 categories:
