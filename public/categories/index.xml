@@ -2,31 +2,31 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Categories on Warp and Weft Data</title>
-    <link>https://warpandweftdata.netlify.app/categories/</link>
+    <link>http://localhost:4321/categories/</link>
     <description>Recent content in Categories on Warp and Weft Data</description>
     <generator>Hugo</generator>
     <language>en</language>
     <lastBuildDate>Thu, 24 Oct 2024 00:00:00 +0000</lastBuildDate>
-    <atom:link href="https://warpandweftdata.netlify.app/categories/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://localhost:4321/categories/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Business</title>
-      <link>https://warpandweftdata.netlify.app/categories/business/</link>
+      <link>http://localhost:4321/categories/business/</link>
       <pubDate>Thu, 24 Oct 2024 00:00:00 +0000</pubDate>
-      <guid>https://warpandweftdata.netlify.app/categories/business/</guid>
+      <guid>http://localhost:4321/categories/business/</guid>
       <description></description>
     </item>
     <item>
       <title>By Others</title>
-      <link>https://warpandweftdata.netlify.app/categories/by-others/</link>
+      <link>http://localhost:4321/categories/by-others/</link>
       <pubDate>Mon, 21 Oct 2024 00:00:00 +0000</pubDate>
-      <guid>https://warpandweftdata.netlify.app/categories/by-others/</guid>
+      <guid>http://localhost:4321/categories/by-others/</guid>
       <description></description>
     </item>
     <item>
       <title>Resume</title>
-      <link>https://warpandweftdata.netlify.app/categories/resume/</link>
+      <link>http://localhost:4321/categories/resume/</link>
       <pubDate>Mon, 21 Oct 2024 00:00:00 +0000</pubDate>
-      <guid>https://warpandweftdata.netlify.app/categories/resume/</guid>
+      <guid>http://localhost:4321/categories/resume/</guid>
       <description></description>
     </item>
   </channel>
