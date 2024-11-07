@@ -37,7 +37,6 @@ library(tidyverse)
 ```
 
 ``` r
-library(lubridate)
 library(rvest)
 ```
 
@@ -49,15 +48,6 @@ library(rvest)
 ## 
 ##     guess_encoding
 ```
-
-``` r
-library(ggplot2)
-```
-
-* tidyverse: A collection of R packages for data science.
-* lubridate: Simplifies working with dates and times.
-* rvest: Useful for web scraping HTML and XML.
-* ggplot2: For creating elegant data visualizations.
 
 # Scrape Current FedEx Fuel Surcharges
 

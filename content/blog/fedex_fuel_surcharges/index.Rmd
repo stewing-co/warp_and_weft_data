@@ -20,15 +20,8 @@ Since its the only moving part in the contract, it is important to keep track of
 # Load Libraries
 ```{r}
 library(tidyverse)
-library(lubridate)
 library(rvest)
-library(ggplot2)
 ```
-
-* tidyverse: A collection of R packages for data science.
-* lubridate: Simplifies working with dates and times.
-* rvest: Useful for web scraping HTML and XML.
-* ggplot2: For creating elegant data visualizations.
 
 # Scrape Current FedEx Fuel Surcharges
 ```{r}
