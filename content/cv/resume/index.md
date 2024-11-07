@@ -8,7 +8,6 @@ draft: false
 tags:
   - hugo-site
 categories:
-  - Resume
 # layout options: single or single-sidebar
 layout: single
 ---

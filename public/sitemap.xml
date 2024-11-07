@@ -2,58 +2,51 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>http://localhost:4321/blog/</loc>
+    <loc>https://warpandweftdata.netlify.app/blog/</loc>
+    <lastmod>2024-11-07T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://warpandweftdata.netlify.app/tags/fedex/</loc>
+    <lastmod>2024-11-07T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://warpandweftdata.netlify.app/tags/r/</loc>
+    <lastmod>2024-11-07T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://warpandweftdata.netlify.app/tags/rvest/</loc>
+    <lastmod>2024-11-07T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://warpandweftdata.netlify.app/tags/</loc>
+    <lastmod>2024-11-07T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://warpandweftdata.netlify.app/</loc>
+    <lastmod>2024-11-07T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://warpandweftdata.netlify.app/blog/fedex_fuel_surcharges/</loc>
+    <lastmod>2024-11-07T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://warpandweftdata.netlify.app/blog/duckdb_intro/</loc>
     <lastmod>2024-11-01T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>http://localhost:4321/blog/duckdb_intro/</loc>
-    <lastmod>2024-11-01T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>http://localhost:4321/</loc>
-    <lastmod>2024-11-01T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>http://localhost:4321/categories/business/</loc>
-    <lastmod>2024-10-24T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>http://localhost:4321/categories/</loc>
-    <lastmod>2024-10-24T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>http://localhost:4321/tags/hugo-site/</loc>
-    <lastmod>2024-10-24T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>http://localhost:4321/project/</loc>
-    <lastmod>2024-10-24T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>http://localhost:4321/project/ship_till_x/</loc>
-    <lastmod>2024-10-24T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>http://localhost:4321/tags/</loc>
-    <lastmod>2024-10-24T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>http://localhost:4321/categories/by-others/</loc>
+    <loc>https://warpandweftdata.netlify.app/tags/hugo-site/</loc>
     <lastmod>2024-10-21T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>http://localhost:4321/cv/resume/</loc>
+    <loc>https://warpandweftdata.netlify.app/cv/resume/</loc>
     <lastmod>2024-10-21T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>http://localhost:4321/project/dw_nominate/</loc>
+    <loc>https://warpandweftdata.netlify.app/cv/</loc>
     <lastmod>2024-10-21T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>http://localhost:4321/categories/resume/</loc>
-    <lastmod>2024-10-21T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>http://localhost:4321/cv/</loc>
-    <lastmod>2024-10-21T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>http://localhost:4321/contact/</loc>
+    <loc>https://warpandweftdata.netlify.app/contact/</loc>
     <lastmod>2019-02-25T13:38:41-06:00</lastmod>
   </url><url>
-    <loc>http://localhost:4321/form/</loc>
+    <loc>https://warpandweftdata.netlify.app/form/</loc>
     <lastmod>2019-02-25T13:38:41-06:00</lastmod>
   </url><url>
-    <loc>http://localhost:4321/about/</loc>
+    <loc>https://warpandweftdata.netlify.app/about/</loc>
   </url><url>
-    <loc>http://localhost:4321/license/</loc>
+    <loc>https://warpandweftdata.netlify.app/categories/</loc>
   </url><url>
-    <loc>http://localhost:4321/series/</loc>
+    <loc>https://warpandweftdata.netlify.app/license/</loc>
+  </url><url>
+    <loc>https://warpandweftdata.netlify.app/series/</loc>
   </url>
 </urlset>
