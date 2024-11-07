@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Rvest on Warp and Weft Data</title>
+    <link>http://localhost:4321/tags/rvest/</link>
+    <description>Recent content in Rvest on Warp and Weft Data</description>
+    <generator>Hugo</generator>
+    <language>en</language>
+    <lastBuildDate>Thu, 07 Nov 2024 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:4321/tags/rvest/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Webscraping FedEx Fuel Surcharges</title>
+      <link>http://localhost:4321/blog/fedex_fuel_surcharges/fuel_surcharges/</link>
+      <pubDate>Thu, 07 Nov 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:4321/blog/fedex_fuel_surcharges/fuel_surcharges/</guid>
+      <description>&lt;h1 id=&#34;introduction&#34;&gt;Introduction&#xA;  &lt;a href=&#34;#introduction&#34;&gt;&lt;/a&gt;&#xA;&lt;/h1&gt;&#xA;&lt;p&gt;FedEx sets annual contracts with their customers. In these contracts all the costs are fixed except for the fuel surcharge. The fuel surcharge is a percentage of the total cost of the shipment and is adjusted weekly based on the price of fuel. This surcharge is a way for FedEx to pass on the cost of fuel to the customer.&lt;/p&gt;&#xA;&lt;p&gt;Since its the only moving part in the contract, it is important to keep track of the fuel surcharge. FedEx publishes the fuel surcharge on their website, but it is not in tidy format. This is a simple webscraping project to get the fuel surcharge from the FedEx website and munged into usable data.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>
