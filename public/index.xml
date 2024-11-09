@@ -2,46 +2,74 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Warp and Weft Data</title>
-    <link>http://localhost:4321/</link>
+    <link>https://warpandweftdata.netlify.app/</link>
     <description>Recent content on Warp and Weft Data</description>
     <generator>Hugo</generator>
     <language>en</language>
     <lastBuildDate>Thu, 07 Nov 2024 00:00:00 +0000</lastBuildDate>
-    <atom:link href="http://localhost:4321/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://warpandweftdata.netlify.app/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Webscraping FedEx Fuel Surcharges</title>
-      <link>http://localhost:4321/blog/fedex_fuel_surcharges/</link>
+      <link>https://warpandweftdata.netlify.app/blog/fedex_fuel_surcharges/</link>
       <pubDate>Thu, 07 Nov 2024 00:00:00 +0000</pubDate>
-      <guid>http://localhost:4321/blog/fedex_fuel_surcharges/</guid>
+      <guid>https://warpandweftdata.netlify.app/blog/fedex_fuel_surcharges/</guid>
       <description>&lt;h1 id=&#34;introduction&#34;&gt;Introduction&#xA;  &lt;a href=&#34;#introduction&#34;&gt;&lt;/a&gt;&#xA;&lt;/h1&gt;&#xA;&lt;p&gt;FedEx sets annual contracts with their customers. In these contracts all the costs are fixed except for the fuel surcharge. The fuel surcharge is a percentage of the total cost of the shipment and is adjusted weekly based on the price of fuel. This surcharge is a way for FedEx to pass on the cost of fuel to the customer.&lt;/p&gt;&#xA;&lt;p&gt;Since its the only moving part in the contract, it is important to keep track of the fuel surcharge. FedEx publishes the fuel surcharge on their website, but it is not in tidy format. This is a simple webscraping project to get the fuel surcharge from the FedEx website and munged into usable data.&lt;/p&gt;</description>
     </item>
     <item>
       <title>Using DuckDB in R: A Walkthrough Starting with MySQL</title>
-      <link>http://localhost:4321/blog/duckdb_intro/</link>
+      <link>https://warpandweftdata.netlify.app/blog/duckdb_intro/</link>
       <pubDate>Fri, 01 Nov 2024 00:00:00 +0000</pubDate>
-      <guid>http://localhost:4321/blog/duckdb_intro/</guid>
+      <guid>https://warpandweftdata.netlify.app/blog/duckdb_intro/</guid>
       <description>&lt;h1 id=&#34;introduction&#34;&gt;Introduction&#xA;  &lt;a href=&#34;#introduction&#34;&gt;&lt;/a&gt;&#xA;&lt;/h1&gt;&#xA;&lt;p&gt;In this walkthrough, we will demonstrate how to use DuckDB in R, starting by connecting to a MySQL server. By integrating MySQL and DuckDB, you can leverage the strengths of both databases within your data science workflows. This guide will help you retrieve data from MySQL, import it into DuckDB, and perform efficient analytical queries.&lt;/p&gt;&#xA;&#xA;&#xA;&#xA;&#xA;&lt;h2 id=&#34;prerequisites&#34;&gt;Prerequisites&#xA;  &lt;a href=&#34;#prerequisites&#34;&gt;&lt;svg class=&#34;anchor-symbol&#34; aria-hidden=&#34;true&#34; height=&#34;26&#34; width=&#34;26&#34; viewBox=&#34;0 0 22 22&#34; xmlns=&#34;http://www.w3.org/2000/svg&#34;&gt;&#xA;      &lt;path d=&#34;M0 0h24v24H0z&#34; fill=&#34;currentColor&#34;&gt;&lt;/path&gt;&#xA;      &lt;path d=&#34;M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76.0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71.0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71.0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76.0 5-2.24 5-5s-2.24-5-5-5z&#34;&gt;&lt;/path&gt;&#xA;    &lt;/svg&gt;&lt;/a&gt;&#xA;&lt;/h2&gt;&#xA;&lt;p&gt;R and RStudio: Ensure you have R and RStudio installed.&#xA;MySQL Server: Access to a MySQL server with the necessary permissions.&#xA;Required R Packages: &lt;code&gt;RMySQL&lt;/code&gt;, &lt;code&gt;DBI&lt;/code&gt;, &lt;code&gt;duckdb&lt;/code&gt;, &lt;code&gt;dplyr&lt;/code&gt;, &lt;code&gt;dbplyr&lt;/code&gt;, &lt;code&gt;ggplot2&lt;/code&gt;&lt;/p&gt;</description>
     </item>
     <item>
       <title>My Resume</title>
-      <link>http://localhost:4321/cv/resume/</link>
+      <link>https://warpandweftdata.netlify.app/cv/resume/</link>
       <pubDate>Mon, 21 Oct 2024 00:00:00 +0000</pubDate>
-      <guid>http://localhost:4321/cv/resume/</guid>
+      <guid>https://warpandweftdata.netlify.app/cv/resume/</guid>
       <description>&lt;h1 id=&#34;steve-ewing&#34;&gt;Steve Ewing&#xA;  &lt;a href=&#34;#steve-ewing&#34;&gt;&lt;/a&gt;&#xA;&lt;/h1&gt;&#xA;&lt;p&gt;&lt;strong&gt;Email:&lt;/strong&gt; &#xA;&lt;a href=&#34;mailto:sewing@warpandweftdata.com&#34;&gt;sewing@warpandweftdata.com&lt;/a&gt;&lt;br&gt;&#xA;&lt;strong&gt;Location:&lt;/strong&gt; Lilburn, GA&lt;br&gt;&#xA;&lt;strong&gt;Phone:&lt;/strong&gt; (973) 907-6713&lt;/p&gt;&#xA;&lt;hr&gt;&#xA;&#xA;&#xA;&#xA;&#xA;&lt;h2 id=&#34;experience&#34;&gt;EXPERIENCE&#xA;  &lt;a href=&#34;#experience&#34;&gt;&lt;svg class=&#34;anchor-symbol&#34; aria-hidden=&#34;true&#34; height=&#34;26&#34; width=&#34;26&#34; viewBox=&#34;0 0 22 22&#34; xmlns=&#34;http://www.w3.org/2000/svg&#34;&gt;&#xA;      &lt;path d=&#34;M0 0h24v24H0z&#34; fill=&#34;currentColor&#34;&gt;&lt;/path&gt;&#xA;      &lt;path d=&#34;M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76.0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71.0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71.0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76.0 5-2.24 5-5s-2.24-5-5-5z&#34;&gt;&lt;/path&gt;&#xA;    &lt;/svg&gt;&lt;/a&gt;&#xA;&lt;/h2&gt;&#xA;&#xA;&#xA;&#xA;&#xA;&lt;h3 id=&#34;central-garden-and-pet--lawrenceville-ga&#34;&gt;Central Garden and Pet – Lawrenceville, GA&#xA;  &lt;a href=&#34;#central-garden-and-pet--lawrenceville-ga&#34;&gt;&lt;svg class=&#34;anchor-symbol&#34; aria-hidden=&#34;true&#34; height=&#34;26&#34; width=&#34;26&#34; viewBox=&#34;0 0 22 22&#34; xmlns=&#34;http://www.w3.org/2000/svg&#34;&gt;&#xA;      &lt;path d=&#34;M0 0h24v24H0z&#34; fill=&#34;currentColor&#34;&gt;&lt;/path&gt;&#xA;      &lt;path d=&#34;M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76.0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71.0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71.0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76.0 5-2.24 5-5s-2.24-5-5-5z&#34;&gt;&lt;/path&gt;&#xA;    &lt;/svg&gt;&lt;/a&gt;&#xA;&lt;/h3&gt;&#xA;&lt;p&gt;&lt;strong&gt;Business Intelligence Manager&lt;/strong&gt;&lt;br&gt;&#xA;&lt;em&gt;January 2021 - Present&lt;/em&gt;&lt;/p&gt;</description>
     </item>
     <item>
       <title>Contact</title>
-      <link>http://localhost:4321/contact/</link>
+      <link>https://warpandweftdata.netlify.app/contact/</link>
       <pubDate>Mon, 25 Feb 2019 13:38:41 -0600</pubDate>
-      <guid>http://localhost:4321/contact/</guid>
+      <guid>https://warpandweftdata.netlify.app/contact/</guid>
       <description>&lt;p&gt;** Contact page don&amp;rsquo;t contain a body, just the front matter above.&#xA;See form.html in the layouts folder.&lt;/p&gt;&#xA;&lt;p&gt;Formspree requires a (free) account and new form to be set up. The link is made on the final published url in the field: Restrict to Domain. It is possible to register up to 2 emails free and you can select which one you want the forms to go to within Formspree in the Settings tab.&#xA;**&lt;/p&gt;</description>
     </item>
     <item>
-      <title>License</title>
-      <link>http://localhost:4321/license/</link>
+      <title>About</title>
+      <link>https://warpandweftdata.netlify.app/about/</link>
+      <pubDate>Thu, 05 May 2016 21:48:51 -0700</pubDate>
+      <guid>https://warpandweftdata.netlify.app/about/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title></title>
+      <link>https://warpandweftdata.netlify.app/about/header/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>http://localhost:4321/license/</guid>
-      <description>&lt;p&gt;My &#xA;&lt;a href=&#34;http://localhost:4321/post/&#34;&gt;blog posts&lt;/a&gt; are released under a &#xA;&lt;a href=&#34;http://creativecommons.org/licenses/by-sa/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Creative Commons Attribution-ShareAlike 4.0 International License&lt;/a&gt;.&lt;/p&gt;&#xA;&lt;center&gt;&#xA;&lt;i class=&#34;fab fa-creative-commons fa-2x&#34;&gt;&lt;/i&gt;&lt;i class=&#34;fab fa-creative-commons-by fa-2x&#34;&gt;&lt;/i&gt;&lt;i class=&#34;fab fa-creative-commons-sa fa-2x&#34;&gt;&lt;/i&gt;&#xA;&lt;/center&gt;</description>
+      <guid>https://warpandweftdata.netlify.app/about/header/</guid>
+      <description>&lt;!-- this is a subheadline --&gt;</description>
+    </item>
+    <item>
+      <title></title>
+      <link>https://warpandweftdata.netlify.app/about/sidebar/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://warpandweftdata.netlify.app/about/sidebar/</guid>
+      <description>&lt;p&gt;** index doesn&amp;rsquo;t contain a body, just front matter above.&#xA;See about/list.html in the layouts folder **&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>About Me</title>
+      <link>https://warpandweftdata.netlify.app/about/main/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://warpandweftdata.netlify.app/about/main/</guid>
+      <description>&lt;p&gt;** index doesn&amp;rsquo;t contain a body, just front matter above.&#xA;See about/list.html in the layouts folder **&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>License</title>
+      <link>https://warpandweftdata.netlify.app/license/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://warpandweftdata.netlify.app/license/</guid>
+      <description>&lt;p&gt;My &#xA;&lt;a href=&#34;https://warpandweftdata.netlify.app/post/&#34;&gt;blog posts&lt;/a&gt; are released under a &#xA;&lt;a href=&#34;http://creativecommons.org/licenses/by-sa/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Creative Commons Attribution-ShareAlike 4.0 International License&lt;/a&gt;.&lt;/p&gt;&#xA;&lt;center&gt;&#xA;&lt;i class=&#34;fab fa-creative-commons fa-2x&#34;&gt;&lt;/i&gt;&lt;i class=&#34;fab fa-creative-commons-by fa-2x&#34;&gt;&lt;/i&gt;&lt;i class=&#34;fab fa-creative-commons-sa fa-2x&#34;&gt;&lt;/i&gt;&#xA;&lt;/center&gt;</description>
     </item>
   </channel>
 </rss>
