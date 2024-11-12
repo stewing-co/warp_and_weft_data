@@ -61,34 +61,13 @@ Looks like a bunch of these places aren't even countries per se.
 
 ```{r}
 # Calculate the count of each type
-type_counts <- no_sub_countries_map %>%
-  count(type)
-
-# Calculate the count of each type
-type_counts <- no_sub_countries_map %>%
+type_counts <- no_sub_countries %>%
   count(type)
 
 # Plot the bar chart
 ggplot(type_counts, aes(x = type, y = n, fill = type)) +
-  geom_bar(stat = "identity", color = "#4b2e2a", size = 0.3) +     # Use 'identity' to plot pre-counted data
-  scale_fill_manual(values = c(
-    "State" = "#8b4513",         # Example color for "State"
-    "Outlying area" = "#D2B48C", # Example color for "Outlying area"
-    "District" = "#4B2E2A"       # Example color for "District"
-  )) +                                                               # Customize colors based on 'type'
+  geom_bar(stat = "identity", color = "#4b2e2a", linewidth = 0.3) +    
   theme_minimal() +
-  theme(
-    plot.background = element_rect(fill = "#f5deb3", color = NA),    # Parchment-style background
-    panel.grid.major = element_blank(),                              # Remove major grid lines for a clean look
-    panel.grid.minor = element_blank(),                              # Remove minor grid lines
-    panel.background = element_blank(),
-    plot.title = element_text(size = 20, face = "bold", family = "pirata", hjust = 0.5, color = "#4b2e2a"),
-    axis.title.x = element_text(size = 14, face = "bold", color = "#4b2e2a", family = "pirata"),
-    axis.title.y = element_text(size = 14, face = "bold", color = "#4b2e2a", family = "pirata"),
-    axis.text.x = element_text(size = 12, color = "#4b2e2a", family = "pirata"),
-    axis.text.y = element_text(size = 12, color = "#4b2e2a", family = "pirata"),
-    legend.position = "none"                                         # Hide legend since colors are clear in the bar chart
-  ) +
   labs(
     title = "Count of Countries by Type",
     x = "Country Type",
@@ -110,7 +89,7 @@ no_sub_2$name_long
 Gah, those aren't independant. They all have soverigns!!
 
 ```{r}
-no_sub_2 |> select(sovereignt, name_long)
+no_sub_2 |> select(sovereignt, name_long) 
 ```
 
 what next...
