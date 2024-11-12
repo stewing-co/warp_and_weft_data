@@ -3,21 +3,30 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>http://localhost:4321/blog/</loc>
-    <lastmod>2024-11-07T00:00:00+00:00</lastmod>
+    <lastmod>2024-11-11T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:4321/tags/maps/</loc>
+    <lastmod>2024-11-11T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:4321/tags/r/</loc>
+    <lastmod>2024-11-11T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:4321/tags/</loc>
+    <lastmod>2024-11-11T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:4321/tags/tidy-tuesday/</loc>
+    <lastmod>2024-11-11T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:4321/blog/tt_11-11-24/</loc>
+    <lastmod>2024-11-11T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:4321/</loc>
+    <lastmod>2024-11-11T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:4321/tags/fedex/</loc>
     <lastmod>2024-11-07T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>http://localhost:4321/tags/r/</loc>
-    <lastmod>2024-11-07T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>http://localhost:4321/tags/rvest/</loc>
-    <lastmod>2024-11-07T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>http://localhost:4321/tags/</loc>
-    <lastmod>2024-11-07T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>http://localhost:4321/</loc>
     <lastmod>2024-11-07T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:4321/blog/fedex_fuel_surcharges/</loc>
