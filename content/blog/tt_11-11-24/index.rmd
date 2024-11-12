@@ -104,7 +104,7 @@ We want only actual countries, what's the list?
 no_sub_2 <- no_sub_countries |>
   filter(type %in% c('Country', 'Sovereign Country'))
  
-no_sub_2$name_long
+no_sub_2$name_long 
 ```
 
 Gah, those aren't independant. They all have soverigns!!
