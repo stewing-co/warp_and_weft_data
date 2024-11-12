@@ -6,20 +6,34 @@
     <description>Recent content in Tags on Warp and Weft Data</description>
     <generator>Hugo</generator>
     <language>en</language>
-    <lastBuildDate>Thu, 07 Nov 2024 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 11 Nov 2024 00:00:00 +0000</lastBuildDate>
     <atom:link href="http://localhost:4321/tags/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>FedEx</title>
-      <link>http://localhost:4321/tags/fedex/</link>
-      <pubDate>Thu, 07 Nov 2024 00:00:00 +0000</pubDate>
-      <guid>http://localhost:4321/tags/fedex/</guid>
+      <title>Maps</title>
+      <link>http://localhost:4321/tags/maps/</link>
+      <pubDate>Mon, 11 Nov 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:4321/tags/maps/</guid>
       <description></description>
     </item>
     <item>
       <title>R</title>
       <link>http://localhost:4321/tags/r/</link>
-      <pubDate>Thu, 07 Nov 2024 00:00:00 +0000</pubDate>
+      <pubDate>Mon, 11 Nov 2024 00:00:00 +0000</pubDate>
       <guid>http://localhost:4321/tags/r/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Tidy Tuesday</title>
+      <link>http://localhost:4321/tags/tidy-tuesday/</link>
+      <pubDate>Mon, 11 Nov 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:4321/tags/tidy-tuesday/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>FedEx</title>
+      <link>http://localhost:4321/tags/fedex/</link>
+      <pubDate>Thu, 07 Nov 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:4321/tags/fedex/</guid>
       <description></description>
     </item>
     <item>

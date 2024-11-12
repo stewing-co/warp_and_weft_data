@@ -37,9 +37,9 @@ country_subdivisions <-
 world_data <- ne_countries(scale = "medium", returnclass = "sf")
 
 no_sub_countries_map <- world_data |>
-  left_join(countries, by = c("iso_a2" = "alpha_2")) |>
+  left_join(countries, by = c("iso_a2_eh" = "alpha_2")) |>
   filter(!is.na(brk_name),
-         !iso_a2 %in% country_subdivisions$alpha_2)  
+         !iso_a2_eh %in% country_subdivisions$alpha_2)  
 
 ggplot(no_sub_countries_map) +
   geom_sf(aes(fill = type)) +          
