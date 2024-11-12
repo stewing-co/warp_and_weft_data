@@ -11,6 +11,10 @@ categories:
 layout: single
 ---
 
+It has been said that "all politics is local." It may feel like that to national candidates and their teams but for the median guy on the street national politics can seem really far away. 
+
+Some places in the world all politics really is local politics. In this weeks Tidy Tuesday I'll look at the countries that don't have ISO_3166_2 records.
+
 ```{r, warning=FALSE, message=FALSE}
 library(tidyverse)
 library(ISOcodes)
@@ -35,14 +39,14 @@ country_subdivisions <-
 
 world_data <- ne_countries(scale = "medium", returnclass = "sf")
 
-no_sub_countries_map <- world_data |>
-  left_join(countries, by = c("iso_a2_eh" = "alpha_2")) |>
+no_sub_countries <- world_data |>
+  inner_join(countries, by = c("iso_a2_eh" = "alpha_2")) |>
   filter(!is.na(brk_name),
          !iso_a2_eh %in% country_subdivisions$alpha_2)  
 
-ggplot(no_sub_countries_map) +
+ggplot(no_sub_countries) +
   geom_sf(aes(fill = type)) +          
-  geom_sf_text(aes(label = brk_name), size = 3, color = "#332f2c", check_overlap = TRUE, fontface = "italic", family = "pirata") + 
+  geom_sf_text(aes(label = brk_name), size = 4, color = "#332f2c", check_overlap = TRUE, fontface = "italic", family = "pirata") + 
   theme(
     plot.background = element_rect(fill = "#add8e6", color = NA),    
     plot.title = element_text(size = 20, face = "bold", family = "pirata", hjust = 0.5, color = "#4b2e2a"),
@@ -52,3 +56,61 @@ ggplot(no_sub_countries_map) +
 
 
 ```
+
+Looks like a bunch of these places aren't even countries per se.
+
+```{r}
+# Calculate the count of each type
+type_counts <- no_sub_countries_map %>%
+  count(type)
+
+# Calculate the count of each type
+type_counts <- no_sub_countries_map %>%
+  count(type)
+
+# Plot the bar chart
+ggplot(type_counts, aes(x = type, y = n, fill = type)) +
+  geom_bar(stat = "identity", color = "#4b2e2a", size = 0.3) +     # Use 'identity' to plot pre-counted data
+  scale_fill_manual(values = c(
+    "State" = "#8b4513",         # Example color for "State"
+    "Outlying area" = "#D2B48C", # Example color for "Outlying area"
+    "District" = "#4B2E2A"       # Example color for "District"
+  )) +                                                               # Customize colors based on 'type'
+  theme_minimal() +
+  theme(
+    plot.background = element_rect(fill = "#f5deb3", color = NA),    # Parchment-style background
+    panel.grid.major = element_blank(),                              # Remove major grid lines for a clean look
+    panel.grid.minor = element_blank(),                              # Remove minor grid lines
+    panel.background = element_blank(),
+    plot.title = element_text(size = 20, face = "bold", family = "pirata", hjust = 0.5, color = "#4b2e2a"),
+    axis.title.x = element_text(size = 14, face = "bold", color = "#4b2e2a", family = "pirata"),
+    axis.title.y = element_text(size = 14, face = "bold", color = "#4b2e2a", family = "pirata"),
+    axis.text.x = element_text(size = 12, color = "#4b2e2a", family = "pirata"),
+    axis.text.y = element_text(size = 12, color = "#4b2e2a", family = "pirata"),
+    legend.position = "none"                                         # Hide legend since colors are clear in the bar chart
+  ) +
+  labs(
+    title = "Count of Countries by Type",
+    x = "Country Type",
+    y = "Count"
+  )
+
+
+```
+
+We want only actual countries, what's the list?
+
+```{r}
+no_sub_2 <- no_sub_countries |>
+  filter(type %in% c('Country', 'Sovereign Country'))
+ 
+no_sub_2$name_long
+```
+
+Gah, those aren't independant. They all have soverigns!!
+
+```{r}
+no_sub_2 |> select(sovereignt, name_long)
+```
+
+what next...
