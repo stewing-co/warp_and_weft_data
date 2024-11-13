@@ -31,7 +31,7 @@ monthly_counts <- following %>%
 
 # Plotting with ggplot2
 ggplot(monthly_counts, aes(x = year_month, y = accounts_created)) +
-  geom_line(size = 1) +  # Line plot for continuity
+  geom_line(linewidth = 1) +  # Line plot for continuity
   geom_point(size = 2) + # Points for emphasis on monthly counts
   labs(
     title = "When Did the People I Follow Get Here?",
@@ -49,6 +49,6 @@ ggplot(monthly_counts, aes(x = year_month, y = accounts_created)) +
 
 ```{r}
 bs_post(
-  text = 'Test posting to bsky from R.'
+  text = 'Test posting to bsky from R. https://warpandweftdata.com/blog/bsky_r/'
 )
 ```
