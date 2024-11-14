@@ -39,7 +39,7 @@ monthly_counts <- following %>%
 
 # Plotting with ggplot2
 ggplot(monthly_counts, aes(x = year_month, y = accounts_created)) +
-  geom_line(size = 1) +  # Line plot for continuity
+  geom_line(linewidth = 1) +  # Line plot for continuity
   geom_point(size = 2) + # Points for emphasis on monthly counts
   labs(
     title = "When Did the People I Follow Get Here?",
@@ -54,21 +54,13 @@ ggplot(monthly_counts, aes(x = year_month, y = accounts_created)) +
   scale_x_date(date_labels = "%b %Y", date_breaks = "1 month")
 ```
 
-```
-## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
-## ℹ Please use `linewidth` instead.
-## This warning is displayed once every 8 hours.
-## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-## generated.
-```
-
 <img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-1.png" width="672" />
 
 
 
 ``` r
 bs_post(
-  text = 'Test posting to bsky from R.'
+  text = "Since I'm posting this from R-Studio I guess bsky already has drafts and scheduling. #Rstats @bskyr.bsky.social"
 )
 ```
 

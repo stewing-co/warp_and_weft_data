@@ -9,10 +9,12 @@ link_list_label: "Interests" # bookmarks, elsewhere, etc.
 link_list:
 - name: R Stats
   url: https://en.wikipedia.org/wiki/R_(programming_language)
-- name: Maps
-  url: https://en.wikipedia.org/wiki/Map
+- name: Books
+  url: https://en.wikipedia.org/wiki/Book
 - name: ATL UTD FC
   url: https://en.wikipedia.org/wiki/Atlanta_United_FC
+- name: Caffeine
+  url: https://en.wikipedia.org/wiki/Caffeine
 ---
 
 ** index doesn't contain a body, just front matter above.

@@ -49,6 +49,6 @@ ggplot(monthly_counts, aes(x = year_month, y = accounts_created)) +
 
 ```{r}
 bs_post(
-  text = 'Test posting to bsky from R. https://warpandweftdata.com/blog/bsky_r/'
+  text = "Since I'm posting this from R-Studio I guess bsky already has drafts and scheduling. #Rstats @bskyr.bsky.social"
 )
 ```
