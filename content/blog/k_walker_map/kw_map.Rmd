@@ -11,7 +11,7 @@ categories:
 layout: single
 ---
 
-Can I copy Kyle's map and post to bsky as a reply?
+Can I copy kylewalker.bsky.social's map and post to bsky as a reply?
 
 First the map.
 ```{r}
@@ -31,7 +31,7 @@ us_wfh <- get_acs(
 
 # Interactive map with mapgl
 library(mapgl)
-
+ 
 # Format the popup
 popup_content <- glue::glue(
   "<strong>{us_wfh$NAME}</strong><br>",
