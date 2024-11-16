@@ -6,20 +6,27 @@
     <description>Recent content in Tags on Warp and Weft Data</description>
     <generator>Hugo</generator>
     <language>en</language>
-    <lastBuildDate>Mon, 11 Nov 2024 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 16 Nov 2024 00:00:00 +0000</lastBuildDate>
     <atom:link href="http://localhost:4321/tags/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Maps</title>
-      <link>http://localhost:4321/tags/maps/</link>
-      <pubDate>Mon, 11 Nov 2024 00:00:00 +0000</pubDate>
-      <guid>http://localhost:4321/tags/maps/</guid>
+      <title>Bluesky</title>
+      <link>http://localhost:4321/tags/bluesky/</link>
+      <pubDate>Sat, 16 Nov 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:4321/tags/bluesky/</guid>
       <description></description>
     </item>
     <item>
       <title>R</title>
       <link>http://localhost:4321/tags/r/</link>
-      <pubDate>Mon, 11 Nov 2024 00:00:00 +0000</pubDate>
+      <pubDate>Sat, 16 Nov 2024 00:00:00 +0000</pubDate>
       <guid>http://localhost:4321/tags/r/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Maps</title>
+      <link>http://localhost:4321/tags/maps/</link>
+      <pubDate>Mon, 11 Nov 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:4321/tags/maps/</guid>
       <description></description>
     </item>
     <item>
