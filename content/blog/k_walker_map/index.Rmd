@@ -6,7 +6,7 @@ date: 2024-11-16
 author: "Steve Ewing"
 draft: false
 series:
-tags: ["R", "bluesky"]
+tags: ["R", "bluesky", "maps"]
 categories:
 layout: single
 ---

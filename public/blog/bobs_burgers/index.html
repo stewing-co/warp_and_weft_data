@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=4321&amp;path=livereload" data-no-instant defer></script>
+  
+                           
+     
+
+
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="generator" content="Hugo 0.136.2">
+<title>Tidy Tuesday: 2024-11-19 | Warp and Weft Data</title>
+
+
+<meta property="twitter:site" content="@blue_pibble">
+<meta property="twitter:creator" content="@blue_pibble">
+
+
+
+
+
+
+
+  
+    
+  
+<meta name="description" content="Bob&#39;s Burgers">
+
+
+<meta property="og:site_name" content="Warp and Weft Data">
+<meta property="og:title" content="Tidy Tuesday: 2024-11-19 | Warp and Weft Data">
+<meta property="og:description" content="Bob&#39;s Burgers" />
+<meta property="og:type" content="page" />
+<meta property="og:url" content="http://localhost:4321/blog/bobs_burgers/" />
+<meta property="og:locale" content="en">
+
+
+
+
+    
+        <meta property="og:image" content="http://localhost:4321/blog/bobs_burgers/featured.jpg" >
+        <meta property="twitter:card" content="summary_large_image">
+        <meta name="twitter:image" content="http://localhost:4321/blog/bobs_burgers/featured.jpg" >
+    
+    
+  
+  <meta itemprop="name" content="Tidy Tuesday: 2024-11-19">
+  <meta itemprop="description" content="First copy to cool graphic that Steven Ponce made.
+## 1. LOAD PACKAGES &amp; SETUP ---- if (!require(&#34;pacman&#34;)) install.packages(&#34;pacman&#34;) pacman::p_load( tidyverse, # Easily Install and Load the &#39;Tidyverse&#39; ggtext, # Improved Text Rendering Support for &#39;ggplot2&#39; showtext, # Using Fonts More Easily in R Graphs janitor, # Simple Tools for Examining and Cleaning Dirty Data skimr, # Compact and Flexible Summaries of Data scales, # Scale Functions for Visualization glue, # Interpreted String Literals bobsburgersR, # Bob&#39;s Burgers Datasets for Data Visualization tidytext, # Text Mining using &#39;dplyr&#39;, &#39;ggplot2&#39;, and Other Tidy Tools textdata, # Download and Load Various Text Datasets patchwork # The Composer of Plots ) ### |- figure size ---- camcorder::gg_record( dir = here::here(&#34;temp_plots&#34;), device = &#34;png&#34;, width = 9, height = 10, units = &#34;in&#34;, dpi = 320 ) ## Warning in camcorder::gg_record(dir = here::here(&#34;temp_plots&#34;), device = &#34;png&#34;,## : Writing to a folder that already exists. gg_playback may use more files than## intended! ### |- resolution ---- showtext_opts(dpi = 320, regular.wt = 300, bold.wt = 800) bobsburgersR::transcript_data ## # A tibble: 181,031 × 6## season episode title line raw_text dialogue## &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; ## 1 1 1 Human Flesh 1 &lt;NA&gt; &lt;NA&gt; ## 2 1 1 Human Flesh 2 &lt;NA&gt; &lt;NA&gt; ## 3 1 1 Human Flesh 3 &lt;NA&gt; &lt;NA&gt; ## 4 1 1 Human Flesh 4 Listen, pep talk. Listen,…## 5 1 1 Human Flesh 5 Big day today. Big day…## 6 1 1 Human Flesh 6 It&#39;s our grand re-re-re-opening. It&#39;s ou…## 7 1 1 Human Flesh 7 It&#39;s labor day weekend, And it loo… It&#39;s la…## 8 1 1 Human Flesh 8 So we have to-- Big day for anothe… So we h…## 9 1 1 Human Flesh 9 Go ahead, sorry. Go ahea…## 10 1 1 Human Flesh 10 Go ahead, do your pep. Go ahea…## # ℹ 181,021 more rows glimpse(transcript_data) ## Rows: 181,031## Columns: 6## $ season &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1…## $ episode &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1…## $ title &lt;chr&gt; &#34;Human Flesh&#34;, &#34;Human Flesh&#34;, &#34;Human Flesh&#34;, &#34;Human Flesh&#34;, &#34;…## $ line &lt;dbl&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18…## $ raw_text &lt;chr&gt; NA, NA, NA, &#34;Listen, pep talk.&#34;, &#34;Big day today.&#34;, &#34;It&#39;s our …## $ dialogue &lt;chr&gt; NA, NA, NA, &#34;Listen, pep talk.&#34;, &#34;Big day today.&#34;, &#34;It&#39;s our … skim(transcript_data) Table: Table 1: Data summary">
+  <meta itemprop="datePublished" content="2024-11-18T00:00:00+00:00">
+  <meta itemprop="dateModified" content="2024-11-18T00:00:00+00:00">
+  <meta itemprop="wordCount" content="2360">
+  <meta itemprop="image" content="http://localhost:4321/blog/bobs_burgers/featured.jpg">
+  <meta itemprop="keywords" content="R">
+  
+  <!--[if IE]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  <link rel="shortcut icon" href="/img/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="/img/favicon.ico" type="image/x-icon">
+  
+  
+  <link rel="stylesheet" href="/style.main.min.0820a865770f259724d61d170adbb19db040647ecaa3b2023c16f04ada7fc7d2.css" integrity="sha256-CCCoZXcPJZck1h0XCtuxnbBAZH7Ko7ICPBbwStp/x9I=" media="screen">
+  
+  
+  <script src="/panelset.min.ed1ac24b6e16f4e2481e3d1d098ae66f5bc77438aef619e6e266d8ac5b00dc72.js" type="text/javascript"></script>
+  
+  
+  <script src="/main.min.f0b39b51e43cf3881368fb093708a9d3b3499e674af4b4e47e27e512a5d411e2.js" type="text/javascript"></script>
+</head>
+<body>
+      <div class="grid-container single">
+<header class="site-header pt4 pb2 mb4 bb b--transparent ph5 headroom z-max" role="banner">
+  <nav class="site-nav db dt-l w-100" role="navigation">
+    <a class="site-brand db dtc-l v-mid link no-underline w-100 w-33-l tc tl-l" href="http://localhost:4321/" title="Home">
+      <img src="/img/logo_leaf.png" class="dib db-l h2 w-auto" alt="Warp and Weft Data">
+    </a>
+    <div class="site-links db dtc-l v-mid w-100 w-47-l tc tr-l mt3 mt0-l ttu tracked">
+      
+        
+        
+        
+      <a class="link f6 f5-l dib pv1 ph2 " href="/about/" title="About Steve Ewing">About</a>
+      
+        
+        
+        
+      <a class="link f6 f5-l dib pv1 ph2 active" href="/blog/" title="Blog">Blog</a>
+      
+      
+    </div>
+  </nav>
+</header>
+
+<main class="page-main pa4" role="main">
+  <section class="page-content mw7 center">
+    <article class="post-content pa0 ph4-l">
+      <header class="post-header">
+        <h1 class="f1 lh-solid measure-narrow mb3 fw4">Tidy Tuesday: 2024-11-19</h1>
+        <h4 class="f4 mt0 mb4 lh-title measure">Bob&#39;s Burgers</h4>
+        <p class="f6 measure lh-copy mv1">By Steve Ewing in <a href="http://localhost:4321/categories/tidy-tuesday">Tidy Tuesday</a> </p>
+        <p class="f7 db mv0 ttu">November 18, 2024</p>
+
+      
+
+      </header>
+      <section class="post-body pt5 pb4">
+        <p>First copy to cool graphic that Steven Ponce made.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic">## 1. LOAD PACKAGES &amp; SETUP ----</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">if</span> (<span style="color:#000;font-weight:bold">!</span><span style="color:#900;font-weight:bold">require</span>(<span style="color:#d14">&#34;pacman&#34;</span>)) <span style="color:#900;font-weight:bold">install.packages</span>(<span style="color:#d14">&#34;pacman&#34;</span>)
+</span></span><span style="display:flex;"><span>pacman<span style="color:#000;font-weight:bold">::</span><span style="color:#900;font-weight:bold">p_load</span>(
+</span></span><span style="display:flex;"><span>  tidyverse,         <span style="color:#998;font-style:italic"># Easily Install and Load the &#39;Tidyverse&#39;</span>
+</span></span><span style="display:flex;"><span>  ggtext,            <span style="color:#998;font-style:italic"># Improved Text Rendering Support for &#39;ggplot2&#39;</span>
+</span></span><span style="display:flex;"><span>  showtext,          <span style="color:#998;font-style:italic"># Using Fonts More Easily in R Graphs</span>
+</span></span><span style="display:flex;"><span>  janitor,           <span style="color:#998;font-style:italic"># Simple Tools for Examining and Cleaning Dirty Data</span>
+</span></span><span style="display:flex;"><span>  skimr,             <span style="color:#998;font-style:italic"># Compact and Flexible Summaries of Data</span>
+</span></span><span style="display:flex;"><span>  scales,            <span style="color:#998;font-style:italic"># Scale Functions for Visualization</span>
+</span></span><span style="display:flex;"><span>  glue,              <span style="color:#998;font-style:italic"># Interpreted String Literals</span>
+</span></span><span style="display:flex;"><span>  bobsburgersR,      <span style="color:#998;font-style:italic"># Bob&#39;s Burgers Datasets for Data Visualization</span>
+</span></span><span style="display:flex;"><span>  tidytext,          <span style="color:#998;font-style:italic"># Text Mining using &#39;dplyr&#39;, &#39;ggplot2&#39;, and Other Tidy Tools </span>
+</span></span><span style="display:flex;"><span>  textdata,          <span style="color:#998;font-style:italic"># Download and Load Various Text Datasets </span>
+</span></span><span style="display:flex;"><span>  patchwork          <span style="color:#998;font-style:italic"># The Composer of Plots</span>
+</span></span><span style="display:flex;"><span>)    
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">### |- figure size ----</span>
+</span></span><span style="display:flex;"><span>camcorder<span style="color:#000;font-weight:bold">::</span><span style="color:#900;font-weight:bold">gg_record</span>(
+</span></span><span style="display:flex;"><span>  dir    <span style="color:#000;font-weight:bold">=</span> here<span style="color:#000;font-weight:bold">::</span><span style="color:#900;font-weight:bold">here</span>(<span style="color:#d14">&#34;temp_plots&#34;</span>),
+</span></span><span style="display:flex;"><span>  device <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;png&#34;</span>,
+</span></span><span style="display:flex;"><span>  width  <span style="color:#000;font-weight:bold">=</span>  <span style="color:#099">9</span>,
+</span></span><span style="display:flex;"><span>  height <span style="color:#000;font-weight:bold">=</span>  <span style="color:#099">10</span>,
+</span></span><span style="display:flex;"><span>  units  <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;in&#34;</span>,
+</span></span><span style="display:flex;"><span>  dpi    <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">320</span>
+</span></span><span style="display:flex;"><span>)
+</span></span></code></pre></div><pre tabindex="0"><code>## Warning in camcorder::gg_record(dir = here::here(&#34;temp_plots&#34;), device = &#34;png&#34;,
+## : Writing to a folder that already exists. gg_playback may use more files than
+## intended!
+</code></pre><div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic">### |- resolution ----</span>
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">showtext_opts</span>(dpi <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">320</span>, regular.wt <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">300</span>, bold.wt <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">800</span>)
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>bobsburgersR<span style="color:#000;font-weight:bold">::</span>transcript_data
+</span></span></code></pre></div><pre tabindex="0"><code>## # A tibble: 181,031 × 6
+##    season episode title        line raw_text                            dialogue
+##     &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;       &lt;dbl&gt; &lt;chr&gt;                               &lt;chr&gt;   
+##  1      1       1 Human Flesh     1 &lt;NA&gt;                                &lt;NA&gt;    
+##  2      1       1 Human Flesh     2 &lt;NA&gt;                                &lt;NA&gt;    
+##  3      1       1 Human Flesh     3 &lt;NA&gt;                                &lt;NA&gt;    
+##  4      1       1 Human Flesh     4 Listen, pep talk.                   Listen,…
+##  5      1       1 Human Flesh     5 Big day today.                      Big day…
+##  6      1       1 Human Flesh     6 It&#39;s our grand re-re-re-opening.    It&#39;s ou…
+##  7      1       1 Human Flesh     7 It&#39;s labor day weekend, And it loo… It&#39;s la…
+##  8      1       1 Human Flesh     8 So we have to-- Big day for anothe… So we h…
+##  9      1       1 Human Flesh     9 Go ahead, sorry.                    Go ahea…
+## 10      1       1 Human Flesh    10 Go ahead, do your pep.              Go ahea…
+## # ℹ 181,021 more rows
+</code></pre><div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#900;font-weight:bold">glimpse</span>(transcript_data)
+</span></span></code></pre></div><pre tabindex="0"><code>## Rows: 181,031
+## Columns: 6
+## $ season   &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1…
+## $ episode  &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1…
+## $ title    &lt;chr&gt; &#34;Human Flesh&#34;, &#34;Human Flesh&#34;, &#34;Human Flesh&#34;, &#34;Human Flesh&#34;, &#34;…
+## $ line     &lt;dbl&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18…
+## $ raw_text &lt;chr&gt; NA, NA, NA, &#34;Listen, pep talk.&#34;, &#34;Big day today.&#34;, &#34;It&#39;s our …
+## $ dialogue &lt;chr&gt; NA, NA, NA, &#34;Listen, pep talk.&#34;, &#34;Big day today.&#34;, &#34;It&#39;s our …
+</code></pre><div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#900;font-weight:bold">skim</span>(transcript_data)
+</span></span></code></pre></div><p>Table: <span id="tab:unnamed-chunk-3"></span>Table 1: Data summary</p>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: left"></th>
+          <th style="text-align: left"></th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left">Name</td>
+          <td style="text-align: left">transcript_data</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Number of rows</td>
+          <td style="text-align: left">181031</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Number of columns</td>
+          <td style="text-align: left">6</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">_______________________</td>
+          <td style="text-align: left"></td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Column type frequency:</td>
+          <td style="text-align: left"></td>
+      </tr>
+      <tr>
+          <td style="text-align: left">character</td>
+          <td style="text-align: left">3</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">numeric</td>
+          <td style="text-align: left">3</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">________________________</td>
+          <td style="text-align: left"></td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Group variables</td>
+          <td style="text-align: left">None</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Variable type: character</strong></p>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: left">skim_variable</th>
+          <th style="text-align: right">n_missing</th>
+          <th style="text-align: right">complete_rate</th>
+          <th style="text-align: right">min</th>
+          <th style="text-align: right">max</th>
+          <th style="text-align: right">empty</th>
+          <th style="text-align: right">n_unique</th>
+          <th style="text-align: right">whitespace</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left">title</td>
+          <td style="text-align: right">0</td>
+          <td style="text-align: right">1.00</td>
+          <td style="text-align: right">5</td>
+          <td style="text-align: right">78</td>
+          <td style="text-align: right">0</td>
+          <td style="text-align: right">272</td>
+          <td style="text-align: right">0</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">raw_text</td>
+          <td style="text-align: right">33159</td>
+          <td style="text-align: right">0.82</td>
+          <td style="text-align: right">1</td>
+          <td style="text-align: right">1233</td>
+          <td style="text-align: right">0</td>
+          <td style="text-align: right">127978</td>
+          <td style="text-align: right">0</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">dialogue</td>
+          <td style="text-align: right">33331</td>
+          <td style="text-align: right">0.82</td>
+          <td style="text-align: right">1</td>
+          <td style="text-align: right">1157</td>
+          <td style="text-align: right">0</td>
+          <td style="text-align: right">127532</td>
+          <td style="text-align: right">0</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Variable type: numeric</strong></p>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: left">skim_variable</th>
+          <th style="text-align: right">n_missing</th>
+          <th style="text-align: right">complete_rate</th>
+          <th style="text-align: right">mean</th>
+          <th style="text-align: right">sd</th>
+          <th style="text-align: right">p0</th>
+          <th style="text-align: right">p25</th>
+          <th style="text-align: right">p50</th>
+          <th style="text-align: right">p75</th>
+          <th style="text-align: right">p100</th>
+          <th style="text-align: left">hist</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left">season</td>
+          <td style="text-align: right">0</td>
+          <td style="text-align: right">1</td>
+          <td style="text-align: right">9.31</td>
+          <td style="text-align: right">4.00</td>
+          <td style="text-align: right">1</td>
+          <td style="text-align: right">6</td>
+          <td style="text-align: right">10</td>
+          <td style="text-align: right">13</td>
+          <td style="text-align: right">14</td>
+          <td style="text-align: left">▂▃▂▃▇</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">episode</td>
+          <td style="text-align: right">0</td>
+          <td style="text-align: right">1</td>
+          <td style="text-align: right">10.54</td>
+          <td style="text-align: right">6.14</td>
+          <td style="text-align: right">1</td>
+          <td style="text-align: right">5</td>
+          <td style="text-align: right">10</td>
+          <td style="text-align: right">16</td>
+          <td style="text-align: right">23</td>
+          <td style="text-align: left">▇▆▇▅▅</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">line</td>
+          <td style="text-align: right">0</td>
+          <td style="text-align: right">1</td>
+          <td style="text-align: right">483.43</td>
+          <td style="text-align: right">459.72</td>
+          <td style="text-align: right">1</td>
+          <td style="text-align: right">167</td>
+          <td style="text-align: right">333</td>
+          <td style="text-align: right">557</td>
+          <td style="text-align: right">2004</td>
+          <td style="text-align: left">▇▃▁▁▁</td>
+      </tr>
+  </tbody>
+</table>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Calculate metrics </span>
+</span></span><span style="display:flex;"><span>episode_metrics <span style="color:#000;font-weight:bold">&lt;-</span> transcript_data <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">filter</span>(<span style="color:#000;font-weight:bold">!</span><span style="color:#900;font-weight:bold">is.na</span>(dialogue)) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">group_by</span>(season, episode) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">summarise</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic"># Basic dialogue metrics</span>
+</span></span><span style="display:flex;"><span>    dialogue_density <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">n</span>() <span style="color:#000;font-weight:bold">/</span> <span style="color:#900;font-weight:bold">max</span>(line),
+</span></span><span style="display:flex;"><span>    avg_length       <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">mean</span>(<span style="color:#900;font-weight:bold">str_length</span>(dialogue)),
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic"># Sentiment analysis - AFINN Sentiment Lexicon</span>
+</span></span><span style="display:flex;"><span>    sentiment_variance <span style="color:#000;font-weight:bold">=</span> dialogue <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#900;font-weight:bold">tibble</span>(text <span style="color:#000;font-weight:bold">=</span> _) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#900;font-weight:bold">unnest_tokens</span>(word, text) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#900;font-weight:bold">inner_join</span>(<span style="color:#900;font-weight:bold">get_sentiments</span>(<span style="color:#d14">&#34;afinn&#34;</span>), by <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;word&#34;</span>) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#900;font-weight:bold">pull</span>(value) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#900;font-weight:bold">var</span>(na.rm <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">TRUE</span>),
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic"># Word and punctuation metrics  </span>
+</span></span><span style="display:flex;"><span>    unique_words      <span style="color:#000;font-weight:bold">=</span> dialogue <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#900;font-weight:bold">str_split</span>(<span style="color:#d14">&#34;\\s+&#34;</span>) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#900;font-weight:bold">unlist</span>() <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#900;font-weight:bold">n_distinct</span>(),
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    question_ratio    <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">mean</span>(<span style="color:#900;font-weight:bold">str_detect</span>(dialogue, <span style="color:#d14">&#34;\\?&#34;</span>)),
+</span></span><span style="display:flex;"><span>    exclamation_ratio <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">mean</span>(<span style="color:#900;font-weight:bold">str_detect</span>(dialogue, <span style="color:#d14">&#34;!&#34;</span>)),
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    .groups <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;drop&#34;</span>
+</span></span><span style="display:flex;"><span>  ) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Scale all metrics</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">mutate</span>(<span style="color:#900;font-weight:bold">across</span>(dialogue_density<span style="color:#000;font-weight:bold">:</span>exclamation_ratio, scale))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Prepare data for visualization </span>
+</span></span><span style="display:flex;"><span>episode_metrics_long <span style="color:#000;font-weight:bold">&lt;-</span> episode_metrics <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">pivot_longer</span>(
+</span></span><span style="display:flex;"><span>    cols <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">c</span>(dialogue_density<span style="color:#000;font-weight:bold">:</span>exclamation_ratio),
+</span></span><span style="display:flex;"><span>    names_to <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;metric&#34;</span>,
+</span></span><span style="display:flex;"><span>    values_to <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;value&#34;</span>
+</span></span><span style="display:flex;"><span>  ) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">mutate</span>(
+</span></span><span style="display:flex;"><span>    angle <span style="color:#000;font-weight:bold">=</span> (<span style="color:#900;font-weight:bold">as.numeric</span>(<span style="color:#900;font-weight:bold">factor</span>(metric)) <span style="color:#000;font-weight:bold">-</span> <span style="color:#099">1</span>) <span style="color:#000;font-weight:bold">*</span> <span style="color:#099">2</span> <span style="color:#000;font-weight:bold">*</span> <span style="color:#000;font-weight:bold">pi</span> <span style="color:#000;font-weight:bold">/</span> <span style="color:#099">6</span>,
+</span></span><span style="display:flex;"><span>    hjust <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">ifelse</span>(angle <span style="color:#000;font-weight:bold">&lt;</span> <span style="color:#000;font-weight:bold">pi</span>, <span style="color:#099">1</span>, <span style="color:#099">0</span>),
+</span></span><span style="display:flex;"><span>    metric <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">case_when</span>(
+</span></span><span style="display:flex;"><span>      metric <span style="color:#000;font-weight:bold">==</span> <span style="color:#d14">&#34;dialogue_density&#34;</span> <span style="color:#000;font-weight:bold">~</span> <span style="color:#d14">&#34;Dialogue\nDensity&#34;</span>,
+</span></span><span style="display:flex;"><span>      metric <span style="color:#000;font-weight:bold">==</span> <span style="color:#d14">&#34;avg_length&#34;</span> <span style="color:#000;font-weight:bold">~</span> <span style="color:#d14">&#34;Average\nLength&#34;</span>,
+</span></span><span style="display:flex;"><span>      metric <span style="color:#000;font-weight:bold">==</span> <span style="color:#d14">&#34;sentiment_variance&#34;</span> <span style="color:#000;font-weight:bold">~</span> <span style="color:#d14">&#34;Sentiment\nVariance&#34;</span>,
+</span></span><span style="display:flex;"><span>      metric <span style="color:#000;font-weight:bold">==</span> <span style="color:#d14">&#34;unique_words&#34;</span> <span style="color:#000;font-weight:bold">~</span> <span style="color:#d14">&#34;Unique\nWords&#34;</span>,
+</span></span><span style="display:flex;"><span>      metric <span style="color:#000;font-weight:bold">==</span> <span style="color:#d14">&#34;question_ratio&#34;</span> <span style="color:#000;font-weight:bold">~</span> <span style="color:#d14">&#34;Question\nRatio&#34;</span>,
+</span></span><span style="display:flex;"><span>      metric <span style="color:#000;font-weight:bold">==</span> <span style="color:#d14">&#34;exclamation_ratio&#34;</span> <span style="color:#000;font-weight:bold">~</span> <span style="color:#d14">&#34;Exclamation\nRatio&#34;</span>
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>  )
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic">### |- plot aesthetics ----</span>
+</span></span><span style="display:flex;"><span>bkg_col      <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#d14">&#34;#f5f5f2&#34;</span>  
+</span></span><span style="display:flex;"><span>title_col    <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#d14">&#34;gray20&#34;</span>           
+</span></span><span style="display:flex;"><span>subtitle_col <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#d14">&#34;gray20&#34;</span>     
+</span></span><span style="display:flex;"><span>caption_col  <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#d14">&#34;gray30&#34;</span>   
+</span></span><span style="display:flex;"><span>text_col     <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#d14">&#34;gray20&#34;</span>   
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">### |-  titles and caption ----</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># icons</span>
+</span></span><span style="display:flex;"><span>tt <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">str_glue</span>(<span style="color:#d14">&#34;Source: {{bobsburgersR}}&#34;</span>)
+</span></span><span style="display:flex;"><span>li <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">str_glue</span>(<span style="color:#d14">&#34;&lt;span style=&#39;font-family:sans&#39;&gt;&amp;#xf08c;&lt;/span&gt;&#34;</span>)
+</span></span><span style="display:flex;"><span>gh <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">str_glue</span>(<span style="color:#d14">&#34;&lt;span style=&#39;font-family:sans&#39;&gt;&amp;#xf09b;&lt;/span&gt;&#34;</span>)
+</span></span><span style="display:flex;"><span>bs <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">str_glue</span>(<span style="color:#d14">&#34;&lt;span style=&#39;font-family:sans&#39;&gt;&amp;#xe671; &lt;/span&gt;&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># text</span>
+</span></span><span style="display:flex;"><span>light_purple <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">str_glue</span>(<span style="color:#d14">&#34;&lt;span style=&#39;color:#A374C2&#39;&gt;**Light Purple**&lt;/span&gt;&#34;</span>)
+</span></span><span style="display:flex;"><span>dark_purple  <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">str_glue</span>(<span style="color:#d14">&#34;&lt;span style=&#39;color:#8856a7&#39;&gt;**Dark Purple**&lt;/span&gt;&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>title_text    <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">str_glue</span>(<span style="color:#d14">&#34;Bob&#39;s Burgers Episode Fingerprints by Season&#34;</span>)
+</span></span><span style="display:flex;"><span>subtitle_text <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">str_glue</span>(<span style="color:#d14">&#34;Analyzing dialogue patterns across seasons&lt;br&gt;&lt;br&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">                          **Note:** Metrics are standardized (**z-scores**). { light_purple } polygons represent individual episodes.&lt;br&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">                          { dark_purple } line shows season average.&#34;</span>)
+</span></span><span style="display:flex;"><span>caption_text  <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">str_glue</span>(<span style="color:#d14">&#34;{li} stevenponce &amp;bull; {gh} poncest &amp;bull; #rstats #ggplot2 &amp;bull; {tt}&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">### |-  fonts ----</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># font_add(&#34;fa6-brands&#34;, here::here(&#34;fonts/6.4.2/Font Awesome 6 Brands-Regular-400.otf&#34;))</span>
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">font_add_google</span>(<span style="color:#d14">&#34;Oswald&#34;</span>, regular.wt <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">400</span>, family <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;title&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">font_add_google</span>(<span style="color:#d14">&#34;Source Sans Pro&#34;</span>, family <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;subtitle&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">font_add_google</span>(<span style="color:#d14">&#34;Source Sans Pro&#34;</span>, family <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;text&#34;</span>)  
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">font_add_google</span>(<span style="color:#d14">&#34;Roboto Mono&#34;</span>, family <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;numbers&#34;</span>)  
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">font_add_google</span>(<span style="color:#d14">&#34;Noto Sans&#34;</span>, regular.wt <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">400</span>, family <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;caption&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">showtext_auto</span>(enable <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">TRUE</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">### |-  plot theme ----</span>
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">theme_set</span>(<span style="color:#900;font-weight:bold">theme_minimal</span>(base_size <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">14</span>, base_family <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;text&#34;</span>))                
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">theme_update</span>(
+</span></span><span style="display:flex;"><span>  plot.title.position   <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;plot&#34;</span>,
+</span></span><span style="display:flex;"><span>  plot.caption.position <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;plot&#34;</span>,
+</span></span><span style="display:flex;"><span>  legend.position       <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;plot&#34;</span>,
+</span></span><span style="display:flex;"><span>  plot.background       <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">element_rect</span>(fill <span style="color:#000;font-weight:bold">=</span> bkg_col, color <span style="color:#000;font-weight:bold">=</span> bkg_col),
+</span></span><span style="display:flex;"><span>  panel.background      <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">element_rect</span>(fill <span style="color:#000;font-weight:bold">=</span> bkg_col, color <span style="color:#000;font-weight:bold">=</span> bkg_col),
+</span></span><span style="display:flex;"><span>  plot.margin           <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">margin</span>(t <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">10</span>, r <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">10</span>, b <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">10</span>, l <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">10</span>),
+</span></span><span style="display:flex;"><span>  axis.title.x          <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">element_text</span>(margin <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">margin</span>(<span style="color:#099">10</span>, <span style="color:#099">0</span>, <span style="color:#099">0</span>, <span style="color:#099">0</span>), size <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">rel</span>(<span style="color:#099">1.1</span>), 
+</span></span><span style="display:flex;"><span>                                       color <span style="color:#000;font-weight:bold">=</span> text_col, family <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;text&#34;</span>, face <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;bold&#34;</span>, hjust <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">0.5</span>),
+</span></span><span style="display:flex;"><span>  axis.title.y          <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">element_text</span>(margin <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">margin</span>(<span style="color:#099">0</span>, <span style="color:#099">10</span>, <span style="color:#099">0</span>, <span style="color:#099">0</span>), size <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">rel</span>(<span style="color:#099">1.1</span>), 
+</span></span><span style="display:flex;"><span>                                       color <span style="color:#000;font-weight:bold">=</span> text_col, family <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;text&#34;</span>, face <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;bold&#34;</span>, hjust <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">0.5</span>),
+</span></span><span style="display:flex;"><span>  axis.text             <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">element_text</span>(size <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">rel</span>(<span style="color:#099">0.5</span>), color <span style="color:#000;font-weight:bold">=</span> text_col, family <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;text&#34;</span>),
+</span></span><span style="display:flex;"><span>  strip.text            <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">element_text</span>(size <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">rel</span>(<span style="color:#099">1</span>), face <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;bold&#34;</span>, margin <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">margin</span>(b <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">10</span>), family <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;text&#34;</span>),
+</span></span><span style="display:flex;"><span>  panel.grid.major      <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">element_line</span>(color <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;gray90&#34;</span>, linewidth <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">0.2</span>),
+</span></span><span style="display:flex;"><span>  panel.spacing.x       <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">unit</span>(<span style="color:#099">3</span>, <span style="color:#d14">&#34;lines&#34;</span>),  
+</span></span><span style="display:flex;"><span>  panel.spacing.y       <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">unit</span>(<span style="color:#099">1</span>, <span style="color:#d14">&#34;lines&#34;</span>),  
+</span></span><span style="display:flex;"><span>  aspect.ratio          <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">1</span>  
+</span></span><span style="display:flex;"><span>)
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic">### |- main plot ---- </span>
+</span></span><span style="display:flex;"><span>main_plot <span style="color:#000;font-weight:bold">&lt;-</span> episode_metrics_long <span style="color:#000;font-weight:bold">|&gt;</span>   
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">ggplot</span>(<span style="color:#900;font-weight:bold">aes</span>(x <span style="color:#000;font-weight:bold">=</span> metric, y <span style="color:#000;font-weight:bold">=</span> value)) <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Geoms</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Add grid lines</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">geom_hline</span>(yintercept <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">seq</span>(<span style="color:#099">-2</span>, <span style="color:#099">7</span>, by <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">1</span>), color <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;gray90&#34;</span>, linewidth <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">0.2</span>) <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Add episode polygons</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">geom_polygon</span>(<span style="color:#900;font-weight:bold">aes</span>(group <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">interaction</span>(season, episode)),
+</span></span><span style="display:flex;"><span>               fill <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;#8856a7&#34;</span>,
+</span></span><span style="display:flex;"><span>               alpha <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">0.2</span>) <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Add season average line</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">stat_summary</span>(<span style="color:#900;font-weight:bold">aes</span>(group <span style="color:#000;font-weight:bold">=</span> season),
+</span></span><span style="display:flex;"><span>               fun <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#39;mean&#39;</span>, 
+</span></span><span style="display:flex;"><span>               geom <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;path&#34;</span>,
+</span></span><span style="display:flex;"><span>               color <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;#8856a7&#34;</span>,
+</span></span><span style="display:flex;"><span>               size <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">0.8</span>,
+</span></span><span style="display:flex;"><span>               alpha <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">0.9</span>,
+</span></span><span style="display:flex;"><span>               na.rm <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">TRUE</span>) <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Scales</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">scale_x_discrete</span>(expand <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">expansion</span>(add <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">1.2</span>)) <span style="color:#000;font-weight:bold">+</span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">scale_y_continuous</span>(
+</span></span><span style="display:flex;"><span>    expand <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">expansion</span>(add <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">c</span>(<span style="color:#099">0.5</span>, <span style="color:#099">1</span>)),
+</span></span><span style="display:flex;"><span>    limits <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">c</span>(<span style="color:#099">-2</span>, <span style="color:#099">7</span>)                 
+</span></span><span style="display:flex;"><span>  ) <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">coord_polar</span>(clip <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#39;off&#39;</span>) <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Labs</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">labs</span>(
+</span></span><span style="display:flex;"><span>    x <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">NULL</span>,
+</span></span><span style="display:flex;"><span>    y <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">NULL</span>,
+</span></span><span style="display:flex;"><span>  ) <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Facet </span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">facet_wrap</span>(<span style="color:#000;font-weight:bold">~</span>season, nrow <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">4</span>, 
+</span></span><span style="display:flex;"><span>             labeller <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">labeller</span>(season <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">function</span>(x) <span style="color:#900;font-weight:bold">paste</span>(<span style="color:#d14">&#34;Season&#34;</span>, x))
+</span></span><span style="display:flex;"><span>  ) <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Theme</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">theme</span>(
+</span></span><span style="display:flex;"><span>    axis.text.y <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">element_blank</span>(),
+</span></span><span style="display:flex;"><span>    axis.title <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">element_blank</span>(),
+</span></span><span style="display:flex;"><span>    plot.margin <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">margin</span>(<span style="color:#099">0</span>, <span style="color:#099">0</span>, <span style="color:#099">0</span>, <span style="color:#099">0</span>)
+</span></span><span style="display:flex;"><span>  )
+</span></span></code></pre></div><pre tabindex="0"><code>## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+## ℹ Please use `linewidth` instead.
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+## generated.
+</code></pre><div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic">### |- key pattern plot ----</span>
+</span></span><span style="display:flex;"><span>key_patterns_plot <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">ggplot</span>() <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">annotate</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#d14">&#34;richtext&#34;</span>,
+</span></span><span style="display:flex;"><span>    x <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">0</span>,
+</span></span><span style="display:flex;"><span>    y <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">0</span>,
+</span></span><span style="display:flex;"><span>    label <span style="color:#000;font-weight:bold">=</span> glue<span style="color:#000;font-weight:bold">::</span><span style="color:#900;font-weight:bold">glue</span>(
+</span></span><span style="display:flex;"><span>      <span style="color:#d14">&#34;&lt;span style=&#39;font-family:title;font-size:12pt;color:{title_col}&#39;&gt;**Key Patterns:**&lt;/span&gt;&lt;br&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">      &lt;span style=&#39;font-family:subtitle;font-size:9pt;color:{text_col}&#39;&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">      • Early seasons (1-3): more experimental patterns&lt;br&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">      • Middle seasons (4-8): consistent style&lt;br&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">      • Later seasons: refined structure&lt;br&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">      • Higher variance: character episodes&lt;br&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">      • Higher question ratios: mystery plots
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">      &lt;/span&gt;&#34;</span>
+</span></span><span style="display:flex;"><span>    ),
+</span></span><span style="display:flex;"><span>    fill <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">NA</span>,
+</span></span><span style="display:flex;"><span>    label.color <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">NA</span>,
+</span></span><span style="display:flex;"><span>    hjust <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">0</span>,
+</span></span><span style="display:flex;"><span>    vjust <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">1.2</span>,
+</span></span><span style="display:flex;"><span>  ) <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">theme_void</span>() <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">theme</span>(
+</span></span><span style="display:flex;"><span>    plot.margin <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">margin</span>(<span style="color:#099">5</span>, <span style="color:#099">10</span>, <span style="color:#099">5</span>, <span style="color:#099">10</span>)      
+</span></span><span style="display:flex;"><span>  )
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">### |- title &amp; subtitle plot ----</span>
+</span></span><span style="display:flex;"><span>title_plot <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">ggplot</span>() <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">labs</span>(
+</span></span><span style="display:flex;"><span>    title <span style="color:#000;font-weight:bold">=</span> title_text,
+</span></span><span style="display:flex;"><span>    subtitle <span style="color:#000;font-weight:bold">=</span> subtitle_text
+</span></span><span style="display:flex;"><span>  ) <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">theme_void</span>() <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">theme</span>(
+</span></span><span style="display:flex;"><span>    plot.title      <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">element_text</span>(
+</span></span><span style="display:flex;"><span>      size          <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">rel</span>(<span style="color:#099">1.8</span>),
+</span></span><span style="display:flex;"><span>      family        <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;title&#34;</span>,
+</span></span><span style="display:flex;"><span>      face          <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;bold&#34;</span>,
+</span></span><span style="display:flex;"><span>      color         <span style="color:#000;font-weight:bold">=</span> title_col,
+</span></span><span style="display:flex;"><span>      lineheight    <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">1.1</span>,
+</span></span><span style="display:flex;"><span>      margin        <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">margin</span>(t <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">5</span>, b <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">5</span>)
+</span></span><span style="display:flex;"><span>    ),   
+</span></span><span style="display:flex;"><span>    plot.subtitle   <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">element_markdown</span>(
+</span></span><span style="display:flex;"><span>      size          <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">rel</span>(<span style="color:#099">1.1</span>),
+</span></span><span style="display:flex;"><span>      family        <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;subtitle&#34;</span>,
+</span></span><span style="display:flex;"><span>      color         <span style="color:#000;font-weight:bold">=</span> subtitle_col,
+</span></span><span style="display:flex;"><span>      lineheight    <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">1.1</span>,
+</span></span><span style="display:flex;"><span>      margin        <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">margin</span>(t <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">5</span>, b <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">15</span>)
+</span></span><span style="display:flex;"><span>    ),
+</span></span><span style="display:flex;"><span>    plot.background <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">element_rect</span>(fill <span style="color:#000;font-weight:bold">=</span> bkg_col, color <span style="color:#000;font-weight:bold">=</span> bkg_col),
+</span></span><span style="display:flex;"><span>    plot.margin     <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">margin</span>(<span style="color:#099">10</span>, <span style="color:#099">10</span>, <span style="color:#099">0</span>, <span style="color:#099">10</span>)
+</span></span><span style="display:flex;"><span>  )
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">### |- combined plot ----</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Define layout design with adjusted areas</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># area(t, l, b, r)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># where:</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># t = top row position</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># l = left column position</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># b = bottom row position</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># r = right column position</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>design <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">c</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#900;font-weight:bold">area</span>(<span style="color:#099">1</span>, <span style="color:#099">1</span>, <span style="color:#099">1</span>, <span style="color:#099">6</span>),      <span style="color:#998;font-style:italic"># title area</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#900;font-weight:bold">area</span>(<span style="color:#099">2</span>, <span style="color:#099">1</span>, <span style="color:#099">5</span>, <span style="color:#099">6</span>),      <span style="color:#998;font-style:italic"># main plot area</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#900;font-weight:bold">area</span>(<span style="color:#099">4</span>, <span style="color:#099">2</span>, <span style="color:#099">5</span>, <span style="color:#099">6</span>)       <span style="color:#998;font-style:italic"># key patterns area </span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>combined_plot <span style="color:#000;font-weight:bold">&lt;-</span> title_plot <span style="color:#000;font-weight:bold">+</span>  main_plot <span style="color:#000;font-weight:bold">+</span> key_patterns_plot <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">plot_layout</span>(
+</span></span><span style="display:flex;"><span>    design <span style="color:#000;font-weight:bold">=</span> design,
+</span></span><span style="display:flex;"><span>    heights <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">c</span>(<span style="color:#099">0.8</span>, <span style="color:#099">4</span>, <span style="color:#099">4</span>, <span style="color:#099">4</span>, <span style="color:#099">0.2</span>), 
+</span></span><span style="display:flex;"><span>    widths <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">c</span>(<span style="color:#099">1</span>, <span style="color:#099">1</span>, <span style="color:#099">1</span>, <span style="color:#099">1</span>, <span style="color:#099">1</span>, <span style="color:#099">0.2</span>)
+</span></span><span style="display:flex;"><span>  ) <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">plot_annotation</span>(
+</span></span><span style="display:flex;"><span>    caption <span style="color:#000;font-weight:bold">=</span> caption_text,
+</span></span><span style="display:flex;"><span>    theme <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">theme</span>(
+</span></span><span style="display:flex;"><span>      plot.background <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">element_rect</span>(fill <span style="color:#000;font-weight:bold">=</span> bkg_col, color <span style="color:#000;font-weight:bold">=</span> bkg_col),
+</span></span><span style="display:flex;"><span>      plot.margin     <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">margin</span>(<span style="color:#099">10</span>, <span style="color:#099">10</span>, <span style="color:#099">10</span>, <span style="color:#099">10</span>),
+</span></span><span style="display:flex;"><span>      plot.caption    <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">element_markdown</span>(
+</span></span><span style="display:flex;"><span>        size          <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">rel</span>(<span style="color:#099">0.65</span>),
+</span></span><span style="display:flex;"><span>        family        <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;caption&#34;</span>,
+</span></span><span style="display:flex;"><span>        color         <span style="color:#000;font-weight:bold">=</span> caption_col,
+</span></span><span style="display:flex;"><span>        lineheight    <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">1.1</span>,
+</span></span><span style="display:flex;"><span>        hjust         <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">0.5</span>,
+</span></span><span style="display:flex;"><span>        margin        <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">margin</span>(t <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">10</span>, b <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">5</span>)
+</span></span><span style="display:flex;"><span>      )
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>  )
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>combined_plot
+</span></span></code></pre></div><p>So that&rsquo;s it! We replicated the original plot. Now lets add on the wikipedia data by episode and see if any of the metrics influence the ratings. It isnt rendering in the document when it gets published so here the png.</p>
+<p><img src="./content/blog/bobs_burgers/plot.jpg" alt="finished product"></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>imdb_wikipedia_data <span style="color:#000;font-weight:bold">&lt;-</span> bobsburgersR<span style="color:#000;font-weight:bold">::</span>imdb_wikipedia_data
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>imdb_wikipedia_data 
+</span></span></code></pre></div><pre tabindex="0"><code>## # A tibble: 275 × 11
+##    episode_overall imdb_aired_date  year season episode imdb_title        rating
+##              &lt;dbl&gt; &lt;date&gt;          &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;              &lt;dbl&gt;
+##  1               1 2011-01-08       2011      1       1 Human Flesh          7.7
+##  2               2 2011-01-15       2011      1       2 Crawl Space          8.1
+##  3               3 2011-01-22       2011      1       3 Sacred Cow           7.5
+##  4               4 2011-02-12       2011      1       4 Sexy Dance Fight…    7.4
+##  5               5 2011-02-19       2011      1       5 Hamburger Dinner…    7.5
+##  6               6 2011-03-05       2011      1       6 Sheesh! Cab, Bob?    8.3
+##  7               7 2011-03-12       2011      1       7 Bed &amp; Breakfast      7.5
+##  8               8 2011-03-19       2011      1       8 Art Crawl            7.9
+##  9               9 2011-03-26       2011      1       9 Spaghetti Wester…    7.6
+## 10              10 2011-04-09       2011      1      10 Burger War           7.7
+## # ℹ 265 more rows
+## # ℹ 4 more variables: synopsis &lt;chr&gt;, wikipedia_directed_by &lt;chr&gt;,
+## #   wikipedia_written_by &lt;chr&gt;, wikipedia_viewers &lt;dbl&gt;
+</code></pre><div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#900;font-weight:bold">glimpse</span>(imdb_wikipedia_data)
+</span></span></code></pre></div><pre tabindex="0"><code>## Rows: 275
+## Columns: 11
+## $ episode_overall       &lt;dbl&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 1…
+## $ imdb_aired_date       &lt;date&gt; 2011-01-08, 2011-01-15, 2011-01-22, 2011-02-12,…
+## $ year                  &lt;dbl&gt; 2011, 2011, 2011, 2011, 2011, 2011, 2011, 2011, …
+## $ season                &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, …
+## $ episode               &lt;dbl&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 1, 2,…
+## $ imdb_title            &lt;chr&gt; &#34;Human Flesh&#34;, &#34;Crawl Space&#34;, &#34;Sacred Cow&#34;, &#34;Sex…
+## $ rating                &lt;dbl&gt; 7.7, 8.1, 7.5, 7.4, 7.5, 8.3, 7.5, 7.9, 7.6, 7.7…
+## $ synopsis              &lt;chr&gt; &#34;On top of watching his dysfunctional family cru…
+## $ wikipedia_directed_by &lt;chr&gt; &#34;Anthony Chun&#34;, &#34;Kyounghee Lim&#34;, &#34;Jennifer Coyle…
+## $ wikipedia_written_by  &lt;chr&gt; &#34;Loren Bouchard &amp; Jim Dauterive&#34;, &#34;Loren Bouchar…
+## $ wikipedia_viewers     &lt;dbl&gt; 9.38, 5.07, 4.81, 4.19, 4.87, 4.91, 4.10, 4.43, …
+</code></pre><div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#900;font-weight:bold">skim</span>(imdb_wikipedia_data)
+</span></span></code></pre></div><p>Table: <span id="tab:unnamed-chunk-8"></span>Table 2: Data summary</p>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: left"></th>
+          <th style="text-align: left"></th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left">Name</td>
+          <td style="text-align: left">imdb_wikipedia_data</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Number of rows</td>
+          <td style="text-align: left">275</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Number of columns</td>
+          <td style="text-align: left">11</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">_______________________</td>
+          <td style="text-align: left"></td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Column type frequency:</td>
+          <td style="text-align: left"></td>
+      </tr>
+      <tr>
+          <td style="text-align: left">character</td>
+          <td style="text-align: left">4</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Date</td>
+          <td style="text-align: left">1</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">numeric</td>
+          <td style="text-align: left">6</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">________________________</td>
+          <td style="text-align: left"></td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Group variables</td>
+          <td style="text-align: left">None</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Variable type: character</strong></p>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: left">skim_variable</th>
+          <th style="text-align: right">n_missing</th>
+          <th style="text-align: right">complete_rate</th>
+          <th style="text-align: right">min</th>
+          <th style="text-align: right">max</th>
+          <th style="text-align: right">empty</th>
+          <th style="text-align: right">n_unique</th>
+          <th style="text-align: right">whitespace</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left">imdb_title</td>
+          <td style="text-align: right">0</td>
+          <td style="text-align: right">1.00</td>
+          <td style="text-align: right">5</td>
+          <td style="text-align: right">77</td>
+          <td style="text-align: right">0</td>
+          <td style="text-align: right">275</td>
+          <td style="text-align: right">0</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">synopsis</td>
+          <td style="text-align: right">0</td>
+          <td style="text-align: right">1.00</td>
+          <td style="text-align: right">18</td>
+          <td style="text-align: right">872</td>
+          <td style="text-align: right">0</td>
+          <td style="text-align: right">275</td>
+          <td style="text-align: right">0</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">wikipedia_directed_by</td>
+          <td style="text-align: right">6</td>
+          <td style="text-align: right">0.98</td>
+          <td style="text-align: right">3</td>
+          <td style="text-align: right">33</td>
+          <td style="text-align: right">0</td>
+          <td style="text-align: right">33</td>
+          <td style="text-align: right">0</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">wikipedia_written_by</td>
+          <td style="text-align: right">6</td>
+          <td style="text-align: right">0.98</td>
+          <td style="text-align: right">3</td>
+          <td style="text-align: right">77</td>
+          <td style="text-align: right">0</td>
+          <td style="text-align: right">31</td>
+          <td style="text-align: right">0</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Variable type: Date</strong></p>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: left">skim_variable</th>
+          <th style="text-align: right">n_missing</th>
+          <th style="text-align: right">complete_rate</th>
+          <th style="text-align: left">min</th>
+          <th style="text-align: left">max</th>
+          <th style="text-align: left">median</th>
+          <th style="text-align: right">n_unique</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left">imdb_aired_date</td>
+          <td style="text-align: right">0</td>
+          <td style="text-align: right">1</td>
+          <td style="text-align: left">2011-01-08</td>
+          <td style="text-align: left">2024-09-21</td>
+          <td style="text-align: left">2018-03-17</td>
+          <td style="text-align: right">266</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Variable type: numeric</strong></p>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: left">skim_variable</th>
+          <th style="text-align: right">n_missing</th>
+          <th style="text-align: right">complete_rate</th>
+          <th style="text-align: right">mean</th>
+          <th style="text-align: right">sd</th>
+          <th style="text-align: right">p0</th>
+          <th style="text-align: right">p25</th>
+          <th style="text-align: right">p50</th>
+          <th style="text-align: right">p75</th>
+          <th style="text-align: right">p100</th>
+          <th style="text-align: left">hist</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left">episode_overall</td>
+          <td style="text-align: right">0</td>
+          <td style="text-align: right">1.00</td>
+          <td style="text-align: right">138.00</td>
+          <td style="text-align: right">79.53</td>
+          <td style="text-align: right">1.00</td>
+          <td style="text-align: right">69.50</td>
+          <td style="text-align: right">138.0</td>
+          <td style="text-align: right">206.5</td>
+          <td style="text-align: right">275.00</td>
+          <td style="text-align: left">▇▇▇▇▇</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">year</td>
+          <td style="text-align: right">0</td>
+          <td style="text-align: right">1.00</td>
+          <td style="text-align: right">2017.47</td>
+          <td style="text-align: right">3.72</td>
+          <td style="text-align: right">2011.00</td>
+          <td style="text-align: right">2014.00</td>
+          <td style="text-align: right">2018.0</td>
+          <td style="text-align: right">2021.0</td>
+          <td style="text-align: right">2024.00</td>
+          <td style="text-align: left">▆▇▆▇▆</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">season</td>
+          <td style="text-align: right">0</td>
+          <td style="text-align: right">1.00</td>
+          <td style="text-align: right">7.84</td>
+          <td style="text-align: right">3.80</td>
+          <td style="text-align: right">1.00</td>
+          <td style="text-align: right">5.00</td>
+          <td style="text-align: right">8.0</td>
+          <td style="text-align: right">11.0</td>
+          <td style="text-align: right">14.00</td>
+          <td style="text-align: left">▆▇▅▇▇</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">episode</td>
+          <td style="text-align: right">0</td>
+          <td style="text-align: right">1.00</td>
+          <td style="text-align: right">10.73</td>
+          <td style="text-align: right">6.19</td>
+          <td style="text-align: right">1.00</td>
+          <td style="text-align: right">5.00</td>
+          <td style="text-align: right">10.0</td>
+          <td style="text-align: right">16.0</td>
+          <td style="text-align: right">23.00</td>
+          <td style="text-align: left">▇▆▇▅▅</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">rating</td>
+          <td style="text-align: right">2</td>
+          <td style="text-align: right">0.99</td>
+          <td style="text-align: right">7.70</td>
+          <td style="text-align: right">0.44</td>
+          <td style="text-align: right">6.70</td>
+          <td style="text-align: right">7.40</td>
+          <td style="text-align: right">7.6</td>
+          <td style="text-align: right">8.0</td>
+          <td style="text-align: right">9.60</td>
+          <td style="text-align: left">▂▇▃▁▁</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">wikipedia_viewers</td>
+          <td style="text-align: right">8</td>
+          <td style="text-align: right">0.97</td>
+          <td style="text-align: right">2.35</td>
+          <td style="text-align: right">1.29</td>
+          <td style="text-align: right">0.59</td>
+          <td style="text-align: right">1.47</td>
+          <td style="text-align: right">2.0</td>
+          <td style="text-align: right">3.1</td>
+          <td style="text-align: right">9.38</td>
+          <td style="text-align: left">▇▃▁▁▁</td>
+      </tr>
+  </tbody>
+</table>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>combinded_data <span style="color:#000;font-weight:bold">&lt;-</span> episode_metrics <span style="color:#000;font-weight:bold">|&gt;</span> 
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">left_join</span>(imdb_wikipedia_data, by <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">c</span>(<span style="color:#d14">&#34;season&#34;</span>, <span style="color:#d14">&#34;episode&#34;</span>)) <span style="color:#000;font-weight:bold">|&gt;</span> 
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">mutate</span>(
+</span></span><span style="display:flex;"><span>    rating <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">as.numeric</span>(rating),
+</span></span><span style="display:flex;"><span>    wikipedia_viewers <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">as.numeric</span>(wikipedia_viewers)
+</span></span><span style="display:flex;"><span>  )
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>predictors <span style="color:#000;font-weight:bold">&lt;-</span> combinded_data <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">select</span>(dialogue_density, avg_length, sentiment_variance, 
+</span></span><span style="display:flex;"><span>         unique_words, question_ratio, exclamation_ratio, rating)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>glm_model <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">glm</span>(rating <span style="color:#000;font-weight:bold">~</span> ., data <span style="color:#000;font-weight:bold">=</span> predictors, family <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">gaussian</span>())
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">summary</span>(glm_model)
+</span></span></code></pre></div><pre tabindex="0"><code>## 
+## Call:
+## glm(formula = rating ~ ., family = gaussian(), data = predictors)
+## 
+## Coefficients:
+##                     Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)         7.694419   0.025434 302.531  &lt; 2e-16 ***
+## dialogue_density    0.153914   0.048316   3.186 0.001618 ** 
+## avg_length         -0.197340   0.056095  -3.518 0.000512 ***
+## sentiment_variance  0.025194   0.026505   0.951 0.342711    
+## unique_words        0.002158   0.029711   0.073 0.942156    
+## question_ratio      0.043562   0.032210   1.352 0.177386    
+## exclamation_ratio   0.138396   0.032051   4.318 2.23e-05 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for gaussian family taken to be 0.1752897)
+## 
+##     Null deviance: 53.244  on 270  degrees of freedom
+## Residual deviance: 46.276  on 264  degrees of freedom
+##   (1 observation deleted due to missingness)
+## AIC: 306.08
+## 
+## Number of Fisher Scoring iterations: 2
+</code></pre><p>Looks like people like them short dense and punchy.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>predictors2 <span style="color:#000;font-weight:bold">&lt;-</span> combinded_data <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">select</span>(dialogue_density, avg_length, exclamation_ratio, rating)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>glm_model2 <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">glm</span>(rating <span style="color:#000;font-weight:bold">~</span> ., data <span style="color:#000;font-weight:bold">=</span> predictors2, family <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">gaussian</span>())
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">summary</span>(glm_model2)
+</span></span></code></pre></div><pre tabindex="0"><code>## 
+## Call:
+## glm(formula = rating ~ ., family = gaussian(), data = predictors2)
+## 
+## Coefficients:
+##                   Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)        7.69464    0.02541 302.837  &lt; 2e-16 ***
+## dialogue_density   0.15753    0.04572   3.446 0.000661 ***
+## avg_length        -0.16881    0.04760  -3.546 0.000461 ***
+## exclamation_ratio  0.14059    0.02891   4.864 1.97e-06 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for gaussian family taken to be 0.1749506)
+## 
+##     Null deviance: 53.244  on 270  degrees of freedom
+## Residual deviance: 46.712  on 267  degrees of freedom
+##   (1 observation deleted due to missingness)
+## AIC: 302.61
+## 
+## Number of Fisher Scoring iterations: 2
+</code></pre>
+        
+        <details closed class="f6 fw7 input-reset">
+  <dl class="f6 lh-copy">
+    <dt class="fw7">Posted on:</dt>
+    <dd class="fw5 ml0">November 18, 2024</dd>
+  </dl>
+  <dl class="f6 lh-copy">
+    <dt class="fw7">Length:</dt>
+    <dd class="fw5 ml0">12 minute read, 2360 words</dd>
+  </dl>
+  
+  <dl class="f6 lh-copy">
+    <dt class="fw7">Categories:</dt>
+    <dd class="fw5 ml0"> <a href="http://localhost:4321/categories/tidy-tuesday">Tidy Tuesday</a> </dd>
+  </dl>
+  
+  
+  
+  <dl class="f6 lh-copy">
+    <dt class="fw7">Tags:</dt>
+    <dd class="fw5 ml0"> <a href="http://localhost:4321/tags/r">R</a> </dd>
+  </dl>
+  
+  <dl class="f6 lh-copy">
+    <dt class="fw7">See Also:</dt>
+    
+    <dd class="fw5 ml0"><a href="/blog/k_walker_map/">Kyle Walker&#39;s Maps</a></dd>
+    
+    <dd class="fw5 ml0"><a href="/blog/bsky_r/">Bluesky Data in R</a></dd>
+    
+    <dd class="fw5 ml0"><a href="/blog/tt_11-11-24/">Tidy Tuesday ISO Codes</a></dd>
+    
+  </dl>
+</details>
+
+      </section>
+      <footer class="post-footer">
+        <div class="post-pagination dt w-100 mt4 mb2">
+  
+  
+  
+  
+    <a class="next dtc pl2 tr v-top fw6"
+    href="http://localhost:4321/blog/k_walker_map/">Kyle Walker&#39;s Maps &rarr;</a>
+  
+</div>
+
+      </footer>
+    </article>
+    
+      <div class="post-comments pa0 pa4-l mt4">
+  
+    
+      <script src="https://utteranc.es/client.js"
+              repo="stewing-co/warp_and_weft_data"
+              issue-term="pathname"
+              theme="boxy-light"
+              label="comments :crystal_ball:"
+              crossorigin="anonymous"
+              async
+              type="text/javascript">
+      </script>
+    
+  
+</div>
+
+    
+  </section>
+</main>
+<footer class="site-footer pv4 bt b--transparent ph5" role="contentinfo">
+  <nav class="db dt-l w-100">
+    <p class="site-copyright f7 db dtc-l v-mid w-100 w-33-l tc tl-l pv2 pv0-l mv0 lh-copy">
+      &copy; 2024 Warp and Weft Data, Atlanta, GA
+      <span class="middot-divider"></span>
+      Made with <span xmlns:dct="http://purl.org/dc/terms/" property="dct:title"><a xmlns:dct="http://purl.org/dc/terms/" href="https://github.com/hugo-apero/" rel="dct:source">Hugo Apéro</a></span>.
+      <br />
+      
+Based on <span xmlns:dct="http://purl.org/dc/terms/" property="dct:title"><a xmlns:dct="http://purl.org/dc/terms/" href="https://github.com/formspree/blogophonic-hugo" rel="dct:source">Blogophonic</a></span> by <a xmlns:cc="http://creativecommons.org/ns#" href="https://formspree.io" property="cc:attributionName" rel="cc:attributionURL">Formspree</a>.
+    </p>
+    
+    <div class="site-social-links db dtc-l v-mid w-100 w-33-l tc pv2 pv0-l mv0">
+      <div class="social-icon-links" aria-hidden="true">
+  
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <a class="link dib h1 w1 ml0 mr2 f6 o-90 glow" href="https://github.com/stewing-co" title="github" target="_blank" rel="me noopener">
+      <i class="fab fa-github fa-lg fa-fw"></i>
+    </a>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <a class="link dib h1 w1 ml0 mr2 f6 o-90 glow" href="https://bsky.app/profile/blue-pibble.bsky.social" title="bluesky" target="_blank" rel="me noopener">
+      <i class="fab fa-bluesky fa-lg fa-fw"></i>
+    </a>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <a class="link dib h1 w1 ml0 mr2 f6 o-90 glow" href="https://www.linkedin.com/in/stewing-in/" title="linkedin" target="_blank" rel="me noopener">
+      <i class="fab fa-linkedin fa-lg fa-fw"></i>
+    </a>
+  
+</div>
+
+    </div>
+    
+    <div class="site-links f6 db dtc-l v-mid w-100 w-67-l tc tr-l pv2 pv0-l mv0">
+      
+      <a class="dib pv1 ph2 link" href="/license/" title="License">License</a>
+      
+      <a class="dib pv1 ph2 link" href="/contact/" title="Contact form">Contact</a>
+      
+    </div>
+  </nav>
+  
+    <script>
+
+    var i, text, code, codes = document.getElementsByTagName('code');
+    for (let i = 0; i < codes.length;) {
+      code = codes[i];
+      if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+        text = code.textContent;
+        if (/^\$[^$]/.test(text) && /[^$]\$$/.test(text)) {
+          text = text.replace(/^\$/, '\\(').replace(/\$$/, '\\)');
+          code.textContent = text;
+        }
+        if (/^\\\((.|\s)+\\\)$/.test(text) ||
+            /^\\\[(.|\s)+\\\]$/.test(text) ||
+            /^\$(.|\s)+\$$/.test(text) ||
+            /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+          code.outerHTML = code.innerHTML;  
+          continue;
+        }
+      }
+      i++;
+    }
+</script>
+
+  
+    
+    
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.13/dist/katex.min.css" integrity="sha384-RZU/ijkSsFbcmivfdRBQDtwuwVqK7GMOw6IMvKyeWL2K5UAlyp6WonmB8m7Jd0Hn" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.13/dist/katex.min.js" integrity="sha384-pK1WpvzWVBQiP0/GjnvRxV4mOb0oxFuyRxJlk6vVw146n3egcN5C925NCP7a7BY8" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.13/dist/contrib/auto-render.min.js" integrity="sha384-vZTG03m+2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+
+
+
+    
+  
+  
+</footer>
+
+      </div>
+    </body>
+</html>
