@@ -113,7 +113,7 @@ manhattan_3d <- mapboxgl(center = c(-73.9652, 40.7804),
     colors = c("pink", "maroon")
   )
 
-manhattan_3d
+manhattan_3d 
 ```
 
 ```{r}
