@@ -400,7 +400,8 @@ combined_plot
 
 So that's it! We replicated the original plot. Now lets add on the wikipedia data by episode and see if any of the metrics influence the ratings. It isnt rendering in the document when it gets published so here the png.
 
-![finished product](./content/blog/bobs_burgers/plot.jpg)
+![finished product](https://github.com/stewing-co/warp_and_weft_data/blob/main/content/blog/bobs_burgers/plot.jpg?raw=true)
+
 
 
 
