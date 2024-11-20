@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr"><head>
+<html lang="en" dir="ltr"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=4321&amp;path=livereload" data-no-instant defer></script>
   
                            
      
@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="generator" content="Hugo 0.136.2">
-<title>Four Square S3 Data | Warp and Weft Data</title>
+<title>Foursquare S3 Data | Warp and Weft Data</title>
 
 
 <meta property="twitter:site" content="@blue_pibble">
@@ -28,30 +28,30 @@
 
 
 <meta property="og:site_name" content="Warp and Weft Data">
-<meta property="og:title" content="Four Square S3 Data | Warp and Weft Data">
+<meta property="og:title" content="Foursquare S3 Data | Warp and Weft Data">
 <meta property="og:description" content="Landscaping Businesses in the US" />
 <meta property="og:type" content="page" />
-<meta property="og:url" content="https://warpandweftdata.netlify.app/blog/foursquare/" />
+<meta property="og:url" content="http://localhost:4321/blog/foursquare/" />
 <meta property="og:locale" content="en">
 
 
 
 
     
-        <meta property="og:image" content="https://warpandweftdata.netlify.app/blog/foursquare/featured.jpg" >
+        <meta property="og:image" content="http://localhost:4321/blog/foursquare/featured.jpg" >
         <meta property="twitter:card" content="summary_large_image">
-        <meta name="twitter:image" content="https://warpandweftdata.netlify.app/blog/foursquare/featured.jpg" >
+        <meta name="twitter:image" content="http://localhost:4321/blog/foursquare/featured.jpg" >
     
     
   
-  <meta itemprop="name" content="Four Square S3 Data">
+  <meta itemprop="name" content="Foursquare S3 Data">
   <meta itemprop="description" content="Foursquare open sourced their database in the form of Parquet files stored in an S3 bucket. This data can be queried using DuckDB. In this post, I will show how to query the Foursquare data to get all the landscaping businesses in the US.
 First find how they label landscaping businesses in the data.
-# Load the duckdb package library(duckdb) ## Loading required package: DBI # Create a DuckDB connection con &lt;- dbConnect(duckdb::duckdb()) # Install and load the httpfs extension dbExecute(con, &#34;INSTALL httpfs;&#34;) ## [1] 0 dbExecute(con, &#34;LOAD httpfs;&#34;) ## [1] 0 # Set S3 Configuration Options dbExecute(con, &#34;SET s3_region=&#39;us-east-1&#39;;&#34;) ## [1] 0 dbExecute(con, &#34;SET s3_endpoint=&#39;s3.amazonaws.com&#39;;&#34;) ## [1] 0 dbExecute(con, &#34;SET s3_url_style=&#39;path&#39;;&#34;) ## [1] 0 dbExecute(con, &#34;SET s3_access_key_id=&#39;&#39;;&#34;) ## [1] 0 dbExecute(con, &#34;SET s3_secret_access_key=&#39;&#39;;&#34;) ## [1] 0 # Define the S3 path to a single Parquet file for sampling s3_path_sample &lt;- &#34;s3://fsq-os-places-us-east-1/release/dt=2024-11-19/places/parquet/places-00000.snappy.parquet&#34; # Define the query to extract distinct category labels containing &#39;Landscape&#39; category_query &lt;- paste0(&#34; SELECT DISTINCT label_value FROM ( SELECT UNNEST(t.fsq_category_labels) AS label_value FROM &#39;&#34;, s3_path_sample, &#34;&#39; AS t WHERE t.fsq_category_labels IS NOT NULL ) AS labels WHERE label_value LIKE &#39;%Landscape%&#39; &#34;) # Execute the query category_labels &lt;- dbGetQuery(con, category_query) # Print the resulting category labels print(category_labels) ## label_value## 1 Business and Professional Services &gt; Home Improvement Service &gt; Landscaper and Gardener Get all the Landscaper and Gardener business data from Foursquare using duck db.">
+# Load the duckdb package library(duckdb) # Create a DuckDB connection con &lt;- dbConnect(duckdb::duckdb()) # Install and load the httpfs extension dbExecute(con, &#34;INSTALL httpfs;&#34;) ## [1] 0 dbExecute(con, &#34;LOAD httpfs;&#34;) ## [1] 0 # Set S3 Configuration Options dbExecute(con, &#34;SET s3_region=&#39;us-east-1&#39;;&#34;) ## [1] 0 dbExecute(con, &#34;SET s3_endpoint=&#39;s3.amazonaws.com&#39;;&#34;) ## [1] 0 dbExecute(con, &#34;SET s3_url_style=&#39;path&#39;;&#34;) ## [1] 0 dbExecute(con, &#34;SET s3_access_key_id=&#39;&#39;;&#34;) ## [1] 0 dbExecute(con, &#34;SET s3_secret_access_key=&#39;&#39;;&#34;) ## [1] 0 # Define the S3 path to a single Parquet file for sampling s3_path_sample &lt;- &#34;s3://fsq-os-places-us-east-1/release/dt=2024-11-19/places/parquet/places-00000.snappy.parquet&#34; # Define the query to extract distinct category labels containing &#39;Landscape&#39; category_query &lt;- paste0(&#34; SELECT DISTINCT label_value FROM ( SELECT UNNEST(t.fsq_category_labels) AS label_value FROM &#39;&#34;, s3_path_sample, &#34;&#39; AS t WHERE t.fsq_category_labels IS NOT NULL ) AS labels WHERE label_value LIKE &#39;%Landscape%&#39; &#34;) # Execute the query category_labels &lt;- dbGetQuery(con, category_query) # Print the resulting category labels print(category_labels) ## label_value## 1 Business and Professional Services &gt; Home Improvement Service &gt; Landscaper and Gardener Get all the Landscaper and Gardener business data from Foursquare using duck db.">
   <meta itemprop="datePublished" content="2024-11-20T00:00:00+00:00">
   <meta itemprop="dateModified" content="2024-11-20T00:00:00+00:00">
-  <meta itemprop="wordCount" content="731">
-  <meta itemprop="image" content="https://warpandweftdata.netlify.app/blog/foursquare/featured.jpg">
+  <meta itemprop="wordCount" content="753">
+  <meta itemprop="image" content="http://localhost:4321/blog/foursquare/featured.jpg">
   <meta itemprop="keywords" content="R,DuckDB,Foursquare,S3">
   
   <!--[if IE]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
@@ -71,7 +71,7 @@ First find how they label landscaping businesses in the data.
       <div class="grid-container single">
 <header class="site-header pt4 pb2 mb4 bb b--transparent ph5 headroom z-max" role="banner">
   <nav class="site-nav db dt-l w-100" role="navigation">
-    <a class="site-brand db dtc-l v-mid link no-underline w-100 w-33-l tc tl-l" href="https://warpandweftdata.netlify.app/" title="Home">
+    <a class="site-brand db dtc-l v-mid link no-underline w-100 w-33-l tc tl-l" href="http://localhost:4321/" title="Home">
       <img src="/img/logo_leaf.png" class="dib db-l h2 w-auto" alt="Warp and Weft Data">
     </a>
     <div class="site-links db dtc-l v-mid w-100 w-47-l tc tr-l mt3 mt0-l ttu tracked">
@@ -95,7 +95,7 @@ First find how they label landscaping businesses in the data.
   <section class="page-content mw7 center">
     <article class="post-content pa0 ph4-l">
       <header class="post-header">
-        <h1 class="f1 lh-solid measure-narrow mb3 fw4">Four Square S3 Data</h1>
+        <h1 class="f1 lh-solid measure-narrow mb3 fw4">Foursquare S3 Data</h1>
         <h4 class="f4 mt0 mb4 lh-title measure">Landscaping Businesses in the US</h4>
         <p class="f6 measure lh-copy mv1">By Steve Ewing</p>
         <p class="f7 db mv0 ttu">November 20, 2024</p>
@@ -108,8 +108,8 @@ First find how they label landscaping businesses in the data.
 <p>First find how they label landscaping businesses in the data.</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Load the duckdb package</span>
 </span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">library</span>(duckdb)
-</span></span></code></pre></div><pre tabindex="0"><code>## Loading required package: DBI
-</code></pre><div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Create a DuckDB connection</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Create a DuckDB connection</span>
 </span></span><span style="display:flex;"><span>con <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">dbConnect</span>(duckdb<span style="color:#000;font-weight:bold">::</span><span style="color:#900;font-weight:bold">duckdb</span>())
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Install and load the httpfs extension</span>
@@ -240,7 +240,7 @@ First find how they label landscaping businesses in the data.
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Get US states shapefile, exclude non-continental states, and transform to the same CRS</span>
 </span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">options</span>(tigris_use_cache <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">TRUE</span>)
-</span></span><span style="display:flex;"><span>us_states <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">states</span>(cb <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">TRUE</span>, resolution <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;20m&#34;</span>, class <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;sf&#34;</span>) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>us_states <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">states</span>(cb <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">TRUE</span>, resolution <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;20m&#34;</span>, class <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;sf&#34;</span>) <span style="color:#000;font-weight:bold">%&gt;%</span>
 </span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Exclude Alaska, Hawaii, and territories</span>
 </span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">filter</span>(<span style="color:#000;font-weight:bold">!</span>NAME <span style="color:#000;font-weight:bold">%in%</span> <span style="color:#900;font-weight:bold">c</span>(
 </span></span><span style="display:flex;"><span>    <span style="color:#d14">&#34;Alaska&#34;</span>, <span style="color:#d14">&#34;Hawaii&#34;</span>, <span style="color:#d14">&#34;Puerto Rico&#34;</span>, <span style="color:#d14">&#34;Guam&#34;</span>,
@@ -269,7 +269,7 @@ First find how they label landscaping businesses in the data.
 </span></span><span style="display:flex;"><span>    data <span style="color:#000;font-weight:bold">=</span> landscaping_sf,
 </span></span><span style="display:flex;"><span>    color <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;darkgreen&#34;</span>,
 </span></span><span style="display:flex;"><span>    alpha <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">0.7</span>,
-</span></span><span style="display:flex;"><span>    size <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">.1</span>
+</span></span><span style="display:flex;"><span>    size <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">0.1</span>
 </span></span><span style="display:flex;"><span>  ) <span style="color:#000;font-weight:bold">+</span>
 </span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">coord_sf</span>(
 </span></span><span style="display:flex;"><span>    crs <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">st_crs</span>(<span style="color:#099">5070</span>),
@@ -282,12 +282,17 @@ First find how they label landscaping businesses in the data.
 </span></span><span style="display:flex;"><span>    x <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;Longitude&#34;</span>,
 </span></span><span style="display:flex;"><span>    y <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;Latitude&#34;</span>
 </span></span><span style="display:flex;"><span>  )
-</span></span></code></pre></div><img src="https://warpandweftdata.netlify.app/blog/foursquare/index_files/figure-html/unnamed-chunk-3-1.png" width="672" />
-<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Save the plot</span>
+</span></span></code></pre></div><img src="/blog/foursquare/index_files/figure-html/unnamed-chunk-3-1.png" width="672" />
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Save the plot (uncomment if you wish to save the plot)</span>
 </span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># ggsave(&#34;landscaping_businesses_map_albers.png&#34;, width = 10, height = 6)</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Disconnect from DuckDB</span>
 </span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">dbDisconnect</span>(con)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Delete the .tmp folder if it exists</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">if</span> (<span style="color:#900;font-weight:bold">dir.exists</span>(<span style="color:#d14">&#34;.tmp&#34;</span>)) {
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">unlink</span>(<span style="color:#d14">&#34;.tmp&#34;</span>, recursive <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">TRUE</span>, force <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">TRUE</span>)
+</span></span><span style="display:flex;"><span>}
 </span></span></code></pre></div>
         
         <details closed class="f6 fw7 input-reset">
@@ -297,14 +302,14 @@ First find how they label landscaping businesses in the data.
   </dl>
   <dl class="f6 lh-copy">
     <dt class="fw7">Length:</dt>
-    <dd class="fw5 ml0">4 minute read, 731 words</dd>
+    <dd class="fw5 ml0">4 minute read, 753 words</dd>
   </dl>
   
   
   
   <dl class="f6 lh-copy">
     <dt class="fw7">Tags:</dt>
-    <dd class="fw5 ml0"> <a href="https://warpandweftdata.netlify.app/tags/r">R</a>  <a href="https://warpandweftdata.netlify.app/tags/duckdb">DuckDB</a>  <a href="https://warpandweftdata.netlify.app/tags/foursquare">Foursquare</a>  <a href="https://warpandweftdata.netlify.app/tags/s3">S3</a> </dd>
+    <dd class="fw5 ml0"> <a href="http://localhost:4321/tags/r">R</a>  <a href="http://localhost:4321/tags/duckdb">DuckDB</a>  <a href="http://localhost:4321/tags/foursquare">Foursquare</a>  <a href="http://localhost:4321/tags/s3">S3</a> </dd>
   </dl>
   
   <dl class="f6 lh-copy">
@@ -327,7 +332,7 @@ First find how they label landscaping businesses in the data.
   
   
     <a class="next dtc pl2 tr v-top fw6"
-    href="https://warpandweftdata.netlify.app/blog/bobs_burgers/">Tidy Tuesday: 2024-11-19 &rarr;</a>
+    href="http://localhost:4321/blog/bobs_burgers/">Tidy Tuesday: 2024-11-19 &rarr;</a>
   
 </div>
 

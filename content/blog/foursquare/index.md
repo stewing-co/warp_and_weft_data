@@ -1,5 +1,5 @@
 ---
-title: "Four Square S3 Data"
+title: "Foursquare S3 Data"
 subtitle: "Landscaping Businesses in the US"
 excerpt: ""
 date: 2024-11-20
@@ -19,13 +19,7 @@ First find how they label landscaping businesses in the data.
 ``` r
 # Load the duckdb package
 library(duckdb)
-```
 
-```
-## Loading required package: DBI
-```
-
-``` r
 # Create a DuckDB connection
 con <- dbConnect(duckdb::duckdb())
 
@@ -220,7 +214,7 @@ landscaping_sf <- st_transform(landscaping_sf, crs = 5070)
 
 # Get US states shapefile, exclude non-continental states, and transform to the same CRS
 options(tigris_use_cache = TRUE)
-us_states <- states(cb = TRUE, resolution = "20m", class = "sf") |>
+us_states <- states(cb = TRUE, resolution = "20m", class = "sf") %>%
   # Exclude Alaska, Hawaii, and territories
   filter(!NAME %in% c(
     "Alaska", "Hawaii", "Puerto Rico", "Guam",
@@ -249,7 +243,7 @@ ggplot() +
     data = landscaping_sf,
     color = "darkgreen",
     alpha = 0.7,
-    size = .1
+    size = 0.1
   ) +
   coord_sf(
     crs = st_crs(5070),
@@ -267,10 +261,15 @@ ggplot() +
 <img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-3-1.png" width="672" />
 
 ``` r
-# Save the plot
+# Save the plot (uncomment if you wish to save the plot)
 # ggsave("landscaping_businesses_map_albers.png", width = 10, height = 6)
 
 # Disconnect from DuckDB
 dbDisconnect(con)
+
+# Delete the .tmp folder if it exists
+if (dir.exists(".tmp")) {
+  unlink(".tmp", recursive = TRUE, force = TRUE)
+}
 ```
 

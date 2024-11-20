@@ -2,88 +2,88 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://warpandweftdata.netlify.app/blog/</loc>
+    <loc>http://localhost:4321/blog/</loc>
     <lastmod>2024-11-20T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://warpandweftdata.netlify.app/tags/duckdb/</loc>
+    <loc>http://localhost:4321/tags/duckdb/</loc>
     <lastmod>2024-11-20T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://warpandweftdata.netlify.app/blog/foursquare/</loc>
+    <loc>http://localhost:4321/blog/foursquare/</loc>
     <lastmod>2024-11-20T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://warpandweftdata.netlify.app/tags/foursquare/</loc>
+    <loc>http://localhost:4321/tags/foursquare/</loc>
     <lastmod>2024-11-20T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://warpandweftdata.netlify.app/tags/r/</loc>
+    <loc>http://localhost:4321/tags/r/</loc>
     <lastmod>2024-11-20T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://warpandweftdata.netlify.app/tags/s3/</loc>
+    <loc>http://localhost:4321/tags/s3/</loc>
     <lastmod>2024-11-20T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://warpandweftdata.netlify.app/tags/</loc>
+    <loc>http://localhost:4321/tags/</loc>
     <lastmod>2024-11-20T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://warpandweftdata.netlify.app/</loc>
+    <loc>http://localhost:4321/</loc>
     <lastmod>2024-11-20T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://warpandweftdata.netlify.app/categories/</loc>
+    <loc>http://localhost:4321/categories/</loc>
     <lastmod>2024-11-18T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://warpandweftdata.netlify.app/categories/tidy-tuesday/</loc>
+    <loc>http://localhost:4321/categories/tidy-tuesday/</loc>
     <lastmod>2024-11-18T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://warpandweftdata.netlify.app/blog/bobs_burgers/</loc>
+    <loc>http://localhost:4321/blog/bobs_burgers/</loc>
     <lastmod>2024-11-18T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://warpandweftdata.netlify.app/tags/bluesky/</loc>
+    <loc>http://localhost:4321/tags/bluesky/</loc>
     <lastmod>2024-11-16T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://warpandweftdata.netlify.app/blog/k_walker_map/</loc>
+    <loc>http://localhost:4321/blog/k_walker_map/</loc>
     <lastmod>2024-11-16T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://warpandweftdata.netlify.app/blog/bsky_r/</loc>
+    <loc>http://localhost:4321/blog/bsky_r/</loc>
     <lastmod>2024-11-13T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://warpandweftdata.netlify.app/tags/maps/</loc>
+    <loc>http://localhost:4321/tags/maps/</loc>
     <lastmod>2024-11-11T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://warpandweftdata.netlify.app/tags/tidy-tuesday/</loc>
+    <loc>http://localhost:4321/tags/tidy-tuesday/</loc>
     <lastmod>2024-11-11T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://warpandweftdata.netlify.app/blog/tt_11-11-24/</loc>
+    <loc>http://localhost:4321/blog/tt_11-11-24/</loc>
     <lastmod>2024-11-11T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://warpandweftdata.netlify.app/tags/fedex/</loc>
+    <loc>http://localhost:4321/tags/fedex/</loc>
     <lastmod>2024-11-07T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://warpandweftdata.netlify.app/tags/rvest/</loc>
+    <loc>http://localhost:4321/tags/rvest/</loc>
     <lastmod>2024-11-07T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://warpandweftdata.netlify.app/blog/fedex_fuel_surcharges/</loc>
+    <loc>http://localhost:4321/blog/fedex_fuel_surcharges/</loc>
     <lastmod>2024-11-07T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://warpandweftdata.netlify.app/blog/duckdb_intro/</loc>
+    <loc>http://localhost:4321/blog/duckdb_intro/</loc>
     <lastmod>2024-11-01T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://warpandweftdata.netlify.app/tags/hugo-site/</loc>
+    <loc>http://localhost:4321/tags/hugo-site/</loc>
     <lastmod>2024-10-21T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://warpandweftdata.netlify.app/cv/resume/</loc>
+    <loc>http://localhost:4321/cv/resume/</loc>
     <lastmod>2024-10-21T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://warpandweftdata.netlify.app/cv/</loc>
+    <loc>http://localhost:4321/cv/</loc>
     <lastmod>2024-10-21T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://warpandweftdata.netlify.app/contact/</loc>
+    <loc>http://localhost:4321/contact/</loc>
     <lastmod>2019-02-25T13:38:41-06:00</lastmod>
   </url><url>
-    <loc>https://warpandweftdata.netlify.app/form/</loc>
+    <loc>http://localhost:4321/form/</loc>
     <lastmod>2019-02-25T13:38:41-06:00</lastmod>
   </url><url>
-    <loc>https://warpandweftdata.netlify.app/about/</loc>
+    <loc>http://localhost:4321/about/</loc>
   </url><url>
-    <loc>https://warpandweftdata.netlify.app/license/</loc>
+    <loc>http://localhost:4321/license/</loc>
   </url><url>
-    <loc>https://warpandweftdata.netlify.app/series/</loc>
+    <loc>http://localhost:4321/series/</loc>
   </url>
 </urlset>

@@ -1,5 +1,5 @@
 ---
-title: "Four Square S3 Data"
+title: "Foursquare S3 Data"
 subtitle: "Landscaping Businesses in the US"
 excerpt: ""
 date: 2024-11-20
@@ -15,7 +15,7 @@ Foursquare open sourced their database in the form of Parquet files stored in an
 
 First find how they label landscaping businesses in the data.
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 # Load the duckdb package
 library(duckdb)
 
@@ -208,7 +208,6 @@ dbDisconnect(con)
 if (dir.exists(".tmp")) {
   unlink(".tmp", recursive = TRUE, force = TRUE)
 }
-
 
 ```
 
