@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr"><head>
+  
+                           
+     
+
+
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="generator" content="Hugo 0.136.2">
+<title>Four Square S3 Data | Warp and Weft Data</title>
+
+
+<meta property="twitter:site" content="@blue_pibble">
+<meta property="twitter:creator" content="@blue_pibble">
+
+
+
+
+
+
+
+  
+    
+  
+<meta name="description" content="Landscaping Businesses in the US">
+
+
+<meta property="og:site_name" content="Warp and Weft Data">
+<meta property="og:title" content="Four Square S3 Data | Warp and Weft Data">
+<meta property="og:description" content="Landscaping Businesses in the US" />
+<meta property="og:type" content="page" />
+<meta property="og:url" content="https://warpandweftdata.netlify.app/blog/foursquare/" />
+<meta property="og:locale" content="en">
+
+
+
+
+    
+        <meta property="og:image" content="https://warpandweftdata.netlify.app/blog/foursquare/featured.jpg" >
+        <meta property="twitter:card" content="summary_large_image">
+        <meta name="twitter:image" content="https://warpandweftdata.netlify.app/blog/foursquare/featured.jpg" >
+    
+    
+  
+  <meta itemprop="name" content="Four Square S3 Data">
+  <meta itemprop="description" content="Foursquare open sourced their database in the form of Parquet files stored in an S3 bucket. This data can be queried using DuckDB. In this post, I will show how to query the Foursquare data to get all the landscaping businesses in the US.
+First find how they label landscaping businesses in the data.
+# Load the duckdb package library(duckdb) ## Loading required package: DBI # Create a DuckDB connection con &lt;- dbConnect(duckdb::duckdb()) # Install and load the httpfs extension dbExecute(con, &#34;INSTALL httpfs;&#34;) ## [1] 0 dbExecute(con, &#34;LOAD httpfs;&#34;) ## [1] 0 # Set S3 Configuration Options dbExecute(con, &#34;SET s3_region=&#39;us-east-1&#39;;&#34;) ## [1] 0 dbExecute(con, &#34;SET s3_endpoint=&#39;s3.amazonaws.com&#39;;&#34;) ## [1] 0 dbExecute(con, &#34;SET s3_url_style=&#39;path&#39;;&#34;) ## [1] 0 dbExecute(con, &#34;SET s3_access_key_id=&#39;&#39;;&#34;) ## [1] 0 dbExecute(con, &#34;SET s3_secret_access_key=&#39;&#39;;&#34;) ## [1] 0 # Define the S3 path to a single Parquet file for sampling s3_path_sample &lt;- &#34;s3://fsq-os-places-us-east-1/release/dt=2024-11-19/places/parquet/places-00000.snappy.parquet&#34; # Define the query to extract distinct category labels containing &#39;Landscape&#39; category_query &lt;- paste0(&#34; SELECT DISTINCT label_value FROM ( SELECT UNNEST(t.fsq_category_labels) AS label_value FROM &#39;&#34;, s3_path_sample, &#34;&#39; AS t WHERE t.fsq_category_labels IS NOT NULL ) AS labels WHERE label_value LIKE &#39;%Landscape%&#39; &#34;) # Execute the query category_labels &lt;- dbGetQuery(con, category_query) # Print the resulting category labels print(category_labels) ## label_value## 1 Business and Professional Services &gt; Home Improvement Service &gt; Landscaper and Gardener Get all the Landscaper and Gardener business data from Foursquare using duck db.">
+  <meta itemprop="datePublished" content="2024-11-20T00:00:00+00:00">
+  <meta itemprop="dateModified" content="2024-11-20T00:00:00+00:00">
+  <meta itemprop="wordCount" content="731">
+  <meta itemprop="image" content="https://warpandweftdata.netlify.app/blog/foursquare/featured.jpg">
+  <meta itemprop="keywords" content="R,DuckDB,Foursquare,S3">
+  
+  <!--[if IE]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  <link rel="shortcut icon" href="/img/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="/img/favicon.ico" type="image/x-icon">
+  
+  
+  <link rel="stylesheet" href="/style.main.min.0820a865770f259724d61d170adbb19db040647ecaa3b2023c16f04ada7fc7d2.css" integrity="sha256-CCCoZXcPJZck1h0XCtuxnbBAZH7Ko7ICPBbwStp/x9I=" media="screen">
+  
+  
+  <script src="/panelset.min.ed1ac24b6e16f4e2481e3d1d098ae66f5bc77438aef619e6e266d8ac5b00dc72.js" type="text/javascript"></script>
+  
+  
+  <script src="/main.min.f0b39b51e43cf3881368fb093708a9d3b3499e674af4b4e47e27e512a5d411e2.js" type="text/javascript"></script>
+</head>
+<body>
+      <div class="grid-container single">
+<header class="site-header pt4 pb2 mb4 bb b--transparent ph5 headroom z-max" role="banner">
+  <nav class="site-nav db dt-l w-100" role="navigation">
+    <a class="site-brand db dtc-l v-mid link no-underline w-100 w-33-l tc tl-l" href="https://warpandweftdata.netlify.app/" title="Home">
+      <img src="/img/logo_leaf.png" class="dib db-l h2 w-auto" alt="Warp and Weft Data">
+    </a>
+    <div class="site-links db dtc-l v-mid w-100 w-47-l tc tr-l mt3 mt0-l ttu tracked">
+      
+        
+        
+        
+      <a class="link f6 f5-l dib pv1 ph2 " href="/about/" title="About Steve Ewing">About</a>
+      
+        
+        
+        
+      <a class="link f6 f5-l dib pv1 ph2 active" href="/blog/" title="Blog">Blog</a>
+      
+      
+    </div>
+  </nav>
+</header>
+
+<main class="page-main pa4" role="main">
+  <section class="page-content mw7 center">
+    <article class="post-content pa0 ph4-l">
+      <header class="post-header">
+        <h1 class="f1 lh-solid measure-narrow mb3 fw4">Four Square S3 Data</h1>
+        <h4 class="f4 mt0 mb4 lh-title measure">Landscaping Businesses in the US</h4>
+        <p class="f6 measure lh-copy mv1">By Steve Ewing</p>
+        <p class="f7 db mv0 ttu">November 20, 2024</p>
+
+      
+
+      </header>
+      <section class="post-body pt5 pb4">
+        <p>Foursquare open sourced their database in the form of Parquet files stored in an S3 bucket. This data can be queried using DuckDB. In this post, I will show how to query the Foursquare data to get all the landscaping businesses in the US.</p>
+<p>First find how they label landscaping businesses in the data.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Load the duckdb package</span>
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">library</span>(duckdb)
+</span></span></code></pre></div><pre tabindex="0"><code>## Loading required package: DBI
+</code></pre><div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Create a DuckDB connection</span>
+</span></span><span style="display:flex;"><span>con <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">dbConnect</span>(duckdb<span style="color:#000;font-weight:bold">::</span><span style="color:#900;font-weight:bold">duckdb</span>())
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Install and load the httpfs extension</span>
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">dbExecute</span>(con, <span style="color:#d14">&#34;INSTALL httpfs;&#34;</span>)
+</span></span></code></pre></div><pre tabindex="0"><code>## [1] 0
+</code></pre><div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#900;font-weight:bold">dbExecute</span>(con, <span style="color:#d14">&#34;LOAD httpfs;&#34;</span>)
+</span></span></code></pre></div><pre tabindex="0"><code>## [1] 0
+</code></pre><div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Set S3 Configuration Options</span>
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">dbExecute</span>(con, <span style="color:#d14">&#34;SET s3_region=&#39;us-east-1&#39;;&#34;</span>)
+</span></span></code></pre></div><pre tabindex="0"><code>## [1] 0
+</code></pre><div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#900;font-weight:bold">dbExecute</span>(con, <span style="color:#d14">&#34;SET s3_endpoint=&#39;s3.amazonaws.com&#39;;&#34;</span>)
+</span></span></code></pre></div><pre tabindex="0"><code>## [1] 0
+</code></pre><div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#900;font-weight:bold">dbExecute</span>(con, <span style="color:#d14">&#34;SET s3_url_style=&#39;path&#39;;&#34;</span>)
+</span></span></code></pre></div><pre tabindex="0"><code>## [1] 0
+</code></pre><div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#900;font-weight:bold">dbExecute</span>(con, <span style="color:#d14">&#34;SET s3_access_key_id=&#39;&#39;;&#34;</span>)
+</span></span></code></pre></div><pre tabindex="0"><code>## [1] 0
+</code></pre><div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#900;font-weight:bold">dbExecute</span>(con, <span style="color:#d14">&#34;SET s3_secret_access_key=&#39;&#39;;&#34;</span>)
+</span></span></code></pre></div><pre tabindex="0"><code>## [1] 0
+</code></pre><div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Define the S3 path to a single Parquet file for sampling</span>
+</span></span><span style="display:flex;"><span>s3_path_sample <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#d14">&#34;s3://fsq-os-places-us-east-1/release/dt=2024-11-19/places/parquet/places-00000.snappy.parquet&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Define the query to extract distinct category labels containing &#39;Landscape&#39;</span>
+</span></span><span style="display:flex;"><span>category_query <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">paste0</span>(<span style="color:#d14">&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">SELECT DISTINCT label_value
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">FROM (
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">    SELECT UNNEST(t.fsq_category_labels) AS label_value
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">    FROM &#39;&#34;</span>, s3_path_sample, <span style="color:#d14">&#34;&#39; AS t
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">    WHERE t.fsq_category_labels IS NOT NULL
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">) AS labels
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">WHERE label_value LIKE &#39;%Landscape%&#39;
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Execute the query</span>
+</span></span><span style="display:flex;"><span>category_labels <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">dbGetQuery</span>(con, category_query)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Print the resulting category labels</span>
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">print</span>(category_labels)
+</span></span></code></pre></div><pre tabindex="0"><code>##                                                                               label_value
+## 1 Business and Professional Services &gt; Home Improvement Service &gt; Landscaper and Gardener
+</code></pre><p>Get all the Landscaper and Gardener business data from Foursquare using duck db.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Load the duckdb package</span>
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">library</span>(duckdb)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Create a DuckDB connection</span>
+</span></span><span style="display:flex;"><span>con <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">dbConnect</span>(duckdb<span style="color:#000;font-weight:bold">::</span><span style="color:#900;font-weight:bold">duckdb</span>())
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Install and load the httpfs extension</span>
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">dbExecute</span>(con, <span style="color:#d14">&#34;INSTALL httpfs;&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">dbExecute</span>(con, <span style="color:#d14">&#34;LOAD httpfs;&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Set S3 Configuration Options</span>
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">dbExecute</span>(con, <span style="color:#d14">&#34;SET s3_region=&#39;us-east-1&#39;;&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">dbExecute</span>(con, <span style="color:#d14">&#34;SET s3_endpoint=&#39;s3.amazonaws.com&#39;;&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">dbExecute</span>(con, <span style="color:#d14">&#34;SET s3_url_style=&#39;path&#39;;&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">dbExecute</span>(con, <span style="color:#d14">&#34;SET s3_access_key_id=&#39;&#39;;&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">dbExecute</span>(con, <span style="color:#d14">&#34;SET s3_secret_access_key=&#39;&#39;;&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Define the exact category label</span>
+</span></span><span style="display:flex;"><span>label <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#d14">&#39;Business and Professional Services &gt; Home Improvement Service &gt; Landscaper and Gardener&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Define the S3 path to include all Parquet files</span>
+</span></span><span style="display:flex;"><span>s3_path_all <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#d14">&#34;s3://fsq-os-places-us-east-1/release/dt=2024-11-19/places/parquet/*.parquet&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Define the main query using array_contains</span>
+</span></span><span style="display:flex;"><span>query <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">paste0</span>(<span style="color:#d14">&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">SELECT *
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">FROM &#39;&#34;</span>, s3_path_all, <span style="color:#d14">&#34;&#39; AS t
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">WHERE t.country = &#39;US&#39;
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">  AND t.fsq_category_labels IS NOT NULL
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">  AND array_contains(t.fsq_category_labels, &#39;&#34;</span>, label, <span style="color:#d14">&#34;&#39;)
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Specify the output file name</span>
+</span></span><span style="display:flex;"><span>output_file <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#d14">&#34;landscaping_and_gardening_businesses.csv&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Execute the query and write results to a CSV file</span>
+</span></span><span style="display:flex;"><span>copy_query <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">paste0</span>(<span style="color:#d14">&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">COPY (&#34;</span>, query, <span style="color:#d14">&#34;)
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">TO &#39;&#34;</span>, output_file, <span style="color:#d14">&#34;&#39;
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">WITH (FORMAT CSV, HEADER TRUE)
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">dbExecute</span>(con, copy_query)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Disconnect from the database</span>
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">dbDisconnect</span>(con)
+</span></span></code></pre></div><p>Load the data into R and display the first few rows.</p>
+<p>Get the map using Tigris</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Install and load packages</span>
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">library</span>(duckdb)
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">library</span>(dplyr)
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">library</span>(ggplot2)
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">library</span>(tigris)
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">library</span>(sf)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Connect to DuckDB</span>
+</span></span><span style="display:flex;"><span>con <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">dbConnect</span>(duckdb<span style="color:#000;font-weight:bold">::</span><span style="color:#900;font-weight:bold">duckdb</span>(), dbdir <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;:memory:&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Read the CSV file into DuckDB</span>
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">dbExecute</span>(con, <span style="color:#d14">&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">    CREATE TABLE landscaping_data AS
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">    SELECT * FROM read_csv_auto(&#39;landscaping_and_gardening_businesses.csv&#39;)
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">&#34;</span>)
+</span></span></code></pre></div><pre tabindex="0"><code>## [1] 100927
+</code></pre><div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Reference the DuckDB table using dplyr</span>
+</span></span><span style="display:flex;"><span>landscaping_tbl <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">tbl</span>(con, <span style="color:#d14">&#34;landscaping_data&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Prepare the data</span>
+</span></span><span style="display:flex;"><span>landscaping_data <span style="color:#000;font-weight:bold">&lt;-</span> landscaping_tbl <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">filter</span>(<span style="color:#000;font-weight:bold">!</span><span style="color:#900;font-weight:bold">is.na</span>(latitude), <span style="color:#000;font-weight:bold">!</span><span style="color:#900;font-weight:bold">is.na</span>(longitude), <span style="color:#900;font-weight:bold">is.na</span>(date_closed)) <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">select</span>(name, latitude, longitude, address, locality, region) <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">collect</span>() <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">mutate</span>(
+</span></span><span style="display:flex;"><span>    latitude <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">as.numeric</span>(latitude),
+</span></span><span style="display:flex;"><span>    longitude <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">as.numeric</span>(longitude)
+</span></span><span style="display:flex;"><span>  )
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Convert the data frame to an sf object</span>
+</span></span><span style="display:flex;"><span>landscaping_sf <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">st_as_sf</span>(
+</span></span><span style="display:flex;"><span>  landscaping_data,
+</span></span><span style="display:flex;"><span>  coords <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">c</span>(<span style="color:#d14">&#34;longitude&#34;</span>, <span style="color:#d14">&#34;latitude&#34;</span>),
+</span></span><span style="display:flex;"><span>  crs <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">4326</span>,  <span style="color:#998;font-style:italic"># Original CRS (WGS84)</span>
+</span></span><span style="display:flex;"><span>  remove <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">FALSE</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Transform to Albers Equal Area Conic projection (EPSG:5070)</span>
+</span></span><span style="display:flex;"><span>landscaping_sf <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">st_transform</span>(landscaping_sf, crs <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">5070</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Get US states shapefile, exclude non-continental states, and transform to the same CRS</span>
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">options</span>(tigris_use_cache <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">TRUE</span>)
+</span></span><span style="display:flex;"><span>us_states <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">states</span>(cb <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">TRUE</span>, resolution <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;20m&#34;</span>, class <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;sf&#34;</span>) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Exclude Alaska, Hawaii, and territories</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">filter</span>(<span style="color:#000;font-weight:bold">!</span>NAME <span style="color:#000;font-weight:bold">%in%</span> <span style="color:#900;font-weight:bold">c</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#d14">&#34;Alaska&#34;</span>, <span style="color:#d14">&#34;Hawaii&#34;</span>, <span style="color:#d14">&#34;Puerto Rico&#34;</span>, <span style="color:#d14">&#34;Guam&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#d14">&#34;American Samoa&#34;</span>, <span style="color:#d14">&#34;Commonwealth of the Northern Mariana Islands&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#d14">&#34;United States Virgin Islands&#34;</span>
+</span></span><span style="display:flex;"><span>  )) <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">st_transform</span>(crs <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">5070</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Calculate the bounding box from us_states</span>
+</span></span><span style="display:flex;"><span>bbox <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">st_bbox</span>(us_states)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Optionally, expand the bounding box by 5%</span>
+</span></span><span style="display:flex;"><span>xrange <span style="color:#000;font-weight:bold">&lt;-</span> bbox[<span style="color:#d14">&#34;xmax&#34;</span>] <span style="color:#000;font-weight:bold">-</span> bbox[<span style="color:#d14">&#34;xmin&#34;</span>]
+</span></span><span style="display:flex;"><span>yrange <span style="color:#000;font-weight:bold">&lt;-</span> bbox[<span style="color:#d14">&#34;ymax&#34;</span>] <span style="color:#000;font-weight:bold">-</span> bbox[<span style="color:#d14">&#34;ymin&#34;</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>bbox_expanded <span style="color:#000;font-weight:bold">&lt;-</span> bbox
+</span></span><span style="display:flex;"><span>bbox_expanded[<span style="color:#d14">&#34;xmin&#34;</span>] <span style="color:#000;font-weight:bold">&lt;-</span> bbox[<span style="color:#d14">&#34;xmin&#34;</span>] <span style="color:#000;font-weight:bold">-</span> <span style="color:#099">0.05</span> <span style="color:#000;font-weight:bold">*</span> xrange
+</span></span><span style="display:flex;"><span>bbox_expanded[<span style="color:#d14">&#34;xmax&#34;</span>] <span style="color:#000;font-weight:bold">&lt;-</span> bbox[<span style="color:#d14">&#34;xmax&#34;</span>] <span style="color:#000;font-weight:bold">+</span> <span style="color:#099">0.05</span> <span style="color:#000;font-weight:bold">*</span> xrange
+</span></span><span style="display:flex;"><span>bbox_expanded[<span style="color:#d14">&#34;ymin&#34;</span>] <span style="color:#000;font-weight:bold">&lt;-</span> bbox[<span style="color:#d14">&#34;ymin&#34;</span>] <span style="color:#000;font-weight:bold">-</span> <span style="color:#099">0.05</span> <span style="color:#000;font-weight:bold">*</span> yrange
+</span></span><span style="display:flex;"><span>bbox_expanded[<span style="color:#d14">&#34;ymax&#34;</span>] <span style="color:#000;font-weight:bold">&lt;-</span> bbox[<span style="color:#d14">&#34;ymax&#34;</span>] <span style="color:#000;font-weight:bold">+</span> <span style="color:#099">0.05</span> <span style="color:#000;font-weight:bold">*</span> yrange
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Create the map with the improved CRS and bounding box</span>
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">ggplot</span>() <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">geom_sf</span>(data <span style="color:#000;font-weight:bold">=</span> us_states, fill <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;lightgray&#34;</span>, color <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;white&#34;</span>) <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">geom_sf</span>(
+</span></span><span style="display:flex;"><span>    data <span style="color:#000;font-weight:bold">=</span> landscaping_sf,
+</span></span><span style="display:flex;"><span>    color <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;darkgreen&#34;</span>,
+</span></span><span style="display:flex;"><span>    alpha <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">0.7</span>,
+</span></span><span style="display:flex;"><span>    size <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">.1</span>
+</span></span><span style="display:flex;"><span>  ) <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">coord_sf</span>(
+</span></span><span style="display:flex;"><span>    crs <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">st_crs</span>(<span style="color:#099">5070</span>),
+</span></span><span style="display:flex;"><span>    xlim <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">c</span>(bbox_expanded[<span style="color:#d14">&#34;xmin&#34;</span>], bbox_expanded[<span style="color:#d14">&#34;xmax&#34;</span>]),
+</span></span><span style="display:flex;"><span>    ylim <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">c</span>(bbox_expanded[<span style="color:#d14">&#34;ymin&#34;</span>], bbox_expanded[<span style="color:#d14">&#34;ymax&#34;</span>])
+</span></span><span style="display:flex;"><span>  ) <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">theme_minimal</span>() <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">labs</span>(
+</span></span><span style="display:flex;"><span>    title <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;Foursquare Landscaping and Gardening Businesses&#34;</span>,
+</span></span><span style="display:flex;"><span>    x <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;Longitude&#34;</span>,
+</span></span><span style="display:flex;"><span>    y <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;Latitude&#34;</span>
+</span></span><span style="display:flex;"><span>  )
+</span></span></code></pre></div><img src="https://warpandweftdata.netlify.app/blog/foursquare/index_files/figure-html/unnamed-chunk-3-1.png" width="672" />
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Save the plot</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># ggsave(&#34;landscaping_businesses_map_albers.png&#34;, width = 10, height = 6)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Disconnect from DuckDB</span>
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">dbDisconnect</span>(con)
+</span></span></code></pre></div>
+        
+        <details closed class="f6 fw7 input-reset">
+  <dl class="f6 lh-copy">
+    <dt class="fw7">Posted on:</dt>
+    <dd class="fw5 ml0">November 20, 2024</dd>
+  </dl>
+  <dl class="f6 lh-copy">
+    <dt class="fw7">Length:</dt>
+    <dd class="fw5 ml0">4 minute read, 731 words</dd>
+  </dl>
+  
+  
+  
+  <dl class="f6 lh-copy">
+    <dt class="fw7">Tags:</dt>
+    <dd class="fw5 ml0"> <a href="https://warpandweftdata.netlify.app/tags/r">R</a>  <a href="https://warpandweftdata.netlify.app/tags/duckdb">DuckDB</a>  <a href="https://warpandweftdata.netlify.app/tags/foursquare">Foursquare</a>  <a href="https://warpandweftdata.netlify.app/tags/s3">S3</a> </dd>
+  </dl>
+  
+  <dl class="f6 lh-copy">
+    <dt class="fw7">See Also:</dt>
+    
+    <dd class="fw5 ml0"><a href="/blog/bobs_burgers/">Tidy Tuesday: 2024-11-19</a></dd>
+    
+    <dd class="fw5 ml0"><a href="/blog/k_walker_map/">Kyle Walker&#39;s Maps</a></dd>
+    
+    <dd class="fw5 ml0"><a href="/blog/bsky_r/">Bluesky Data in R</a></dd>
+    
+  </dl>
+</details>
+
+      </section>
+      <footer class="post-footer">
+        <div class="post-pagination dt w-100 mt4 mb2">
+  
+  
+  
+  
+    <a class="next dtc pl2 tr v-top fw6"
+    href="https://warpandweftdata.netlify.app/blog/bobs_burgers/">Tidy Tuesday: 2024-11-19 &rarr;</a>
+  
+</div>
+
+      </footer>
+    </article>
+    
+      <div class="post-comments pa0 pa4-l mt4">
+  
+    
+      <script src="https://utteranc.es/client.js"
+              repo="stewing-co/warp_and_weft_data"
+              issue-term="pathname"
+              theme="boxy-light"
+              label="comments :crystal_ball:"
+              crossorigin="anonymous"
+              async
+              type="text/javascript">
+      </script>
+    
+  
+</div>
+
+    
+  </section>
+</main>
+<footer class="site-footer pv4 bt b--transparent ph5" role="contentinfo">
+  <nav class="db dt-l w-100">
+    <p class="site-copyright f7 db dtc-l v-mid w-100 w-33-l tc tl-l pv2 pv0-l mv0 lh-copy">
+      &copy; 2024 Warp and Weft Data, Atlanta, GA
+      <span class="middot-divider"></span>
+      Made with <span xmlns:dct="http://purl.org/dc/terms/" property="dct:title"><a xmlns:dct="http://purl.org/dc/terms/" href="https://github.com/hugo-apero/" rel="dct:source">Hugo Apéro</a></span>.
+      <br />
+      
+Based on <span xmlns:dct="http://purl.org/dc/terms/" property="dct:title"><a xmlns:dct="http://purl.org/dc/terms/" href="https://github.com/formspree/blogophonic-hugo" rel="dct:source">Blogophonic</a></span> by <a xmlns:cc="http://creativecommons.org/ns#" href="https://formspree.io" property="cc:attributionName" rel="cc:attributionURL">Formspree</a>.
+    </p>
+    
+    <div class="site-social-links db dtc-l v-mid w-100 w-33-l tc pv2 pv0-l mv0">
+      <div class="social-icon-links" aria-hidden="true">
+  
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <a class="link dib h1 w1 ml0 mr2 f6 o-90 glow" href="https://github.com/stewing-co" title="github" target="_blank" rel="me noopener">
+      <i class="fab fa-github fa-lg fa-fw"></i>
+    </a>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <a class="link dib h1 w1 ml0 mr2 f6 o-90 glow" href="https://bsky.app/profile/blue-pibble.bsky.social" title="bluesky" target="_blank" rel="me noopener">
+      <i class="fab fa-bluesky fa-lg fa-fw"></i>
+    </a>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <a class="link dib h1 w1 ml0 mr2 f6 o-90 glow" href="https://www.linkedin.com/in/stewing-in/" title="linkedin" target="_blank" rel="me noopener">
+      <i class="fab fa-linkedin fa-lg fa-fw"></i>
+    </a>
+  
+</div>
+
+    </div>
+    
+    <div class="site-links f6 db dtc-l v-mid w-100 w-67-l tc tr-l pv2 pv0-l mv0">
+      
+      <a class="dib pv1 ph2 link" href="/license/" title="License">License</a>
+      
+      <a class="dib pv1 ph2 link" href="/contact/" title="Contact form">Contact</a>
+      
+    </div>
+  </nav>
+  
+    <script>
+
+    var i, text, code, codes = document.getElementsByTagName('code');
+    for (let i = 0; i < codes.length;) {
+      code = codes[i];
+      if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+        text = code.textContent;
+        if (/^\$[^$]/.test(text) && /[^$]\$$/.test(text)) {
+          text = text.replace(/^\$/, '\\(').replace(/\$$/, '\\)');
+          code.textContent = text;
+        }
+        if (/^\\\((.|\s)+\\\)$/.test(text) ||
+            /^\\\[(.|\s)+\\\]$/.test(text) ||
+            /^\$(.|\s)+\$$/.test(text) ||
+            /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+          code.outerHTML = code.innerHTML;  
+          continue;
+        }
+      }
+      i++;
+    }
+</script>
+
+  
+    
+    
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.13/dist/katex.min.css" integrity="sha384-RZU/ijkSsFbcmivfdRBQDtwuwVqK7GMOw6IMvKyeWL2K5UAlyp6WonmB8m7Jd0Hn" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.13/dist/katex.min.js" integrity="sha384-pK1WpvzWVBQiP0/GjnvRxV4mOb0oxFuyRxJlk6vVw146n3egcN5C925NCP7a7BY8" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.13/dist/contrib/auto-render.min.js" integrity="sha384-vZTG03m+2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+
+
+
+    
+  
+  
+</footer>
+
+      </div>
+    </body>
+</html>

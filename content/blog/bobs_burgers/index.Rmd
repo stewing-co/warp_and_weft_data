@@ -11,7 +11,7 @@ categories: ["Tidy Tuesday"]
 layout: single
 ---
 
-First copy to cool graphic that Steven Ponce made.
+First copy the cool graphic that Steven Ponce made.
 
 ```{r, message=FALSE}
 ## 1. LOAD PACKAGES & SETUP ----
