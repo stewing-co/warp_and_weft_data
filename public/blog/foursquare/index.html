@@ -50,7 +50,7 @@ First find how they label landscaping businesses in the data.
 # Load the duckdb package library(duckdb) # Create a DuckDB connection con &lt;- dbConnect(duckdb::duckdb()) # Install and load the httpfs extension dbExecute(con, &#34;INSTALL httpfs;&#34;) ## [1] 0 dbExecute(con, &#34;LOAD httpfs;&#34;) ## [1] 0 # Set S3 Configuration Options dbExecute(con, &#34;SET s3_region=&#39;us-east-1&#39;;&#34;) ## [1] 0 dbExecute(con, &#34;SET s3_endpoint=&#39;s3.amazonaws.com&#39;;&#34;) ## [1] 0 dbExecute(con, &#34;SET s3_url_style=&#39;path&#39;;&#34;) ## [1] 0 dbExecute(con, &#34;SET s3_access_key_id=&#39;&#39;;&#34;) ## [1] 0 dbExecute(con, &#34;SET s3_secret_access_key=&#39;&#39;;&#34;) ## [1] 0 # Define the S3 path to a single Parquet file for sampling s3_path_sample &lt;- &#34;s3://fsq-os-places-us-east-1/release/dt=2024-11-19/places/parquet/places-00000.snappy.parquet&#34; # Define the query to extract distinct category labels containing &#39;Landscape&#39; category_query &lt;- paste0(&#34; SELECT DISTINCT label_value FROM ( SELECT UNNEST(t.fsq_category_labels) AS label_value FROM &#39;&#34;, s3_path_sample, &#34;&#39; AS t WHERE t.fsq_category_labels IS NOT NULL ) AS labels WHERE label_value LIKE &#39;%Landscape%&#39; &#34;) # Execute the query category_labels &lt;- dbGetQuery(con, category_query) # Print the resulting category labels print(category_labels) ## label_value## 1 Business and Professional Services &gt; Home Improvement Service &gt; Landscaper and Gardener Get all the Landscaper and Gardener business data from Foursquare using duck db.">
   <meta itemprop="datePublished" content="2024-11-20T00:00:00+00:00">
   <meta itemprop="dateModified" content="2024-11-20T00:00:00+00:00">
-  <meta itemprop="wordCount" content="753">
+  <meta itemprop="wordCount" content="746">
   <meta itemprop="image" content="http://localhost:4321/blog/foursquare/featured.jpg">
   <meta itemprop="keywords" content="R,DuckDB,Foursquare,S3">
   
@@ -150,10 +150,7 @@ First find how they label landscaping businesses in the data.
 </span></span></code></pre></div><pre tabindex="0"><code>##                                                                               label_value
 ## 1 Business and Professional Services &gt; Home Improvement Service &gt; Landscaper and Gardener
 </code></pre><p>Get all the Landscaper and Gardener business data from Foursquare using duck db.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Load the duckdb package</span>
-</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">library</span>(duckdb)
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Create a DuckDB connection</span>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Create a DuckDB connection</span>
 </span></span><span style="display:flex;"><span>con <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">dbConnect</span>(duckdb<span style="color:#000;font-weight:bold">::</span><span style="color:#900;font-weight:bold">duckdb</span>())
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Install and load the httpfs extension</span>
@@ -199,7 +196,6 @@ First find how they label landscaping businesses in the data.
 </span></span></code></pre></div><p>Load the data into R and display the first few rows.</p>
 <p>Get the map using Tigris</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Install and load packages</span>
-</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">library</span>(duckdb)
 </span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">library</span>(dplyr)
 </span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">library</span>(ggplot2)
 </span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">library</span>(tigris)
@@ -302,7 +298,7 @@ First find how they label landscaping businesses in the data.
   </dl>
   <dl class="f6 lh-copy">
     <dt class="fw7">Length:</dt>
-    <dd class="fw5 ml0">4 minute read, 753 words</dd>
+    <dd class="fw5 ml0">4 minute read, 746 words</dd>
   </dl>
   
   

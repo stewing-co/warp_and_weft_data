@@ -112,9 +112,6 @@ Get all the Landscaper and Gardener business data from Foursquare using duck db.
 
 
 ``` r
-# Load the duckdb package
-library(duckdb)
-
 # Create a DuckDB connection
 con <- dbConnect(duckdb::duckdb())
 
@@ -167,7 +164,6 @@ Get the map using Tigris
 
 ``` r
 # Install and load packages
-library(duckdb)
 library(dplyr)
 library(ggplot2)
 library(tigris)
