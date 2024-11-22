@@ -9,3 +9,5 @@ dmo_data.duckdb.wal
 content/blog/bsky_sentiment_index/bluesky_data.duckdb
 public/blog/bsky_sentiment_index/bluesky_data.duckdb
 /.quarto/
+content/blog/bsky_sentiment_index/bsky_social.db
+public/blog/bsky_sentiment_index/bsky_social.db
