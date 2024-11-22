@@ -90,6 +90,13 @@
     <lastmod>2019-02-25T13:38:41-06:00</lastmod>
   </url><url>
     <loc>http://localhost:4321/about/</loc>
+    <lastmod>2016-05-05T21:48:51-07:00</lastmod>
+  </url><url>
+    <loc>http://localhost:4321/about/header/</loc>
+  </url><url>
+    <loc>http://localhost:4321/about/sidebar/</loc>
+  </url><url>
+    <loc>http://localhost:4321/about/main/</loc>
   </url><url>
     <loc>http://localhost:4321/license/</loc>
   </url><url>
