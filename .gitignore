@@ -6,5 +6,6 @@ my_duckdb_database.duckdb
 my_duckdb_database.duckdb.wal
 dmo_data.duckdb
 dmo_data.duckdb.wal
-
+content/blog/bsky_sentiment_index/bluesky_data.duckdb
+public/blog/bsky_sentiment_index/bluesky_data.duckdb
 /.quarto/

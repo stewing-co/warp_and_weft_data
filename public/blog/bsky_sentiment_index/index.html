@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=4321&amp;path=livereload" data-no-instant defer></script>
+  
+                           
+     
+
+
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="generator" content="Hugo 0.136.2">
+<title>Bluesky Sentiment Indexing | Warp and Weft Data</title>
+
+
+<meta property="twitter:site" content="@blue_pibble">
+<meta property="twitter:creator" content="@blue_pibble">
+
+
+
+
+
+
+
+  
+    
+  
+<meta name="description" content="Starter Pack Cohorts">
+
+
+<meta property="og:site_name" content="Warp and Weft Data">
+<meta property="og:title" content="Bluesky Sentiment Indexing | Warp and Weft Data">
+<meta property="og:description" content="Starter Pack Cohorts" />
+<meta property="og:type" content="page" />
+<meta property="og:url" content="http://localhost:4321/blog/bsky_sentiment_index/" />
+<meta property="og:locale" content="en">
+
+
+
+
+    
+        <meta property="og:image" content="http://localhost:4321/blog/bsky_sentiment_index/featured.jpg" >
+        <meta property="twitter:card" content="summary_large_image">
+        <meta name="twitter:image" content="http://localhost:4321/blog/bsky_sentiment_index/featured.jpg" >
+    
+    
+  
+  <meta itemprop="name" content="Bluesky Sentiment Indexing">
+  <meta itemprop="description" content="First get the starter packs for a given vector of actors, then get the people in each starter pack.
+library(tidyverse) library(httr2) actor_identifiers &lt;- c(&#34;marcelias.bsky.social&#34;, #politics &#34;flavorflav.bsky.social&#34;, #entertainment &#34;hltco.bsky.social&#34;, #sports &#34;katharinehayhoe.com&#34;) #science get_people_in_starter_packs &lt;- function(actor_identifiers) { # Create a logged-in API session object once session &lt;- request(&#34;https://bsky.social/xrpc/com.atproto.server.createSession&#34;) |&gt; req_method(&#34;POST&#34;) |&gt; req_body_json(list( identifier = Sys.getenv(&#34;BLUESKY_APP_USER&#34;), password = Sys.getenv(&#34;BLUESKY_APP_PASS&#34;) )) |&gt; req_perform() |&gt; resp_body_json() # Initialize an empty tibble to hold all items from all actors all_actors_items_df &lt;- tibble() # Loop over each actor_identifier for (actor_identifier in actor_identifiers) { # Fetch starter packs for the current actor_identifier req &lt;- request(&#34;https://bsky.social/xrpc/app.bsky.graph.getActorStarterPacks&#34;) |&gt; req_method(&#34;GET&#34;) |&gt; req_headers(Authorization = paste0(&#34;Bearer &#34;, session$accessJwt)) |&gt; req_url_query(actor = actor_identifier) resp &lt;- req |&gt; req_perform() starter_packs &lt;- resp_body_json(resp) starter_packs_list &lt;- starter_packs$starterPacks # Check if starter_packs_list is empty or NULL if (is.null(starter_packs_list) || length(starter_packs_list) == 0) { message(&#34;No starter packs found for actor: &#34;, actor_identifier) next # Skip to next actor_identifier } # Unnest the nested list into a tibble unnested_sp &lt;- map_dfr( starter_packs_list, ~ tibble( uri = .x$uri, cid = .x$cid, record_type = .x$record$`$type`, record_createdAt = .x$record$createdAt, record_description = .x$record$description, record_list = .x$record$list, record_name = .x$record$name, record_updatedAt = .x$record$updatedAt, creator_did = .x$creator$did, creator_handle = .x$creator$handle, creator_displayName = .x$creator$displayName, creator_avatar = .x$creator$avatar, creator_viewer_muted = .x$creator$viewer$muted, creator_viewer_blockedBy = .x$creator$viewer$blockedBy, creator_viewer_following = .x$creator$viewer$following, creator_createdAt = .x$creator$createdAt, joinedAllTimeCount = .x$joinedAllTimeCount, joinedWeekCount = .x$joinedWeekCount, indexedAt = .x$indexedAt, actor_identifier = actor_identifier # Add actor_identifier to the tibble ) ) # Initialize an empty tibble to hold all items from all lists of this actor all_items_df &lt;- tibble() # Loop over each record in unnested_sp for (i in seq_len(nrow(unnested_sp))) { # Extract list URI, name, and creator handle for the current starter pack list_uri &lt;- unnested_sp$record_list[i] record_name &lt;- unnested_sp$record_name[i] creator_handle &lt;- unnested_sp$creator_handle[i] # Initialize an empty list to hold items from this list all_items &lt;- list() # Initialize cursor as NULL cursor &lt;- NULL repeat { # Construct the GET request req &lt;- request(&#34;https://bsky.social/xrpc/app.bsky.graph.getList&#34;) |&gt; req_method(&#34;GET&#34;) |&gt; req_headers(Authorization = paste0(&#34;Bearer &#34;, session$accessJwt)) |&gt; req_url_query(list = list_uri) # If cursor is not NULL, add it to the query if (!is.null(cursor)) { req &lt;- req |&gt; req_url_query(cursor = cursor) } # Perform the request resp &lt;- req |&gt; req_error( is_error = function(resp) FALSE ) |&gt; req_perform() # Check if the response is an error if (resp_status(resp) &gt;= 400) { message(&#34;An error occurred: &#34;, resp_status_desc(resp)) # Optionally, print the response body for more details print(resp_body_string(resp)) break } # Parse the response list_data &lt;- resp_body_json(resp) # Extract items and append to all_items all_items &lt;- c(all_items, list_data$items) # Update cursor if (!is.null(list_data$cursor)) { cursor &lt;- list_data$cursor } else { # No more pages to fetch break } } # Now process all_items, adding record_name and creator_handle items_df &lt;- map_dfr(all_items, function(item) { tibble( uri = item$uri, did = item$subject$did %||% NA_character_, handle = item$subject$handle %||% NA_character_, displayName = item$subject$displayName %||% NA_character_, avatar = item$subject$avatar %||% NA_character_, description = item$subject$description %||% NA_character_, createdAt = item$subject$createdAt %||% NA_character_, indexedAt = item$subject$indexedAt %||% NA_character_, record_name = record_name, # Add the record_name here creator_handle = creator_handle # Add the creator_handle here ) }) # Append items_df to all_items_df for this actor all_items_df &lt;- bind_rows(all_items_df, items_df) } # Append all_items_df for this actor to the overall all_actors_items_df all_actors_items_df &lt;- bind_rows(all_actors_items_df, all_items_df) } # Return the combined data frame all_actors_items_df } people_in_starter_packs &lt;- get_people_in_starter_packs(actor_identifiers) Now get all the posts up until now for all the people in the starter packs.">
+  <meta itemprop="datePublished" content="2024-11-22T00:00:00+00:00">
+  <meta itemprop="dateModified" content="2024-11-22T00:00:00+00:00">
+  <meta itemprop="wordCount" content="2822">
+  <meta itemprop="image" content="http://localhost:4321/blog/bsky_sentiment_index/featured.jpg">
+  <meta itemprop="keywords" content="R,DuckDB,Bluesky">
+  
+  <!--[if IE]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  <link rel="shortcut icon" href="/img/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="/img/favicon.ico" type="image/x-icon">
+  
+  
+  <link rel="stylesheet" href="/style.main.min.0820a865770f259724d61d170adbb19db040647ecaa3b2023c16f04ada7fc7d2.css" integrity="sha256-CCCoZXcPJZck1h0XCtuxnbBAZH7Ko7ICPBbwStp/x9I=" media="screen">
+  
+  
+  <script src="/panelset.min.ed1ac24b6e16f4e2481e3d1d098ae66f5bc77438aef619e6e266d8ac5b00dc72.js" type="text/javascript"></script>
+  
+  
+  <script src="/main.min.f0b39b51e43cf3881368fb093708a9d3b3499e674af4b4e47e27e512a5d411e2.js" type="text/javascript"></script>
+</head>
+<body>
+      <div class="grid-container single">
+<header class="site-header pt4 pb2 mb4 bb b--transparent ph5 headroom z-max" role="banner">
+  <nav class="site-nav db dt-l w-100" role="navigation">
+    <a class="site-brand db dtc-l v-mid link no-underline w-100 w-33-l tc tl-l" href="http://localhost:4321/" title="Home">
+      <img src="/img/logo_leaf.png" class="dib db-l h2 w-auto" alt="Warp and Weft Data">
+    </a>
+    <div class="site-links db dtc-l v-mid w-100 w-47-l tc tr-l mt3 mt0-l ttu tracked">
+      
+        
+        
+        
+      <a class="link f6 f5-l dib pv1 ph2 " href="/about/" title="About Steve Ewing">About</a>
+      
+        
+        
+        
+      <a class="link f6 f5-l dib pv1 ph2 active" href="/blog/" title="Blog">Blog</a>
+      
+      
+    </div>
+  </nav>
+</header>
+
+<main class="page-main pa4" role="main">
+  <section class="page-content mw7 center">
+    <article class="post-content pa0 ph4-l">
+      <header class="post-header">
+        <h1 class="f1 lh-solid measure-narrow mb3 fw4">Bluesky Sentiment Indexing</h1>
+        <h4 class="f4 mt0 mb4 lh-title measure">Starter Pack Cohorts</h4>
+        <p class="f6 measure lh-copy mv1">By Steve Ewing in <a href="http://localhost:4321/categories/bluesky">Bluesky</a> </p>
+        <p class="f7 db mv0 ttu">November 22, 2024</p>
+
+      
+
+      </header>
+      <section class="post-body pt5 pb4">
+        <p>First get the starter packs for a given vector of actors, then get the people in each starter pack.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#900;font-weight:bold">library</span>(tidyverse)
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">library</span>(httr2)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>actor_identifiers <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">c</span>(<span style="color:#d14">&#34;marcelias.bsky.social&#34;</span>, <span style="color:#998;font-style:italic">#politics</span>
+</span></span><span style="display:flex;"><span>                       <span style="color:#d14">&#34;flavorflav.bsky.social&#34;</span>, <span style="color:#998;font-style:italic">#entertainment</span>
+</span></span><span style="display:flex;"><span>                       <span style="color:#d14">&#34;hltco.bsky.social&#34;</span>, <span style="color:#998;font-style:italic">#sports</span>
+</span></span><span style="display:flex;"><span>                       <span style="color:#d14">&#34;katharinehayhoe.com&#34;</span>) <span style="color:#998;font-style:italic">#science</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>get_people_in_starter_packs <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#000;font-weight:bold">function</span>(actor_identifiers) {
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Create a logged-in API session object once</span>
+</span></span><span style="display:flex;"><span>  session <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">request</span>(<span style="color:#d14">&#34;https://bsky.social/xrpc/com.atproto.server.createSession&#34;</span>) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#900;font-weight:bold">req_method</span>(<span style="color:#d14">&#34;POST&#34;</span>) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#900;font-weight:bold">req_body_json</span>(<span style="color:#900;font-weight:bold">list</span>(
+</span></span><span style="display:flex;"><span>      identifier <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">Sys.getenv</span>(<span style="color:#d14">&#34;BLUESKY_APP_USER&#34;</span>),
+</span></span><span style="display:flex;"><span>      password <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">Sys.getenv</span>(<span style="color:#d14">&#34;BLUESKY_APP_PASS&#34;</span>)
+</span></span><span style="display:flex;"><span>    )) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#900;font-weight:bold">req_perform</span>() <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#900;font-weight:bold">resp_body_json</span>()
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Initialize an empty tibble to hold all items from all actors</span>
+</span></span><span style="display:flex;"><span>  all_actors_items_df <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">tibble</span>()
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Loop over each actor_identifier</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#000;font-weight:bold">for</span> (actor_identifier <span style="color:#000;font-weight:bold">in</span> actor_identifiers) {
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic"># Fetch starter packs for the current actor_identifier</span>
+</span></span><span style="display:flex;"><span>    req <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">request</span>(<span style="color:#d14">&#34;https://bsky.social/xrpc/app.bsky.graph.getActorStarterPacks&#34;</span>) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#900;font-weight:bold">req_method</span>(<span style="color:#d14">&#34;GET&#34;</span>) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#900;font-weight:bold">req_headers</span>(Authorization <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">paste0</span>(<span style="color:#d14">&#34;Bearer &#34;</span>, session<span style="color:#000;font-weight:bold">$</span>accessJwt)) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#900;font-weight:bold">req_url_query</span>(actor <span style="color:#000;font-weight:bold">=</span> actor_identifier)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    resp <span style="color:#000;font-weight:bold">&lt;-</span> req <span style="color:#000;font-weight:bold">|&gt;</span> <span style="color:#900;font-weight:bold">req_perform</span>()
+</span></span><span style="display:flex;"><span>    starter_packs <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">resp_body_json</span>(resp)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    starter_packs_list <span style="color:#000;font-weight:bold">&lt;-</span> starter_packs<span style="color:#000;font-weight:bold">$</span>starterPacks
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic"># Check if starter_packs_list is empty or NULL</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> (<span style="color:#900;font-weight:bold">is.null</span>(starter_packs_list) <span style="color:#000;font-weight:bold">||</span> <span style="color:#900;font-weight:bold">length</span>(starter_packs_list) <span style="color:#000;font-weight:bold">==</span> <span style="color:#099">0</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#900;font-weight:bold">message</span>(<span style="color:#d14">&#34;No starter packs found for actor: &#34;</span>, actor_identifier)
+</span></span><span style="display:flex;"><span>      <span style="color:#000;font-weight:bold">next</span>  <span style="color:#998;font-style:italic"># Skip to next actor_identifier</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic"># Unnest the nested list into a tibble</span>
+</span></span><span style="display:flex;"><span>    unnested_sp <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">map_dfr</span>(
+</span></span><span style="display:flex;"><span>      starter_packs_list,
+</span></span><span style="display:flex;"><span>      <span style="color:#000;font-weight:bold">~</span> <span style="color:#900;font-weight:bold">tibble</span>(
+</span></span><span style="display:flex;"><span>        uri <span style="color:#000;font-weight:bold">=</span> .x<span style="color:#000;font-weight:bold">$</span>uri,
+</span></span><span style="display:flex;"><span>        cid <span style="color:#000;font-weight:bold">=</span> .x<span style="color:#000;font-weight:bold">$</span>cid,
+</span></span><span style="display:flex;"><span>        record_type <span style="color:#000;font-weight:bold">=</span> .x<span style="color:#000;font-weight:bold">$</span>record<span style="color:#000;font-weight:bold">$</span>`$type`,
+</span></span><span style="display:flex;"><span>        record_createdAt <span style="color:#000;font-weight:bold">=</span> .x<span style="color:#000;font-weight:bold">$</span>record<span style="color:#000;font-weight:bold">$</span>createdAt,
+</span></span><span style="display:flex;"><span>        record_description <span style="color:#000;font-weight:bold">=</span> .x<span style="color:#000;font-weight:bold">$</span>record<span style="color:#000;font-weight:bold">$</span>description,
+</span></span><span style="display:flex;"><span>        record_list <span style="color:#000;font-weight:bold">=</span> .x<span style="color:#000;font-weight:bold">$</span>record<span style="color:#000;font-weight:bold">$</span>list,
+</span></span><span style="display:flex;"><span>        record_name <span style="color:#000;font-weight:bold">=</span> .x<span style="color:#000;font-weight:bold">$</span>record<span style="color:#000;font-weight:bold">$</span>name,
+</span></span><span style="display:flex;"><span>        record_updatedAt <span style="color:#000;font-weight:bold">=</span> .x<span style="color:#000;font-weight:bold">$</span>record<span style="color:#000;font-weight:bold">$</span>updatedAt,
+</span></span><span style="display:flex;"><span>        creator_did <span style="color:#000;font-weight:bold">=</span> .x<span style="color:#000;font-weight:bold">$</span>creator<span style="color:#000;font-weight:bold">$</span>did,
+</span></span><span style="display:flex;"><span>        creator_handle <span style="color:#000;font-weight:bold">=</span> .x<span style="color:#000;font-weight:bold">$</span>creator<span style="color:#000;font-weight:bold">$</span>handle,
+</span></span><span style="display:flex;"><span>        creator_displayName <span style="color:#000;font-weight:bold">=</span> .x<span style="color:#000;font-weight:bold">$</span>creator<span style="color:#000;font-weight:bold">$</span>displayName,
+</span></span><span style="display:flex;"><span>        creator_avatar <span style="color:#000;font-weight:bold">=</span> .x<span style="color:#000;font-weight:bold">$</span>creator<span style="color:#000;font-weight:bold">$</span>avatar,
+</span></span><span style="display:flex;"><span>        creator_viewer_muted <span style="color:#000;font-weight:bold">=</span> .x<span style="color:#000;font-weight:bold">$</span>creator<span style="color:#000;font-weight:bold">$</span>viewer<span style="color:#000;font-weight:bold">$</span>muted,
+</span></span><span style="display:flex;"><span>        creator_viewer_blockedBy <span style="color:#000;font-weight:bold">=</span> .x<span style="color:#000;font-weight:bold">$</span>creator<span style="color:#000;font-weight:bold">$</span>viewer<span style="color:#000;font-weight:bold">$</span>blockedBy,
+</span></span><span style="display:flex;"><span>        creator_viewer_following <span style="color:#000;font-weight:bold">=</span> .x<span style="color:#000;font-weight:bold">$</span>creator<span style="color:#000;font-weight:bold">$</span>viewer<span style="color:#000;font-weight:bold">$</span>following,
+</span></span><span style="display:flex;"><span>        creator_createdAt <span style="color:#000;font-weight:bold">=</span> .x<span style="color:#000;font-weight:bold">$</span>creator<span style="color:#000;font-weight:bold">$</span>createdAt,
+</span></span><span style="display:flex;"><span>        joinedAllTimeCount <span style="color:#000;font-weight:bold">=</span> .x<span style="color:#000;font-weight:bold">$</span>joinedAllTimeCount,
+</span></span><span style="display:flex;"><span>        joinedWeekCount <span style="color:#000;font-weight:bold">=</span> .x<span style="color:#000;font-weight:bold">$</span>joinedWeekCount,
+</span></span><span style="display:flex;"><span>        indexedAt <span style="color:#000;font-weight:bold">=</span> .x<span style="color:#000;font-weight:bold">$</span>indexedAt,
+</span></span><span style="display:flex;"><span>        actor_identifier <span style="color:#000;font-weight:bold">=</span> actor_identifier  <span style="color:#998;font-style:italic"># Add actor_identifier to the tibble</span>
+</span></span><span style="display:flex;"><span>      )
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic"># Initialize an empty tibble to hold all items from all lists of this actor</span>
+</span></span><span style="display:flex;"><span>    all_items_df <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">tibble</span>()
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic"># Loop over each record in unnested_sp</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">for</span> (i <span style="color:#000;font-weight:bold">in</span> <span style="color:#900;font-weight:bold">seq_len</span>(<span style="color:#900;font-weight:bold">nrow</span>(unnested_sp))) {
+</span></span><span style="display:flex;"><span>      <span style="color:#998;font-style:italic"># Extract list URI, name, and creator handle for the current starter pack</span>
+</span></span><span style="display:flex;"><span>      list_uri <span style="color:#000;font-weight:bold">&lt;-</span> unnested_sp<span style="color:#000;font-weight:bold">$</span>record_list[i]
+</span></span><span style="display:flex;"><span>      record_name <span style="color:#000;font-weight:bold">&lt;-</span> unnested_sp<span style="color:#000;font-weight:bold">$</span>record_name[i]
+</span></span><span style="display:flex;"><span>      creator_handle <span style="color:#000;font-weight:bold">&lt;-</span> unnested_sp<span style="color:#000;font-weight:bold">$</span>creator_handle[i]
+</span></span><span style="display:flex;"><span>      
+</span></span><span style="display:flex;"><span>      <span style="color:#998;font-style:italic"># Initialize an empty list to hold items from this list</span>
+</span></span><span style="display:flex;"><span>      all_items <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">list</span>()
+</span></span><span style="display:flex;"><span>      
+</span></span><span style="display:flex;"><span>      <span style="color:#998;font-style:italic"># Initialize cursor as NULL</span>
+</span></span><span style="display:flex;"><span>      cursor <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#000;font-weight:bold">NULL</span>
+</span></span><span style="display:flex;"><span>      
+</span></span><span style="display:flex;"><span>      <span style="color:#000;font-weight:bold">repeat</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#998;font-style:italic"># Construct the GET request</span>
+</span></span><span style="display:flex;"><span>        req <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">request</span>(<span style="color:#d14">&#34;https://bsky.social/xrpc/app.bsky.graph.getList&#34;</span>) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#900;font-weight:bold">req_method</span>(<span style="color:#d14">&#34;GET&#34;</span>) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#900;font-weight:bold">req_headers</span>(Authorization <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">paste0</span>(<span style="color:#d14">&#34;Bearer &#34;</span>, session<span style="color:#000;font-weight:bold">$</span>accessJwt)) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#900;font-weight:bold">req_url_query</span>(list <span style="color:#000;font-weight:bold">=</span> list_uri)
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#998;font-style:italic"># If cursor is not NULL, add it to the query</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">if</span> (<span style="color:#000;font-weight:bold">!</span><span style="color:#900;font-weight:bold">is.null</span>(cursor)) {
+</span></span><span style="display:flex;"><span>          req <span style="color:#000;font-weight:bold">&lt;-</span> req <span style="color:#000;font-weight:bold">|&gt;</span> <span style="color:#900;font-weight:bold">req_url_query</span>(cursor <span style="color:#000;font-weight:bold">=</span> cursor)
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#998;font-style:italic"># Perform the request</span>
+</span></span><span style="display:flex;"><span>        resp <span style="color:#000;font-weight:bold">&lt;-</span> req <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#900;font-weight:bold">req_error</span>(
+</span></span><span style="display:flex;"><span>            is_error <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">function</span>(resp)
+</span></span><span style="display:flex;"><span>              <span style="color:#000;font-weight:bold">FALSE</span>
+</span></span><span style="display:flex;"><span>          ) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#900;font-weight:bold">req_perform</span>()
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#998;font-style:italic"># Check if the response is an error</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">if</span> (<span style="color:#900;font-weight:bold">resp_status</span>(resp) <span style="color:#000;font-weight:bold">&gt;=</span> <span style="color:#099">400</span>) {
+</span></span><span style="display:flex;"><span>          <span style="color:#900;font-weight:bold">message</span>(<span style="color:#d14">&#34;An error occurred: &#34;</span>, <span style="color:#900;font-weight:bold">resp_status_desc</span>(resp))
+</span></span><span style="display:flex;"><span>          <span style="color:#998;font-style:italic"># Optionally, print the response body for more details</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#900;font-weight:bold">print</span>(<span style="color:#900;font-weight:bold">resp_body_string</span>(resp))
+</span></span><span style="display:flex;"><span>          <span style="color:#000;font-weight:bold">break</span>
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#998;font-style:italic"># Parse the response</span>
+</span></span><span style="display:flex;"><span>        list_data <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">resp_body_json</span>(resp)
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#998;font-style:italic"># Extract items and append to all_items</span>
+</span></span><span style="display:flex;"><span>        all_items <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">c</span>(all_items, list_data<span style="color:#000;font-weight:bold">$</span>items)
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#998;font-style:italic"># Update cursor</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">if</span> (<span style="color:#000;font-weight:bold">!</span><span style="color:#900;font-weight:bold">is.null</span>(list_data<span style="color:#000;font-weight:bold">$</span>cursor)) {
+</span></span><span style="display:flex;"><span>          cursor <span style="color:#000;font-weight:bold">&lt;-</span> list_data<span style="color:#000;font-weight:bold">$</span>cursor
+</span></span><span style="display:flex;"><span>        } <span style="color:#000;font-weight:bold">else</span> {
+</span></span><span style="display:flex;"><span>          <span style="color:#998;font-style:italic"># No more pages to fetch</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#000;font-weight:bold">break</span>
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>      
+</span></span><span style="display:flex;"><span>      <span style="color:#998;font-style:italic"># Now process all_items, adding record_name and creator_handle</span>
+</span></span><span style="display:flex;"><span>      items_df <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">map_dfr</span>(all_items, <span style="color:#000;font-weight:bold">function</span>(item) {
+</span></span><span style="display:flex;"><span>        <span style="color:#900;font-weight:bold">tibble</span>(
+</span></span><span style="display:flex;"><span>          uri <span style="color:#000;font-weight:bold">=</span> item<span style="color:#000;font-weight:bold">$</span>uri,
+</span></span><span style="display:flex;"><span>          did <span style="color:#000;font-weight:bold">=</span> item<span style="color:#000;font-weight:bold">$</span>subject<span style="color:#000;font-weight:bold">$</span>did <span style="color:#000;font-weight:bold">%||%</span> <span style="color:#000;font-weight:bold">NA_character_</span>,
+</span></span><span style="display:flex;"><span>          handle <span style="color:#000;font-weight:bold">=</span> item<span style="color:#000;font-weight:bold">$</span>subject<span style="color:#000;font-weight:bold">$</span>handle <span style="color:#000;font-weight:bold">%||%</span> <span style="color:#000;font-weight:bold">NA_character_</span>,
+</span></span><span style="display:flex;"><span>          displayName <span style="color:#000;font-weight:bold">=</span> item<span style="color:#000;font-weight:bold">$</span>subject<span style="color:#000;font-weight:bold">$</span>displayName <span style="color:#000;font-weight:bold">%||%</span> <span style="color:#000;font-weight:bold">NA_character_</span>,
+</span></span><span style="display:flex;"><span>          avatar <span style="color:#000;font-weight:bold">=</span> item<span style="color:#000;font-weight:bold">$</span>subject<span style="color:#000;font-weight:bold">$</span>avatar <span style="color:#000;font-weight:bold">%||%</span> <span style="color:#000;font-weight:bold">NA_character_</span>,
+</span></span><span style="display:flex;"><span>          description <span style="color:#000;font-weight:bold">=</span> item<span style="color:#000;font-weight:bold">$</span>subject<span style="color:#000;font-weight:bold">$</span>description <span style="color:#000;font-weight:bold">%||%</span> <span style="color:#000;font-weight:bold">NA_character_</span>,
+</span></span><span style="display:flex;"><span>          createdAt <span style="color:#000;font-weight:bold">=</span> item<span style="color:#000;font-weight:bold">$</span>subject<span style="color:#000;font-weight:bold">$</span>createdAt <span style="color:#000;font-weight:bold">%||%</span> <span style="color:#000;font-weight:bold">NA_character_</span>,
+</span></span><span style="display:flex;"><span>          indexedAt <span style="color:#000;font-weight:bold">=</span> item<span style="color:#000;font-weight:bold">$</span>subject<span style="color:#000;font-weight:bold">$</span>indexedAt <span style="color:#000;font-weight:bold">%||%</span> <span style="color:#000;font-weight:bold">NA_character_</span>,
+</span></span><span style="display:flex;"><span>          record_name <span style="color:#000;font-weight:bold">=</span> record_name,         <span style="color:#998;font-style:italic"># Add the record_name here</span>
+</span></span><span style="display:flex;"><span>          creator_handle <span style="color:#000;font-weight:bold">=</span> creator_handle    <span style="color:#998;font-style:italic"># Add the creator_handle here</span>
+</span></span><span style="display:flex;"><span>        )
+</span></span><span style="display:flex;"><span>      })
+</span></span><span style="display:flex;"><span>      
+</span></span><span style="display:flex;"><span>      <span style="color:#998;font-style:italic"># Append items_df to all_items_df for this actor</span>
+</span></span><span style="display:flex;"><span>      all_items_df <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">bind_rows</span>(all_items_df, items_df)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic"># Append all_items_df for this actor to the overall all_actors_items_df</span>
+</span></span><span style="display:flex;"><span>    all_actors_items_df <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">bind_rows</span>(all_actors_items_df, all_items_df)
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Return the combined data frame</span>
+</span></span><span style="display:flex;"><span>  all_actors_items_df
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>people_in_starter_packs <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">get_people_in_starter_packs</span>(actor_identifiers)
+</span></span></code></pre></div><p>Now get all the posts up until now for all the people in the starter packs.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># # Function to get posts from a vector of handles</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># get_posts_from_handles &lt;- function(handles) {</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#   </span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#   # Create a logged-in API session object once</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#   session &lt;- request(&#34;https://bsky.social/xrpc/com.atproto.server.createSession&#34;) |&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#     req_method(&#34;POST&#34;) |&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#     req_body_json(list(</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#       identifier = Sys.getenv(&#34;BLUESKY_APP_USER&#34;),</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#       password = Sys.getenv(&#34;BLUESKY_APP_PASS&#34;)</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#     )) |&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#     req_perform() |&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#     resp_body_json()</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#   </span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#   # Initialize an empty tibble to hold all posts</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#   all_posts_df &lt;- tibble()</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#   </span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#   # Loop over each handle</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#   for (handle in handles) {</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#     message(&#34;Fetching posts for handle: &#34;, handle)</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#     </span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#     # Initialize an empty list to hold posts for this handle</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#     all_posts &lt;- list()</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#     </span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#     # Initialize cursor as NULL</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#     cursor &lt;- NULL</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#     </span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#     repeat {</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#       # Construct the GET request</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#       req &lt;- request(&#34;https://bsky.social/xrpc/app.bsky.feed.getAuthorFeed&#34;) |&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#         req_method(&#34;GET&#34;) |&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#         req_headers(Authorization = paste0(&#34;Bearer &#34;, session$accessJwt)) |&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#         req_url_query(actor = handle)</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#       </span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#       # If cursor is not NULL, add it to the query</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#       if (!is.null(cursor)) {</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#         req &lt;- req |&gt; req_url_query(cursor = cursor)</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#       }</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#       </span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#       # Perform the request</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#       resp &lt;- req |&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#         req_error(is_error = function(resp) FALSE) |&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#         req_perform()</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#       </span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#       # Check if the response is an error</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#       if (resp_status(resp) &gt;= 400) {</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#         message(&#34;An error occurred fetching posts for &#34;, handle, &#34;: &#34;, resp_status_desc(resp))</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#         # Optionally, print the response body for more details</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#         print(resp_body_string(resp))</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#         break</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#       }</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#       </span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#       # Parse the response</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#       feed_data &lt;- resp_body_json(resp)</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#       </span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#       # Check if feed is empty</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#       if (length(feed_data$feed) == 0) {</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#         message(&#34;No posts found for handle: &#34;, handle)</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#         break</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#       }</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#       </span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#       # Extract posts and append to all_posts</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#       all_posts &lt;- c(all_posts, feed_data$feed)</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#       </span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#       # Update cursor</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#       if (!is.null(feed_data$cursor)) {</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#         cursor &lt;- feed_data$cursor</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#       } else {</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#         # No more pages to fetch</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#         break</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#       }</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#       </span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#       # Optional: Pause to respect rate limits</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#       Sys.sleep(0.1)</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#     }</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#     </span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#     # Now process all_posts into a tibble</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#     posts_df &lt;- map_dfr(all_posts, function(post) {</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#       tibble(</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#         uri = post$post$uri,</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#         cid = post$post$cid,</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#         author_did = post$post$author$did %||% NA_character_,</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#         author_handle = post$post$author$handle %||% NA_character_,</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#         author_displayName = post$post$author$displayName %||% NA_character_,</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#         record_type = post$post$record$`$type` %||% NA_character_,</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#         record_text = post$post$record$text %||% NA_character_,</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#         record_createdAt = post$post$record$createdAt %||% NA_character_,</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#         reply_root = post$post$record$reply$root$uri %||% NA_character_,</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#         reply_parent = post$post$record$reply$parent$uri %||% NA_character_,</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#         repost_count = post$post$repostCount %||% NA_integer_,</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#         reply_count = post$post$replyCount %||% NA_integer_,</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#         like_count = post$post$likeCount %||% NA_integer_,</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#         indexed_at = post$post$indexedAt %||% NA_character_</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#       )</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#     })</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#     </span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#     # Append posts_df to all_posts_df</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#     all_posts_df &lt;- bind_rows(all_posts_df, posts_df)</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#   }</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#   </span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#   # Return the combined posts data frame</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#   all_posts_df</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># }</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># </span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># # Fetch posts for all handles</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># all_posts_df &lt;- get_posts_from_handles(unique(all_items_df$handle))</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># # View the resulting posts dataset</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># print(all_posts_df)</span>
+</span></span></code></pre></div><p>Load the saved data from the database.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#900;font-weight:bold">library</span>(duckdb)
+</span></span></code></pre></div><pre tabindex="0"><code>## Loading required package: DBI
+</code></pre><div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#900;font-weight:bold">library</span>(DBI)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Create or connect to a DuckDB database file</span>
+</span></span><span style="display:flex;"><span>con <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">dbConnect</span>(duckdb<span style="color:#000;font-weight:bold">::</span><span style="color:#900;font-weight:bold">duckdb</span>(), <span style="color:#d14">&#34;bluesky_data.duckdb&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Save the people_in_starter_packs data frame to the database</span>
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">dbWriteTable</span>(con, <span style="color:#d14">&#34;people_in_starter_packs&#34;</span>, people_in_starter_packs, overwrite <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">TRUE</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># # Save the all_posts_df data frame to the database</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># dbWriteTable(con, &#34;posts&#34;, all_posts_df, overwrite = TRUE)</span>
+</span></span></code></pre></div><p>Update the posts in the database.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Function to update posts in the database</span>
+</span></span><span style="display:flex;"><span>update_posts_in_database <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#000;font-weight:bold">function</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">library</span>(DBI)
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">library</span>(duckdb)
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">library</span>(httr2)
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">library</span>(tidyverse)
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">library</span>(parsedate)  <span style="color:#998;font-style:italic"># Added to handle ISO 8601 timestamp parsing</span>
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Create a logged-in API session object once</span>
+</span></span><span style="display:flex;"><span>  session <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">request</span>(<span style="color:#d14">&#34;https://bsky.social/xrpc/com.atproto.server.createSession&#34;</span>) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#900;font-weight:bold">req_method</span>(<span style="color:#d14">&#34;POST&#34;</span>) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#900;font-weight:bold">req_body_json</span>(<span style="color:#900;font-weight:bold">list</span>(
+</span></span><span style="display:flex;"><span>      identifier <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">Sys.getenv</span>(<span style="color:#d14">&#34;BLUESKY_APP_USER&#34;</span>),
+</span></span><span style="display:flex;"><span>      password <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">Sys.getenv</span>(<span style="color:#d14">&#34;BLUESKY_APP_PASS&#34;</span>)
+</span></span><span style="display:flex;"><span>    )) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#900;font-weight:bold">req_perform</span>() <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#900;font-weight:bold">resp_body_json</span>()
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Connect to the database</span>
+</span></span><span style="display:flex;"><span>  con <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">dbConnect</span>(duckdb<span style="color:#000;font-weight:bold">::</span><span style="color:#900;font-weight:bold">duckdb</span>(), <span style="color:#d14">&#34;bluesky_data.duckdb&#34;</span>)
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Get the list of handles from the people_in_starter_packs table</span>
+</span></span><span style="display:flex;"><span>  handles_df <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">dbGetQuery</span>(con, <span style="color:#d14">&#34;SELECT DISTINCT handle FROM people_in_starter_packs&#34;</span>)
+</span></span><span style="display:flex;"><span>  handles <span style="color:#000;font-weight:bold">&lt;-</span> handles_df<span style="color:#000;font-weight:bold">$</span>handle
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Initialize a tibble to hold new posts</span>
+</span></span><span style="display:flex;"><span>  new_posts_df <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">tibble</span>()
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Loop over each handle</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#000;font-weight:bold">for</span> (handle <span style="color:#000;font-weight:bold">in</span> handles) {
+</span></span><span style="display:flex;"><span>    <span style="color:#900;font-weight:bold">message</span>(<span style="color:#d14">&#34;Updating posts for handle: &#34;</span>, handle)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic"># Get the latest record_createdAt for this handle from the posts table</span>
+</span></span><span style="display:flex;"><span>    latest_time_query <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">sprintf</span>(
+</span></span><span style="display:flex;"><span>      <span style="color:#d14">&#34;SELECT MAX(record_createdAt) as latest_time FROM posts WHERE author_handle = &#39;%s&#39;&#34;</span>,
+</span></span><span style="display:flex;"><span>      handle
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>    latest_time_result <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">dbGetQuery</span>(con, latest_time_query)
+</span></span><span style="display:flex;"><span>    latest_time <span style="color:#000;font-weight:bold">&lt;-</span> latest_time_result<span style="color:#000;font-weight:bold">$</span>latest_time[1]
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic"># If there is no latest_time (i.e., no posts for this handle), set to NULL</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> (<span style="color:#900;font-weight:bold">is.na</span>(latest_time) <span style="color:#000;font-weight:bold">||</span> <span style="color:#900;font-weight:bold">is.null</span>(latest_time)) {
+</span></span><span style="display:flex;"><span>      latest_time <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#000;font-weight:bold">NULL</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#900;font-weight:bold">message</span>(<span style="color:#d14">&#34;No existing posts found for handle: &#34;</span>, handle)
+</span></span><span style="display:flex;"><span>    } <span style="color:#000;font-weight:bold">else</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#900;font-weight:bold">message</span>(<span style="color:#d14">&#34;Latest post time for &#34;</span>, handle, <span style="color:#d14">&#34;: &#34;</span>, latest_time)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic"># Initialize variables for fetching posts</span>
+</span></span><span style="display:flex;"><span>    all_posts <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">list</span>()
+</span></span><span style="display:flex;"><span>    cursor <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#000;font-weight:bold">NULL</span>
+</span></span><span style="display:flex;"><span>    keep_fetching <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#000;font-weight:bold">TRUE</span>
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">repeat</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#998;font-style:italic"># Construct the GET request</span>
+</span></span><span style="display:flex;"><span>      req <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">request</span>(<span style="color:#d14">&#34;https://bsky.social/xrpc/app.bsky.feed.getAuthorFeed&#34;</span>) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#900;font-weight:bold">req_method</span>(<span style="color:#d14">&#34;GET&#34;</span>) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#900;font-weight:bold">req_headers</span>(Authorization <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">paste0</span>(<span style="color:#d14">&#34;Bearer &#34;</span>, session<span style="color:#000;font-weight:bold">$</span>accessJwt)) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#900;font-weight:bold">req_url_query</span>(actor <span style="color:#000;font-weight:bold">=</span> handle)
+</span></span><span style="display:flex;"><span>      
+</span></span><span style="display:flex;"><span>      <span style="color:#998;font-style:italic"># If cursor is not NULL, add it to the query</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#000;font-weight:bold">if</span> (<span style="color:#000;font-weight:bold">!</span><span style="color:#900;font-weight:bold">is.null</span>(cursor)) {
+</span></span><span style="display:flex;"><span>        req <span style="color:#000;font-weight:bold">&lt;-</span> req <span style="color:#000;font-weight:bold">|&gt;</span> <span style="color:#900;font-weight:bold">req_url_query</span>(cursor <span style="color:#000;font-weight:bold">=</span> cursor)
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>      
+</span></span><span style="display:flex;"><span>      <span style="color:#998;font-style:italic"># Perform the request</span>
+</span></span><span style="display:flex;"><span>      resp <span style="color:#000;font-weight:bold">&lt;-</span> req <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#900;font-weight:bold">req_error</span>(is_error <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">function</span>(resp) <span style="color:#000;font-weight:bold">FALSE</span>) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#900;font-weight:bold">req_perform</span>()
+</span></span><span style="display:flex;"><span>      
+</span></span><span style="display:flex;"><span>      <span style="color:#998;font-style:italic"># Check if the response is an error</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#000;font-weight:bold">if</span> (<span style="color:#900;font-weight:bold">resp_status</span>(resp) <span style="color:#000;font-weight:bold">&gt;=</span> <span style="color:#099">400</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#900;font-weight:bold">message</span>(<span style="color:#d14">&#34;An error occurred fetching posts for &#34;</span>, handle, <span style="color:#d14">&#34;: &#34;</span>, <span style="color:#900;font-weight:bold">resp_status_desc</span>(resp))
+</span></span><span style="display:flex;"><span>        <span style="color:#998;font-style:italic"># Optionally, print the response body for more details</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#900;font-weight:bold">print</span>(<span style="color:#900;font-weight:bold">resp_body_string</span>(resp))
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">break</span>
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>      
+</span></span><span style="display:flex;"><span>      <span style="color:#998;font-style:italic"># Parse the response</span>
+</span></span><span style="display:flex;"><span>      feed_data <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">resp_body_json</span>(resp)
+</span></span><span style="display:flex;"><span>      
+</span></span><span style="display:flex;"><span>      <span style="color:#998;font-style:italic"># Check if feed is empty</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#000;font-weight:bold">if</span> (<span style="color:#900;font-weight:bold">length</span>(feed_data<span style="color:#000;font-weight:bold">$</span>feed) <span style="color:#000;font-weight:bold">==</span> <span style="color:#099">0</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#900;font-weight:bold">message</span>(<span style="color:#d14">&#34;No posts found for handle: &#34;</span>, handle)
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">break</span>
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>      
+</span></span><span style="display:flex;"><span>      <span style="color:#998;font-style:italic"># Process posts and check timestamps</span>
+</span></span><span style="display:flex;"><span>      posts_to_add <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">list</span>()
+</span></span><span style="display:flex;"><span>      <span style="color:#000;font-weight:bold">for</span> (post <span style="color:#000;font-weight:bold">in</span> feed_data<span style="color:#000;font-weight:bold">$</span>feed) {
+</span></span><span style="display:flex;"><span>        post_time <span style="color:#000;font-weight:bold">&lt;-</span> post<span style="color:#000;font-weight:bold">$</span>post<span style="color:#000;font-weight:bold">$</span>record<span style="color:#000;font-weight:bold">$</span>createdAt <span style="color:#000;font-weight:bold">%||%</span> <span style="color:#d14">&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">if</span> (post_time <span style="color:#000;font-weight:bold">==</span> <span style="color:#d14">&#34;&#34;</span>) <span style="color:#000;font-weight:bold">next</span>  <span style="color:#998;font-style:italic"># Skip if no timestamp</span>
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#998;font-style:italic"># Parse the timestamps using parsedate::parse_iso_8601</span>
+</span></span><span style="display:flex;"><span>        post_time_parsed <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">parse_iso_8601</span>(post_time)
+</span></span><span style="display:flex;"><span>        latest_time_parsed <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#000;font-weight:bold">if</span> (<span style="color:#000;font-weight:bold">!</span><span style="color:#900;font-weight:bold">is.null</span>(latest_time)) <span style="color:#900;font-weight:bold">parse_iso_8601</span>(latest_time) <span style="color:#000;font-weight:bold">else</span> <span style="color:#000;font-weight:bold">NULL</span>
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#998;font-style:italic"># Compare post_time with latest_time</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">if</span> (<span style="color:#000;font-weight:bold">!</span><span style="color:#900;font-weight:bold">is.null</span>(latest_time_parsed) <span style="color:#000;font-weight:bold">&amp;&amp;</span> <span style="color:#000;font-weight:bold">!</span><span style="color:#900;font-weight:bold">is.na</span>(post_time_parsed) <span style="color:#000;font-weight:bold">&amp;&amp;</span> post_time_parsed <span style="color:#000;font-weight:bold">&lt;=</span> latest_time_parsed) {
+</span></span><span style="display:flex;"><span>          <span style="color:#998;font-style:italic"># Reached posts we&#39;ve already fetched</span>
+</span></span><span style="display:flex;"><span>          keep_fetching <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#000;font-weight:bold">FALSE</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#000;font-weight:bold">break</span>
+</span></span><span style="display:flex;"><span>        } <span style="color:#000;font-weight:bold">else</span> {
+</span></span><span style="display:flex;"><span>          <span style="color:#998;font-style:italic"># New post, add to the list</span>
+</span></span><span style="display:flex;"><span>          posts_to_add <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">c</span>(posts_to_add, <span style="color:#900;font-weight:bold">list</span>(post))
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>      
+</span></span><span style="display:flex;"><span>      <span style="color:#998;font-style:italic"># Append new posts to all_posts</span>
+</span></span><span style="display:flex;"><span>      all_posts <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">c</span>(all_posts, posts_to_add)
+</span></span><span style="display:flex;"><span>      
+</span></span><span style="display:flex;"><span>      <span style="color:#998;font-style:italic"># Break the loop if we&#39;ve reached existing posts</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#000;font-weight:bold">if</span> (<span style="color:#000;font-weight:bold">!</span>keep_fetching) {
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">break</span>
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>      
+</span></span><span style="display:flex;"><span>      <span style="color:#998;font-style:italic"># Update cursor</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#000;font-weight:bold">if</span> (<span style="color:#000;font-weight:bold">!</span><span style="color:#900;font-weight:bold">is.null</span>(feed_data<span style="color:#000;font-weight:bold">$</span>cursor)) {
+</span></span><span style="display:flex;"><span>        cursor <span style="color:#000;font-weight:bold">&lt;-</span> feed_data<span style="color:#000;font-weight:bold">$</span>cursor
+</span></span><span style="display:flex;"><span>      } <span style="color:#000;font-weight:bold">else</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#998;font-style:italic"># No more pages to fetch</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">break</span>
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>      
+</span></span><span style="display:flex;"><span>      <span style="color:#998;font-style:italic"># Optional: Pause to respect rate limits</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#900;font-weight:bold">Sys.sleep</span>(<span style="color:#099">0.1</span>)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic"># If there are new posts, process and insert them into the database</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> (<span style="color:#900;font-weight:bold">length</span>(all_posts) <span style="color:#000;font-weight:bold">&gt;</span> <span style="color:#099">0</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#900;font-weight:bold">message</span>(<span style="color:#d14">&#34;Found &#34;</span>, <span style="color:#900;font-weight:bold">length</span>(all_posts), <span style="color:#d14">&#34; new posts for handle: &#34;</span>, handle)
+</span></span><span style="display:flex;"><span>      
+</span></span><span style="display:flex;"><span>      <span style="color:#998;font-style:italic"># Process the new posts into a tibble</span>
+</span></span><span style="display:flex;"><span>      posts_df <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">map_dfr</span>(all_posts, <span style="color:#000;font-weight:bold">function</span>(post) {
+</span></span><span style="display:flex;"><span>        <span style="color:#900;font-weight:bold">tibble</span>(
+</span></span><span style="display:flex;"><span>          uri <span style="color:#000;font-weight:bold">=</span> post<span style="color:#000;font-weight:bold">$</span>post<span style="color:#000;font-weight:bold">$</span>uri,
+</span></span><span style="display:flex;"><span>          cid <span style="color:#000;font-weight:bold">=</span> post<span style="color:#000;font-weight:bold">$</span>post<span style="color:#000;font-weight:bold">$</span>cid,
+</span></span><span style="display:flex;"><span>          author_did <span style="color:#000;font-weight:bold">=</span> post<span style="color:#000;font-weight:bold">$</span>post<span style="color:#000;font-weight:bold">$</span>author<span style="color:#000;font-weight:bold">$</span>did <span style="color:#000;font-weight:bold">%||%</span> <span style="color:#000;font-weight:bold">NA_character_</span>,
+</span></span><span style="display:flex;"><span>          author_handle <span style="color:#000;font-weight:bold">=</span> post<span style="color:#000;font-weight:bold">$</span>post<span style="color:#000;font-weight:bold">$</span>author<span style="color:#000;font-weight:bold">$</span>handle <span style="color:#000;font-weight:bold">%||%</span> <span style="color:#000;font-weight:bold">NA_character_</span>,
+</span></span><span style="display:flex;"><span>          author_displayName <span style="color:#000;font-weight:bold">=</span> post<span style="color:#000;font-weight:bold">$</span>post<span style="color:#000;font-weight:bold">$</span>author<span style="color:#000;font-weight:bold">$</span>displayName <span style="color:#000;font-weight:bold">%||%</span> <span style="color:#000;font-weight:bold">NA_character_</span>,
+</span></span><span style="display:flex;"><span>          record_type <span style="color:#000;font-weight:bold">=</span> post<span style="color:#000;font-weight:bold">$</span>post<span style="color:#000;font-weight:bold">$</span>record<span style="color:#000;font-weight:bold">$</span>`$type` <span style="color:#000;font-weight:bold">%||%</span> <span style="color:#000;font-weight:bold">NA_character_</span>,
+</span></span><span style="display:flex;"><span>          record_text <span style="color:#000;font-weight:bold">=</span> post<span style="color:#000;font-weight:bold">$</span>post<span style="color:#000;font-weight:bold">$</span>record<span style="color:#000;font-weight:bold">$</span>text <span style="color:#000;font-weight:bold">%||%</span> <span style="color:#000;font-weight:bold">NA_character_</span>,
+</span></span><span style="display:flex;"><span>          record_createdAt <span style="color:#000;font-weight:bold">=</span> post<span style="color:#000;font-weight:bold">$</span>post<span style="color:#000;font-weight:bold">$</span>record<span style="color:#000;font-weight:bold">$</span>createdAt <span style="color:#000;font-weight:bold">%||%</span> <span style="color:#000;font-weight:bold">NA_character_</span>,
+</span></span><span style="display:flex;"><span>          reply_root <span style="color:#000;font-weight:bold">=</span> post<span style="color:#000;font-weight:bold">$</span>post<span style="color:#000;font-weight:bold">$</span>record<span style="color:#000;font-weight:bold">$</span>reply<span style="color:#000;font-weight:bold">$</span>root<span style="color:#000;font-weight:bold">$</span>uri <span style="color:#000;font-weight:bold">%||%</span> <span style="color:#000;font-weight:bold">NA_character_</span>,
+</span></span><span style="display:flex;"><span>          reply_parent <span style="color:#000;font-weight:bold">=</span> post<span style="color:#000;font-weight:bold">$</span>post<span style="color:#000;font-weight:bold">$</span>record<span style="color:#000;font-weight:bold">$</span>reply<span style="color:#000;font-weight:bold">$</span>parent<span style="color:#000;font-weight:bold">$</span>uri <span style="color:#000;font-weight:bold">%||%</span> <span style="color:#000;font-weight:bold">NA_character_</span>,
+</span></span><span style="display:flex;"><span>          repost_count <span style="color:#000;font-weight:bold">=</span> post<span style="color:#000;font-weight:bold">$</span>post<span style="color:#000;font-weight:bold">$</span>repostCount <span style="color:#000;font-weight:bold">%||%</span> <span style="color:#000;font-weight:bold">NA_integer_</span>,
+</span></span><span style="display:flex;"><span>          reply_count <span style="color:#000;font-weight:bold">=</span> post<span style="color:#000;font-weight:bold">$</span>post<span style="color:#000;font-weight:bold">$</span>replyCount <span style="color:#000;font-weight:bold">%||%</span> <span style="color:#000;font-weight:bold">NA_integer_</span>,
+</span></span><span style="display:flex;"><span>          like_count <span style="color:#000;font-weight:bold">=</span> post<span style="color:#000;font-weight:bold">$</span>post<span style="color:#000;font-weight:bold">$</span>likeCount <span style="color:#000;font-weight:bold">%||%</span> <span style="color:#000;font-weight:bold">NA_integer_</span>,
+</span></span><span style="display:flex;"><span>          indexed_at <span style="color:#000;font-weight:bold">=</span> post<span style="color:#000;font-weight:bold">$</span>post<span style="color:#000;font-weight:bold">$</span>indexedAt <span style="color:#000;font-weight:bold">%||%</span> <span style="color:#000;font-weight:bold">NA_character_</span>
+</span></span><span style="display:flex;"><span>        )
+</span></span><span style="display:flex;"><span>      })
+</span></span><span style="display:flex;"><span>      
+</span></span><span style="display:flex;"><span>      <span style="color:#998;font-style:italic"># Write the new posts to the database</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#900;font-weight:bold">dbWriteTable</span>(con, <span style="color:#d14">&#34;posts&#34;</span>, posts_df, append <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">TRUE</span>)
+</span></span><span style="display:flex;"><span>    } <span style="color:#000;font-weight:bold">else</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#900;font-weight:bold">message</span>(<span style="color:#d14">&#34;No new posts found for handle: &#34;</span>, handle)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Disconnect from the database</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">dbDisconnect</span>(con, shutdown <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">TRUE</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">update_posts_in_database</span>()
+</span></span></code></pre></div><p>Add sentiment scoring</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>compute_sentiment_scores <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#000;font-weight:bold">function</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">library</span>(DBI)
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">library</span>(duckdb)
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">library</span>(tidyverse)
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">library</span>(tidytext)
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Connect to the database</span>
+</span></span><span style="display:flex;"><span>  con <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">dbConnect</span>(duckdb<span style="color:#000;font-weight:bold">::</span><span style="color:#900;font-weight:bold">duckdb</span>(), <span style="color:#d14">&#34;bluesky_data.duckdb&#34;</span>)
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Read the posts table</span>
+</span></span><span style="display:flex;"><span>  posts_df <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">dbReadTable</span>(con, <span style="color:#d14">&#34;posts&#34;</span>)
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Ensure record_text is not NA</span>
+</span></span><span style="display:flex;"><span>  posts_df <span style="color:#000;font-weight:bold">&lt;-</span> posts_df <span style="color:#000;font-weight:bold">%&gt;%</span> <span style="color:#900;font-weight:bold">filter</span>(<span style="color:#000;font-weight:bold">!</span><span style="color:#900;font-weight:bold">is.na</span>(record_text))
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Select relevant columns</span>
+</span></span><span style="display:flex;"><span>  posts_df <span style="color:#000;font-weight:bold">&lt;-</span> posts_df <span style="color:#000;font-weight:bold">%&gt;%</span> <span style="color:#900;font-weight:bold">select</span>(uri, record_text)
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Tokenize the text</span>
+</span></span><span style="display:flex;"><span>  posts_tokens <span style="color:#000;font-weight:bold">&lt;-</span> posts_df <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#900;font-weight:bold">unnest_tokens</span>(word, record_text)
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Get the AFINN sentiment lexicon</span>
+</span></span><span style="display:flex;"><span>  afinn <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">get_sentiments</span>(<span style="color:#d14">&#34;afinn&#34;</span>)
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Join tokens with sentiment lexicon</span>
+</span></span><span style="display:flex;"><span>  posts_sentiment <span style="color:#000;font-weight:bold">&lt;-</span> posts_tokens <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#900;font-weight:bold">inner_join</span>(afinn, by <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;word&#34;</span>)
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Compute sentiment score per post</span>
+</span></span><span style="display:flex;"><span>  post_sentiment_scores <span style="color:#000;font-weight:bold">&lt;-</span> posts_sentiment <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#900;font-weight:bold">group_by</span>(uri) <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#900;font-weight:bold">summarise</span>(sentiment_score <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">sum</span>(value))
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Handle posts without sentiment words</span>
+</span></span><span style="display:flex;"><span>  all_uris <span style="color:#000;font-weight:bold">&lt;-</span> posts_df<span style="color:#000;font-weight:bold">$</span>uri
+</span></span><span style="display:flex;"><span>  post_sentiment_scores <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">tibble</span>(uri <span style="color:#000;font-weight:bold">=</span> all_uris) <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#900;font-weight:bold">left_join</span>(post_sentiment_scores, by <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;uri&#34;</span>) <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#900;font-weight:bold">mutate</span>(sentiment_score <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">replace_na</span>(sentiment_score, <span style="color:#099">0</span>))
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Write the sentiment scores to the database</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">dbWriteTable</span>(con, <span style="color:#d14">&#34;post_sentiment_scores&#34;</span>, post_sentiment_scores, overwrite <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">TRUE</span>)
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Disconnect from the database</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">dbDisconnect</span>(con, shutdown <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">TRUE</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">compute_sentiment_scores</span>()
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Reconnect to the database</span>
+</span></span><span style="display:flex;"><span>con <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">dbConnect</span>(duckdb<span style="color:#000;font-weight:bold">::</span><span style="color:#900;font-weight:bold">duckdb</span>(), <span style="color:#d14">&#34;bluesky_data.duckdb&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Join posts with sentiment scores</span>
+</span></span><span style="display:flex;"><span>posts_with_sentiment <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">dbGetQuery</span>(con, <span style="color:#d14">&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">  SELECT p.*, s.sentiment_score
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">  FROM posts p
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">  LEFT JOIN post_sentiment_scores s ON p.uri = s.uri
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Disconnect from the database</span>
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">dbDisconnect</span>(con, shutdown <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">TRUE</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># View the data frame</span>
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">head</span>(posts_with_sentiment)
+</span></span></code></pre></div><pre tabindex="0"><code>##                                                                      uri
+## 1 at://did:plc:mkyjjkt5uwobjstft6x4tfy4/app.bsky.feed.post/3k4mkgq7qrq2l
+## 2 at://did:plc:s3usd6r2ja3vjwazopbk3iaz/app.bsky.feed.post/3k32voqufko2r
+## 3 at://did:plc:uynpich2hsqmryyhr3moz5re/app.bsky.feed.post/3k4kpjh6btq2b
+## 4 at://did:plc:nf66nltcbiomd5u3fpj4b42v/app.bsky.feed.post/3k4kn4qsg6c22
+## 5 at://did:plc:mkyjjkt5uwobjstft6x4tfy4/app.bsky.feed.post/3k4kw7ekd6e2w
+## 6 at://did:plc:mkyjjkt5uwobjstft6x4tfy4/app.bsky.feed.post/3k4kvs75bps2l
+##                                                           cid
+## 1 bafyreicqps4jg7m7hwhxu32xcy4atzydfj422d6hqki6g4kthbiqxnbw2e
+## 2 bafyreihfqxay3elo4nav2udxgnz3ir2zdxqy4mra7ixbfpcp6sgmun2isy
+## 3 bafyreiew3apfmapto5qcwx5dkb7eabanadtntb3li2salirhu2wvuc7p2u
+## 4 bafyreih4qjymynxmkraidjis7brvz4rnzsizubrlurpraxliney33b2sj4
+## 5 bafyreidk3437fs4lluj26kfn6fba3wn2abwhwozrqpucnywmstydfc6r2u
+## 6 bafyreiaqzji2vyc4sbmuluqafrnvip4rwad7epfxxyzfwdjzjvhef3go4u
+##                         author_did               author_handle
+## 1 did:plc:mkyjjkt5uwobjstft6x4tfy4     tessafisher.bsky.social
+## 2 did:plc:s3usd6r2ja3vjwazopbk3iaz     lucriesbeck.bsky.social
+## 3 did:plc:uynpich2hsqmryyhr3moz5re     pavedwalden.bsky.social
+## 4 did:plc:nf66nltcbiomd5u3fpj4b42v punkrockscience.bsky.social
+## 5 did:plc:mkyjjkt5uwobjstft6x4tfy4     tessafisher.bsky.social
+## 6 did:plc:mkyjjkt5uwobjstft6x4tfy4     tessafisher.bsky.social
+##          author_displayName        record_type
+## 1          Dr. Tessa Fisher app.bsky.feed.post
+## 2 luc is figuring it out ♻️🛰️ app.bsky.feed.post
+## 3               pavedwalden app.bsky.feed.post
+## 4            Dr. Stephanie  app.bsky.feed.post
+## 5          Dr. Tessa Fisher app.bsky.feed.post
+## 6          Dr. Tessa Fisher app.bsky.feed.post
+##                                                                                                                                                                                                                                                                                                          record_text
+## 1                                                                                                                                                                                                                             The frequency of paranoid reading on this site as of late is getting pretty exhausting
+## 2            Hi.\n\nI’m trying to raise funds for my top surgery.\n\nAs of this morning, about 37% of my goal has been met.\n\nI’m beyond grateful for your support, and I still need your help to get me closer to this procedure.\n\nCan you help me spread the word?\n\nThank you! \n\nhttps://gofund.me/f39217a4
+## 3            When you see someone getting main charactered, I want you to notice how people feed off each other&#39;s anger, &#34;yes and&#34;ing each dunk, finding new angles of attack, building a narrative around the target. It feels good to be in agreement. It feels good to be funny. It feels better than being fair.
+## 4 NIH postdocs want a union!\n\nBetter pay, better workplace protections, better healthcare… And because so many other postdocs peg salaries to the NIH scale, this could benefit far more people than just at the NIH.\n\nThe NIH tried (and has now recanted) “they’re not employees”.\n\nUNION STRONG, FRIENDS! 🧪
+## 5                                                                                                                                                                                I, for one, look forward to the day when trans women will be free to post about other things in addition to discourse and shitposts
+## 6                                                                                                                                                           First off, this is an excellent choice of names for a star.\n\nSecondly, stellar astro folks, do we have an idea if Earendel is actually Pop III or not?
+##           record_createdAt
+## 1 2023-08-10T16:29:23.978Z
+## 2 2023-07-21T22:37:37.871Z
+## 3 2023-08-09T22:55:04.949Z
+## 4 2023-08-09T22:12:11.362Z
+## 5 2023-08-10T00:54:42.746Z
+## 6 2023-08-10T00:47:20.265Z
+##                                                               reply_root
+## 1                                                                   &lt;NA&gt;
+## 2                                                                   &lt;NA&gt;
+## 3 at://did:plc:uynpich2hsqmryyhr3moz5re/app.bsky.feed.post/3k4kphtkvvd2g
+## 4                                                                   &lt;NA&gt;
+## 5                                                                   &lt;NA&gt;
+## 6                                                                   &lt;NA&gt;
+##                                                             reply_parent
+## 1                                                                   &lt;NA&gt;
+## 2                                                                   &lt;NA&gt;
+## 3 at://did:plc:uynpich2hsqmryyhr3moz5re/app.bsky.feed.post/3k4kphtkvvd2g
+## 4                                                                   &lt;NA&gt;
+## 5                                                                   &lt;NA&gt;
+## 6                                                                   &lt;NA&gt;
+##   repost_count reply_count like_count               indexed_at sentiment_score
+## 1            0           0          0 2023-08-10T16:29:23.978Z               1
+## 2            5           1          4 2023-07-21T22:37:37.871Z              13
+## 3           52           4        162 2023-08-09T22:55:04.949Z              13
+## 4           13           1         27 2023-08-09T22:12:11.362Z              10
+## 5            1           0         10 2023-08-10T00:54:42.746Z               1
+## 6            0           0          2 2023-08-10T00:47:20.265Z               3
+</code></pre><p>Indexing</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#900;font-weight:bold">library</span>(tidyverse)
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">library</span>(lubridate)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Reconnect to the database</span>
+</span></span><span style="display:flex;"><span>con <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">dbConnect</span>(duckdb<span style="color:#000;font-weight:bold">::</span><span style="color:#900;font-weight:bold">duckdb</span>(), <span style="color:#d14">&#34;bluesky_data.duckdb&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Load posts with sentiment scores</span>
+</span></span><span style="display:flex;"><span>posts_with_sentiment <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">dbGetQuery</span>(con, <span style="color:#d14">&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">  SELECT p.*, s.sentiment_score
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">  FROM posts p
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">  LEFT JOIN post_sentiment_scores s ON p.uri = s.uri
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Load starter pack information</span>
+</span></span><span style="display:flex;"><span>starter_packs_df <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">dbReadTable</span>(con, <span style="color:#d14">&#34;people_in_starter_packs&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Disconnect from the database</span>
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">dbDisconnect</span>(con, shutdown <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">TRUE</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Merge posts with starter pack information</span>
+</span></span><span style="display:flex;"><span>posts_with_starter_pack <span style="color:#000;font-weight:bold">&lt;-</span> posts_with_sentiment <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">left_join</span>(starter_packs_df <span style="color:#000;font-weight:bold">%&gt;%</span> <span style="color:#900;font-weight:bold">select</span>(handle, record_name, creator_handle), by <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">c</span>(<span style="color:#d14">&#34;author_handle&#34;</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;handle&#34;</span>)) <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Ensure &#39;record_createdAt&#39; is parsed as POSIXct</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">mutate</span>(
+</span></span><span style="display:flex;"><span>    record_createdAt <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">as.POSIXct</span>(record_createdAt, format <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;%Y-%m-%dT%H:%M:%OSZ&#34;</span>, tz <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;UTC&#34;</span>),
+</span></span><span style="display:flex;"><span>    date <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">as.Date</span>(record_createdAt),
+</span></span><span style="display:flex;"><span>    sentiment_score <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">replace_na</span>(sentiment_score, <span style="color:#099">0</span>))
+</span></span></code></pre></div><pre tabindex="0"><code>## Warning in left_join(., starter_packs_df %&gt;% select(handle, record_name, : Detected an unexpected many-to-many relationship between `x` and `y`.
+## ℹ Row 81 of `x` matches multiple rows in `y`.
+## ℹ Row 1503 of `y` matches multiple rows in `x`.
+## ℹ If a many-to-many relationship is expected, set `relationship =
+##   &#34;many-to-many&#34;` to silence this warning.
+</code></pre><div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Calculate the overall average sentiment score</span>
+</span></span><span style="display:flex;"><span>overall_average_sentiment <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">mean</span>(posts_with_starter_pack<span style="color:#000;font-weight:bold">$</span>sentiment_score, na.rm <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">TRUE</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Group by date and starter pack name to compute daily averages</span>
+</span></span><span style="display:flex;"><span>daily_sentiment <span style="color:#000;font-weight:bold">&lt;-</span> posts_with_starter_pack <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">group_by</span>(date, author_handle, creator_handle) <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">summarise</span>(avg_sentiment_handles <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">mean</span>(sentiment_score, na.rm <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">TRUE</span>),
+</span></span><span style="display:flex;"><span>            .groups <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;drop&#34;</span>) <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">group_by</span>(date, creator_handle) <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">summarise</span>(
+</span></span><span style="display:flex;"><span>    average_sentiment <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">mean</span>(avg_sentiment_handles, na.rm <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">TRUE</span>),
+</span></span><span style="display:flex;"><span>    .groups <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;drop&#34;</span>
+</span></span><span style="display:flex;"><span>  ) <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">filter</span>(date <span style="color:#000;font-weight:bold">&gt;=</span> <span style="color:#900;font-weight:bold">floor_date</span>(<span style="color:#900;font-weight:bold">Sys.Date</span>(), <span style="color:#d14">&#34;month&#34;</span>),
+</span></span><span style="display:flex;"><span>         <span style="color:#000;font-weight:bold">!</span><span style="color:#900;font-weight:bold">is.na</span>(creator_handle))
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#900;font-weight:bold">library</span>(ggplot2)
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">library</span>(scales)
+</span></span></code></pre></div><pre tabindex="0"><code>## 
+## Attaching package: &#39;scales&#39;
+</code></pre><pre tabindex="0"><code>## The following object is masked from &#39;package:purrr&#39;:
+## 
+##     discard
+</code></pre><pre tabindex="0"><code>## The following object is masked from &#39;package:readr&#39;:
+## 
+##     col_factor
+</code></pre><div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#900;font-weight:bold">library</span>(viridis)
+</span></span></code></pre></div><pre tabindex="0"><code>## Loading required package: viridisLite
+</code></pre><pre tabindex="0"><code>## 
+## Attaching package: &#39;viridis&#39;
+</code></pre><pre tabindex="0"><code>## The following object is masked from &#39;package:scales&#39;:
+## 
+##     viridis_pal
+</code></pre><div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Plot the sentiment index over time with every other day on the x-axis</span>
+</span></span><span style="display:flex;"><span>plot <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">ggplot</span>(daily_sentiment, <span style="color:#900;font-weight:bold">aes</span>(x <span style="color:#000;font-weight:bold">=</span> date, y <span style="color:#000;font-weight:bold">=</span> average_sentiment, color <span style="color:#000;font-weight:bold">=</span> creator_handle)) <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">geom_line</span>(size <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">1</span>) <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">geom_point</span>(size <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">2</span>) <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">scale_color_viridis</span>(discrete <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">TRUE</span>, option <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;D&#34;</span>) <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">scale_x_date</span>(
+</span></span><span style="display:flex;"><span>    date_labels <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;%b %d&#34;</span>,
+</span></span><span style="display:flex;"><span>    date_breaks <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;2 days&#34;</span>,
+</span></span><span style="display:flex;"><span>    expand <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">c</span>(<span style="color:#099">0.01</span>, <span style="color:#099">0</span>)
+</span></span><span style="display:flex;"><span>  ) <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">scale_y_continuous</span>(
+</span></span><span style="display:flex;"><span>    limits <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">c</span>(<span style="color:#900;font-weight:bold">min</span>(daily_sentiment<span style="color:#000;font-weight:bold">$</span>average_sentiment) <span style="color:#000;font-weight:bold">-</span> <span style="color:#099">1</span>, <span style="color:#900;font-weight:bold">max</span>(daily_sentiment<span style="color:#000;font-weight:bold">$</span>average_sentiment) <span style="color:#000;font-weight:bold">+</span> <span style="color:#099">1</span>),
+</span></span><span style="display:flex;"><span>    expand <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">c</span>(<span style="color:#099">0</span>, <span style="color:#099">0</span>)
+</span></span><span style="display:flex;"><span>  ) <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">labs</span>(
+</span></span><span style="display:flex;"><span>    title <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;Daily Average Sentiment by Starter Pack&#34;</span>,
+</span></span><span style="display:flex;"><span>    subtitle <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;Based on sentiment analysis of user posts&#34;</span>,
+</span></span><span style="display:flex;"><span>    x <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;Date&#34;</span>,
+</span></span><span style="display:flex;"><span>    y <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;Average Sentiment Score&#34;</span>,
+</span></span><span style="display:flex;"><span>    color <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;Starter Pack&#34;</span>
+</span></span><span style="display:flex;"><span>  ) <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">theme_minimal</span>(base_size <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">12</span>) <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">theme</span>(
+</span></span><span style="display:flex;"><span>    axis.text.x <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">element_text</span>(angle <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">45</span>, hjust <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">1</span>),
+</span></span><span style="display:flex;"><span>    plot.title <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">element_text</span>(face <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;bold&#34;</span>, size <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">16</span>),
+</span></span><span style="display:flex;"><span>    plot.subtitle <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">element_text</span>(size <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">12</span>),
+</span></span><span style="display:flex;"><span>    legend.title <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">element_text</span>(face <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;bold&#34;</span>),
+</span></span><span style="display:flex;"><span>    legend.position <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;bottom&#34;</span>,
+</span></span><span style="display:flex;"><span>    panel.grid.minor <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">element_blank</span>()
+</span></span><span style="display:flex;"><span>  )
+</span></span></code></pre></div><pre tabindex="0"><code>## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+## ℹ Please use `linewidth` instead.
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+## generated.
+</code></pre><div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#900;font-weight:bold">ggsave</span>(<span style="color:#d14">&#34;featured.jpg&#34;</span>, plot, width <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">6</span>, height <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">3</span>, device <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;jpg&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Disconnect from the database</span>
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">dbDisconnect</span>(con, shutdown <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">TRUE</span>)
+</span></span></code></pre></div><pre tabindex="0"><code>## Warning: Connection already closed.
+</code></pre><div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>plot
+</span></span></code></pre></div><img src="/blog/bsky_sentiment_index/index_files/figure-html/unnamed-chunk-8-1.png" width="672" />
+
+        
+        <details closed class="f6 fw7 input-reset">
+  <dl class="f6 lh-copy">
+    <dt class="fw7">Posted on:</dt>
+    <dd class="fw5 ml0">November 22, 2024</dd>
+  </dl>
+  <dl class="f6 lh-copy">
+    <dt class="fw7">Length:</dt>
+    <dd class="fw5 ml0">14 minute read, 2822 words</dd>
+  </dl>
+  
+  <dl class="f6 lh-copy">
+    <dt class="fw7">Categories:</dt>
+    <dd class="fw5 ml0"> <a href="http://localhost:4321/categories/bluesky">Bluesky</a> </dd>
+  </dl>
+  
+  
+  
+  <dl class="f6 lh-copy">
+    <dt class="fw7">Tags:</dt>
+    <dd class="fw5 ml0"> <a href="http://localhost:4321/tags/r">R</a>  <a href="http://localhost:4321/tags/duckdb">DuckDB</a>  <a href="http://localhost:4321/tags/bluesky">Bluesky</a> </dd>
+  </dl>
+  
+  <dl class="f6 lh-copy">
+    <dt class="fw7">See Also:</dt>
+    
+    <dd class="fw5 ml0"><a href="/blog/aw_bsky_bot/">Andrew Wheiss&#39;s Bluesky Bot</a></dd>
+    
+    <dd class="fw5 ml0"><a href="/blog/foursquare/">Foursquare S3 Data</a></dd>
+    
+    <dd class="fw5 ml0"><a href="/blog/bobs_burgers/">Tidy Tuesday: 2024-11-19</a></dd>
+    
+  </dl>
+</details>
+
+      </section>
+      <footer class="post-footer">
+        <div class="post-pagination dt w-100 mt4 mb2">
+  
+  
+  
+  
+    <a class="next dtc pl2 tr v-top fw6"
+    href="http://localhost:4321/blog/aw_bsky_bot/">Andrew Wheiss&#39;s Bluesky Bot &rarr;</a>
+  
+</div>
+
+      </footer>
+    </article>
+    
+      <div class="post-comments pa0 pa4-l mt4">
+  
+    
+      <script src="https://utteranc.es/client.js"
+              repo="stewing-co/warp_and_weft_data"
+              issue-term="pathname"
+              theme="boxy-light"
+              label="comments :crystal_ball:"
+              crossorigin="anonymous"
+              async
+              type="text/javascript">
+      </script>
+    
+  
+</div>
+
+    
+  </section>
+</main>
+<footer class="site-footer pv4 bt b--transparent ph5" role="contentinfo">
+  <nav class="db dt-l w-100">
+    <p class="site-copyright f7 db dtc-l v-mid w-100 w-33-l tc tl-l pv2 pv0-l mv0 lh-copy">
+      &copy; 2024 Warp and Weft Data, Atlanta, GA
+      <span class="middot-divider"></span>
+      Made with <span xmlns:dct="http://purl.org/dc/terms/" property="dct:title"><a xmlns:dct="http://purl.org/dc/terms/" href="https://github.com/hugo-apero/" rel="dct:source">Hugo Apéro</a></span>.
+      <br />
+      
+Based on <span xmlns:dct="http://purl.org/dc/terms/" property="dct:title"><a xmlns:dct="http://purl.org/dc/terms/" href="https://github.com/formspree/blogophonic-hugo" rel="dct:source">Blogophonic</a></span> by <a xmlns:cc="http://creativecommons.org/ns#" href="https://formspree.io" property="cc:attributionName" rel="cc:attributionURL">Formspree</a>.
+    </p>
+    
+    <div class="site-social-links db dtc-l v-mid w-100 w-33-l tc pv2 pv0-l mv0">
+      <div class="social-icon-links" aria-hidden="true">
+  
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <a class="link dib h1 w1 ml0 mr2 f6 o-90 glow" href="https://github.com/stewing-co" title="github" target="_blank" rel="me noopener">
+      <i class="fab fa-github fa-lg fa-fw"></i>
+    </a>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <a class="link dib h1 w1 ml0 mr2 f6 o-90 glow" href="https://bsky.app/profile/blue-pibble.bsky.social" title="bluesky" target="_blank" rel="me noopener">
+      <i class="fab fa-bluesky fa-lg fa-fw"></i>
+    </a>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <a class="link dib h1 w1 ml0 mr2 f6 o-90 glow" href="https://www.linkedin.com/in/stewing-in/" title="linkedin" target="_blank" rel="me noopener">
+      <i class="fab fa-linkedin fa-lg fa-fw"></i>
+    </a>
+  
+</div>
+
+    </div>
+    
+    <div class="site-links f6 db dtc-l v-mid w-100 w-67-l tc tr-l pv2 pv0-l mv0">
+      
+      <a class="dib pv1 ph2 link" href="/license/" title="License">License</a>
+      
+      <a class="dib pv1 ph2 link" href="/contact/" title="Contact form">Contact</a>
+      
+    </div>
+  </nav>
+  
+    <script>
+
+    var i, text, code, codes = document.getElementsByTagName('code');
+    for (let i = 0; i < codes.length;) {
+      code = codes[i];
+      if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+        text = code.textContent;
+        if (/^\$[^$]/.test(text) && /[^$]\$$/.test(text)) {
+          text = text.replace(/^\$/, '\\(').replace(/\$$/, '\\)');
+          code.textContent = text;
+        }
+        if (/^\\\((.|\s)+\\\)$/.test(text) ||
+            /^\\\[(.|\s)+\\\]$/.test(text) ||
+            /^\$(.|\s)+\$$/.test(text) ||
+            /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+          code.outerHTML = code.innerHTML;  
+          continue;
+        }
+      }
+      i++;
+    }
+</script>
+
+  
+    
+    
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.13/dist/katex.min.css" integrity="sha384-RZU/ijkSsFbcmivfdRBQDtwuwVqK7GMOw6IMvKyeWL2K5UAlyp6WonmB8m7Jd0Hn" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.13/dist/katex.min.js" integrity="sha384-pK1WpvzWVBQiP0/GjnvRxV4mOb0oxFuyRxJlk6vVw146n3egcN5C925NCP7a7BY8" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.13/dist/contrib/auto-render.min.js" integrity="sha384-vZTG03m+2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+
+
+
+    
+  
+  
+</footer>
+
+      </div>
+    </body>
+</html>
