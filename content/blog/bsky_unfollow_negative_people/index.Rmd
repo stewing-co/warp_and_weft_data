@@ -13,13 +13,13 @@ layout: single
 
 I followed a ton of people using the new starter packs. Now I'm going to keep all my mutuals and unfollow the people I'm following who aren't following me back and who have a net negative sentiment score on their posts.
 
-```{r, eval=FALSE}
+```{r}
 # Load necessary libraries
 library(DBI)
 library(duckdb)
 library(tidyverse)
-library(httr2)
 library(tidytext)
+library(httr2)
 library(parsedate)  
 
 get_follow_relationships <- function(db_path) {
@@ -174,9 +174,7 @@ print(relationships)
 ```{r, eval=FALSE}
 # Function to get posts from a vector of handles, fetching only new posts and writing to db as it fetches
 get_posts_from_handles <- function(handles, session, db_path) {
-  # Load parsedate library
-  library(parsedate)
-  
+
   # Connect to the database
   con <- dbConnect(duckdb::duckdb(), db_path)
   
@@ -324,11 +322,7 @@ get_posts_from_handles <- function(handles, session, db_path) {
 
 # Function to compute sentiment scores for new posts
 compute_sentiment_scores_for_new_posts <- function(db_path) {
-  library(DBI)
-  library(duckdb)
-  library(tidyverse)
-  library(tidytext)
-  
+
   # Connect to the database
   con <- dbConnect(duckdb::duckdb(), db_path)
   
@@ -464,10 +458,6 @@ main()
 ```
 
 ```{r, eval=FALSE}
-
-# Define the database path
-db_path <- "C:/Users/steph/OneDrive/warp_and_weft_data/content/blog/bsky_sentiment_index/bluesky_data.duckdb"
-
 # Function to unfollow users based on criteria, excluding those who are following you
 unfollow_users_based_on_criteria <- function(db_path) {
   # Create a logged-in API session object
@@ -503,7 +493,7 @@ unfollow_users_based_on_criteria <- function(db_path) {
     "
     SELECT author_handle AS handle
     FROM wwd_following_average_sentiment
-    WHERE average_sentiment < 5
+    WHERE average_sentiment < 1
   "
   )
   
@@ -781,15 +771,14 @@ unfollow_users_based_on_criteria(db_path)
 
 ```
 
-```{r, eval=FALSE}
+```{r}
 # Function to create a histogram of average sentiment scores of remaining follows
 create_histogram_of_avg_sentiment <- function(db_path) {
   # Connect to the database
   con <- dbConnect(duckdb::duckdb(), db_path)
   
   # Retrieve the list of users you are currently following
-  follows_df <- dbGetQuery(con,
-                           "SELECT * FROM follow_relationships WHERE tag = 'wwd-following'")
+  follows_df <- dbGetQuery(con, "SELECT * FROM follow_relationships WHERE tag = 'wwd-following'")
   
   # Retrieve the average sentiment scores
   avg_sentiment_df <- dbGetQuery(

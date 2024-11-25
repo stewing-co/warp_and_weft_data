@@ -19,10 +19,37 @@ I followed a ton of people using the new starter packs. Now I'm going to keep al
 library(DBI)
 library(duckdb)
 library(tidyverse)
-library(httr2)
-library(tidytext)
-library(parsedate)  
+```
 
+```
+## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+## ✔ dplyr     1.1.4     ✔ readr     2.1.5
+## ✔ forcats   1.0.0     ✔ stringr   1.5.1
+## ✔ ggplot2   3.5.1     ✔ tibble    3.2.1
+## ✔ lubridate 1.9.3     ✔ tidyr     1.3.1
+## ✔ purrr     1.0.2     
+## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()
+## ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+```
+
+``` r
+library(tidytext)
+library(httr2)
+library(parsedate)  
+```
+
+```
+## 
+## Attaching package: 'parsedate'
+## 
+## The following object is masked from 'package:readr':
+## 
+##     parse_date
+```
+
+``` r
 get_follow_relationships <- function(db_path) {
   library(tidyverse)
   library(httr2)
@@ -166,18 +193,41 @@ db_path <- "C:/Users/steph/OneDrive/warp_and_weft_data/content/blog/bsky_sentime
 
 # Call the function with the database path
 relationships <- get_follow_relationships(db_path)
+```
 
+```
+## Fetching your followers...
+## Fetching users you are following...
+## Follow relationships have been stored in the database.
+```
+
+``` r
 # View the results
 print(relationships)
+```
+
+```
+## # A tibble: 972 × 6
+##    did                            handle displayName description createdAt tag  
+##    <chr>                          <chr>  <chr>       <chr>       <chr>     <chr>
+##  1 did:plc:qofqpqau42nmrqgtcqpr4… tooma… "seven ex … "humanoid … 2024-11-… wwd-…
+##  2 did:plc:4dlr3yhphrh6vc7q627mc… aklot… "Alex Klot… "Physics p… 2023-06-… wwd-…
+##  3 did:plc:yz7ogsukyb7j6mup6udg5… annag… "Anna Hugh… "\U0001f30… 2023-05-… wwd-…
+##  4 did:plc:uwscsrt6wq2pahbzef2nc… sanja… "sanjana c… "nuclear a… 2023-04-… wwd-…
+##  5 did:plc:spanui6736cbvrbrci2hx… astro… "Brandon B… "computati… 2023-06-… wwd-…
+##  6 did:plc:5ufuqy3qstws4yzjuixf4… frogs… "anna !!! … "| she/her… 2023-04-… wwd-…
+##  7 did:plc:gvcmzzacbgwgttvcxzytp… astro… "athena, g… "astrophys… 2023-08-… wwd-…
+##  8 did:plc:my5x3kz6owobc5mcncdo4… adeen… "Dr. Adeen… "Planetary… 2023-06-… wwd-…
+##  9 did:plc:2bppr6lzjxvpcrp5lho6j… focus… "katie"     "opinions … 2023-04-… wwd-…
+## 10 did:plc:qzmgfnhb76ffudt7utnmy… yonib… "Yoni Bran… "astrologe… 2023-05-… wwd-…
+## # ℹ 962 more rows
 ```
 
 
 ``` r
 # Function to get posts from a vector of handles, fetching only new posts and writing to db as it fetches
 get_posts_from_handles <- function(handles, session, db_path) {
-  # Load parsedate library
-  library(parsedate)
-  
+
   # Connect to the database
   con <- dbConnect(duckdb::duckdb(), db_path)
   
@@ -325,11 +375,7 @@ get_posts_from_handles <- function(handles, session, db_path) {
 
 # Function to compute sentiment scores for new posts
 compute_sentiment_scores_for_new_posts <- function(db_path) {
-  library(DBI)
-  library(duckdb)
-  library(tidyverse)
-  library(tidytext)
-  
+
   # Connect to the database
   con <- dbConnect(duckdb::duckdb(), db_path)
   
@@ -465,9 +511,6 @@ main()
 
 
 ``` r
-# Define the database path
-db_path <- "C:/Users/steph/OneDrive/warp_and_weft_data/content/blog/bsky_sentiment_index/bluesky_data.duckdb"
-
 # Function to unfollow users based on criteria, excluding those who are following you
 unfollow_users_based_on_criteria <- function(db_path) {
   # Create a logged-in API session object
@@ -503,7 +546,7 @@ unfollow_users_based_on_criteria <- function(db_path) {
     "
     SELECT author_handle AS handle
     FROM wwd_following_average_sentiment
-    WHERE average_sentiment < 5
+    WHERE average_sentiment < 1
   "
   )
   
@@ -788,8 +831,7 @@ create_histogram_of_avg_sentiment <- function(db_path) {
   con <- dbConnect(duckdb::duckdb(), db_path)
   
   # Retrieve the list of users you are currently following
-  follows_df <- dbGetQuery(con,
-                           "SELECT * FROM follow_relationships WHERE tag = 'wwd-following'")
+  follows_df <- dbGetQuery(con, "SELECT * FROM follow_relationships WHERE tag = 'wwd-following'")
   
   # Retrieve the average sentiment scores
   avg_sentiment_df <- dbGetQuery(
@@ -824,4 +866,6 @@ create_histogram_of_avg_sentiment <- function(db_path) {
 # Run the function to create the histogram
 create_histogram_of_avg_sentiment(db_path)
 ```
+
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-4-1.png" width="672" />
 
