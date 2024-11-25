@@ -120,3 +120,161 @@ manhattan_3d
 # htmlwidgets::saveWidget(manhattan_3d, "manhattan_3d.html", selfcontained = FALSE)
 ```
 
+```{r}
+library(climateR)
+library(terra)
+library(sf)
+library(dplyr)
+library(mapgl)
+library(tigris)
+
+# Get Texas boundary
+tx <- states(resolution = "20m") %>%
+  filter(STUSPS == "TX")
+
+# Fetch GridMET data
+tmmx_data <- getGridMET(
+  AOI = tx,
+  varname = "tmmx",
+  startDate = "2024-11-04",
+  endDate = "2024-11-04"
+)
+
+tmmx_rast <- tmmx_data$daily_maximum_temperature
+
+# Convert temperature from Kelvin to Fahrenheit
+tmmx_rast <- (tmmx_rast - 273.15) * 9/5 + 32
+
+# Convert raster to polygons
+tmmx_polygons <- as.polygons(tmmx_rast, aggregate = FALSE)
+# Convert to sf object
+tmmx_sf <- st_as_sf(tmmx_polygons)
+
+# Ensure the CRS matches Texas boundary
+tmmx_sf <- st_transform(tmmx_sf, st_crs(tx))
+
+# Clip to Texas boundary
+tmmx_sf <- st_intersection(tmmx_sf, tx) %>%
+  transmute(temp = round(tmmx_2024.11.04, 2)) %>%
+  select(temp) 
+
+# Create the map
+heat_map <- mapboxgl(
+  style = mapbox_style("light"),
+  bounds = tx, 
+  customAttribution = '<a href="https://www.climatologylab.org/gridmet.html" target="_blank">Data source: GridMET</a>'
+) %>%
+  add_fill_layer(
+    id = "temperature",
+    source = tmmx_sf,
+    fill_color = mapgl::interpolate(
+      column = "temp",
+      values = seq(min(tmmx_sf$temp, na.rm = TRUE), max(tmmx_sf$temp, na.rm = TRUE), length.out = 100),
+      stops = viridisLite::inferno(100)
+    ),
+    fill_opacity = 0.8,
+    tooltip = "temp"
+  ) %>%
+  add_line_layer(
+    id = "state_border",
+    source = tx,
+    line_color = "black",
+    line_width = 2
+  ) %>%
+  add_continuous_legend(
+    legend_title = "High temperature in Texas, Nov 4 2024",
+    values = c(sprintf("%.1f°F", min(tmmx_sf$temp, na.rm = TRUE)), 
+               sprintf("%.1f°F", max(tmmx_sf$temp, na.rm = TRUE))),
+    colors = viridisLite::inferno(100)
+  )
+
+heat_map
+```
+
+```{r}
+library(tidycensus)
+library(tigris)
+library(cartogram)
+library(dplyr)
+library(mapgl)
+
+us_county_pop <- get_estimates(
+  geography = "county",
+  vintage = 2023,
+  variables = c("POPESTIMATE", "RNETMIG"),
+  geometry = TRUE,
+  output = "wide"
+) %>%
+  shift_geometry() %>%
+  mutate(pop_proportion = POPESTIMATE / sum(POPESTIMATE, na.rm = TRUE))
+
+dorling <- cartogram_dorling(us_county_pop, "pop_proportion", k = 0.2, itermax = 100)
+
+readr::write_rds(dorling, "dorling.rds")
+
+style <- list(
+  version = 8,
+  sources = structure(list(), .Names = character(0)),
+  layers = list(
+    list(
+      id = "background",
+      type = "background",
+      paint = list(
+        `background-color` = "lightgrey"
+      )
+    )
+  )
+)
+
+dorling <- readr::read_rds("dorling.rds") %>%
+  select(NAME, RNETMIG) %>%
+  mutate(NAME = utf8::utf8_encode(NAME)) %>%
+  mutate(tooltip = paste0("<b>", NAME, "</b><br>Net migration rate: ", round(RNETMIG, 2)))
+
+
+state_borders <- states(cb = TRUE, year = 2023, resolution = "20m") %>%
+  filter(GEOID != "72") %>%
+  shift_geometry()
+
+
+
+dorling_map <- mapboxgl(style = style, projection = "albers",
+        center = c(-98.8, 37.68),
+        zoom = 2.5) |> 
+  add_source(
+    id = "dorling",
+    data = dorling,
+    tolerance = 0
+  ) |> 
+  add_line_layer(
+    id = "state_borders",
+    source = state_borders,
+    line_color = "black",
+    line_width = 0.5
+  ) |> 
+  add_fill_layer(
+    id = "dorling",
+    source = "dorling",
+    fill_color = mapgl::interpolate(
+      column = 'RNETMIG',
+      values = c(-50, 0, 67),
+      stops = c("#075af4", "#ffffff", "#f30303"),
+    ),
+    fill_outline_color = "black",
+    fill_opacity = 0.8,
+    tooltip = "tooltip",
+    hover_options = list(
+      fill_opacity = 1
+    )
+  ) |> 
+  mapgl::add_legend(
+    "<span style='font-weight: bold;'>Net migration rate, 2023</span><br><span style='font-size: 0.9em;'>Dorling cartogram of US counties; county positions may differ from actual locations</span>",
+     values = c("-50", "0", "+67"),
+     colors = c("#075af4", "#ffffff", "#f30303")
+  )
+ 
+dorling_map 
+
+```
+
+

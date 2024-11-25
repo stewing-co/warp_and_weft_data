@@ -3,30 +3,33 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>http://localhost:4321/tags/bluesky/</loc>
-    <lastmod>2024-11-22T00:00:00+00:00</lastmod>
+    <lastmod>2024-11-24T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:4321/categories/bluesky/</loc>
-    <lastmod>2024-11-22T00:00:00+00:00</lastmod>
+    <lastmod>2024-11-24T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>http://localhost:4321/blog/bsky_sentiment_index/</loc>
-    <lastmod>2024-11-22T00:00:00+00:00</lastmod>
+    <loc>http://localhost:4321/blog/bsky_unfollow_negative_people/</loc>
+    <lastmod>2024-11-24T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:4321/categories/</loc>
-    <lastmod>2024-11-22T00:00:00+00:00</lastmod>
+    <lastmod>2024-11-24T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:4321/blog/</loc>
-    <lastmod>2024-11-22T00:00:00+00:00</lastmod>
+    <lastmod>2024-11-24T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:4321/tags/duckdb/</loc>
-    <lastmod>2024-11-22T00:00:00+00:00</lastmod>
+    <lastmod>2024-11-24T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:4321/tags/r/</loc>
-    <lastmod>2024-11-22T00:00:00+00:00</lastmod>
+    <lastmod>2024-11-24T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:4321/tags/</loc>
-    <lastmod>2024-11-22T00:00:00+00:00</lastmod>
+    <lastmod>2024-11-24T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:4321/</loc>
+    <lastmod>2024-11-24T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:4321/blog/bsky_sentiment_index/</loc>
     <lastmod>2024-11-22T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:4321/blog/aw_bsky_bot/</loc>
@@ -50,11 +53,11 @@
     <loc>http://localhost:4321/blog/k_walker_map/</loc>
     <lastmod>2024-11-16T00:00:00+00:00</lastmod>
   </url><url>
+    <loc>http://localhost:4321/tags/maps/</loc>
+    <lastmod>2024-11-16T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>http://localhost:4321/blog/bsky_r/</loc>
     <lastmod>2024-11-13T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>http://localhost:4321/tags/maps/</loc>
-    <lastmod>2024-11-11T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:4321/tags/tidy-tuesday/</loc>
     <lastmod>2024-11-11T00:00:00+00:00</lastmod>
@@ -90,13 +93,6 @@
     <lastmod>2019-02-25T13:38:41-06:00</lastmod>
   </url><url>
     <loc>http://localhost:4321/about/</loc>
-    <lastmod>2016-05-05T21:48:51-07:00</lastmod>
-  </url><url>
-    <loc>http://localhost:4321/about/header/</loc>
-  </url><url>
-    <loc>http://localhost:4321/about/sidebar/</loc>
-  </url><url>
-    <loc>http://localhost:4321/about/main/</loc>
   </url><url>
     <loc>http://localhost:4321/license/</loc>
   </url><url>
