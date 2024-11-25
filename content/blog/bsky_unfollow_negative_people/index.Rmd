@@ -13,7 +13,15 @@ layout: single
 
 I followed a ton of people using the new starter packs. Now I'm going to keep all my mutuals and unfollow the people I'm following who aren't following me back and who have a net negative sentiment score on their posts.
 
-```{r}
+```{r, eval=FALSE}
+# Load necessary libraries
+library(DBI)
+library(duckdb)
+library(tidyverse)
+library(httr2)
+library(tidytext)
+library(parsedate)  
+
 get_follow_relationships <- function(db_path) {
   library(tidyverse)
   library(httr2)
@@ -50,11 +58,15 @@ get_follow_relationships <- function(db_path) {
       }
       
       resp <- req |>
-        req_error(is_error = function(resp) FALSE) |>
+        req_error(
+          is_error = function(resp)
+            FALSE
+        ) |>
         req_perform()
       
       if (resp_status(resp) >= 400) {
-        message("An error occurred fetching data: ", resp_status_desc(resp))
+        message("An error occurred fetching data: ",
+                resp_status_desc(resp))
         print(resp_body_string(resp))
         break
       }
@@ -103,11 +115,13 @@ get_follow_relationships <- function(db_path) {
   
   # Get followers
   message("Fetching your followers...")
-  followers_df <- get_all_follows("https://bsky.social/xrpc/app.bsky.graph.getFollowers", self_did)
+  followers_df <- get_all_follows("https://bsky.social/xrpc/app.bsky.graph.getFollowers",
+                                  self_did)
   
   # Get following
   message("Fetching users you are following...")
-  following_df <- get_all_follows("https://bsky.social/xrpc/app.bsky.graph.getFollows", self_did)
+  following_df <- get_all_follows("https://bsky.social/xrpc/app.bsky.graph.getFollows",
+                                  self_did)
   
   # Identify relationships
   followers_handles <- followers_df$handle
@@ -157,18 +171,7 @@ print(relationships)
 
 ```
 
-```{r}
-# Load necessary libraries
-library(DBI)
-library(duckdb)
-library(tidyverse)
-library(httr2)
-library(tidytext)
-library(parsedate)
-
-# Define the database path
-db_path <- "C:/Users/steph/OneDrive/warp_and_weft_data/content/blog/bsky_sentiment_index/bluesky_data.duckdb"
-
+```{r, eval=FALSE}
 # Function to get posts from a vector of handles, fetching only new posts and writing to db as it fetches
 get_posts_from_handles <- function(handles, session, db_path) {
   # Load parsedate library
@@ -216,12 +219,18 @@ get_posts_from_handles <- function(handles, session, db_path) {
       
       # Perform the request
       resp <- req |>
-        req_error(is_error = function(resp) FALSE) |>
+        req_error(
+          is_error = function(resp)
+            FALSE
+        ) |>
         req_perform()
       
       # Check if the response is an error
       if (resp_status(resp) >= 400) {
-        message("An error occurred fetching posts for ", handle, ": ", resp_status_desc(resp))
+        message("An error occurred fetching posts for ",
+                handle,
+                ": ",
+                resp_status_desc(resp))
         # Optionally, print the response body for more details
         print(resp_body_string(resp))
         break
@@ -240,14 +249,20 @@ get_posts_from_handles <- function(handles, session, db_path) {
       posts_to_add <- list()
       for (post in feed_data$feed) {
         post_time <- post$post$record$createdAt %||% ""
-        if (post_time == "") next  # Skip if no timestamp
+        if (post_time == "")
+          next  # Skip if no timestamp
         
         # Parse the timestamps using parsedate::parse_iso_8601
         post_time_parsed <- parse_iso_8601(post_time)
-        latest_time_parsed <- if (!is.null(latest_time)) parse_iso_8601(latest_time) else NULL
+        latest_time_parsed <- if (!is.null(latest_time))
+          parse_iso_8601(latest_time)
+        else
+          NULL
         
         # Compare post_time with latest_time
-        if (!is.null(latest_time_parsed) && !is.na(post_time_parsed) && post_time_parsed <= latest_time_parsed) {
+        if (!is.null(latest_time_parsed) &&
+            !is.na(post_time_parsed) &&
+            post_time_parsed <= latest_time_parsed) {
           # Reached posts we've already fetched
           keep_fetching <- FALSE
           break
@@ -358,7 +373,10 @@ compute_sentiment_scores_for_new_posts <- function(db_path) {
     mutate(sentiment_score = replace_na(sentiment_score, 0))
   
   # Write the new sentiment scores to the database, appending
-  dbWriteTable(con, "post_sentiment_scores", post_sentiment_scores, append = TRUE)
+  dbWriteTable(con,
+               "post_sentiment_scores",
+               post_sentiment_scores,
+               append = TRUE)
   
   # Disconnect from the database
   dbDisconnect(con, shutdown = FALSE)
@@ -443,15 +461,9 @@ handle_list
 # Run the main function
 main()
 
-
 ```
 
-```{r}
-# Load necessary libraries
-library(DBI)
-library(duckdb)
-library(httr2)
-library(tidyverse)
+```{r, eval=FALSE}
 
 # Define the database path
 db_path <- "C:/Users/steph/OneDrive/warp_and_weft_data/content/blog/bsky_sentiment_index/bluesky_data.duckdb"
@@ -475,22 +487,31 @@ unfollow_users_based_on_criteria <- function(db_path) {
   con <- dbConnect(duckdb::duckdb(), db_path)
   
   # Retrieve users with 0 posts
-  users_with_zero_posts <- dbGetQuery(con, "
+  users_with_zero_posts <- dbGetQuery(
+    con,
+    "
     SELECT handle
     FROM follow_relationships
     WHERE tag = 'wwd-following'
     AND handle NOT IN (SELECT DISTINCT author_handle FROM posts)
-  ")
+  "
+  )
   
   # Retrieve users with average sentiment score below -5
-  users_with_low_sentiment <- dbGetQuery(con, "
+  users_with_low_sentiment <- dbGetQuery(
+    con,
+    "
     SELECT author_handle AS handle
     FROM wwd_following_average_sentiment
     WHERE average_sentiment < 5
-  ")
+  "
+  )
   
   # Combine the users to unfollow
-  users_to_unfollow <- unique(c(users_with_zero_posts$handle, users_with_low_sentiment$handle))
+  users_to_unfollow <- unique(c(
+    users_with_zero_posts$handle,
+    users_with_low_sentiment$handle
+  ))
   
   # Retrieve the list of users who are following you
   message("Fetching your followers...")
@@ -510,11 +531,15 @@ unfollow_users_based_on_criteria <- function(db_path) {
       }
       
       resp <- req %>%
-        req_error(is_error = function(resp) FALSE) %>%
+        req_error(
+          is_error = function(resp)
+            FALSE
+        ) %>%
         req_perform()
       
       if (resp_status(resp) >= 400) {
-        message("An error occurred fetching followers: ", resp_status_desc(resp))
+        message("An error occurred fetching followers: ",
+                resp_status_desc(resp))
         print(resp_body_string(resp))
         break
       }
@@ -577,22 +602,24 @@ unfollow_users_based_on_criteria <- function(db_path) {
       req <- request("https://bsky.social/xrpc/com.atproto.repo.listRecords") %>%
         req_method("GET") %>%
         req_headers(Authorization = paste0("Bearer ", session$accessJwt)) %>%
-        req_url_query(
-          repo = repo_did,
-          collection = "app.bsky.graph.follow",
-          limit = 100
-        )
+        req_url_query(repo = repo_did,
+                      collection = "app.bsky.graph.follow",
+                      limit = 100)
       
       if (!is.null(cursor)) {
         req <- req %>% req_url_query(cursor = cursor)
       }
       
       resp <- req %>%
-        req_error(is_error = function(resp) FALSE) %>%
+        req_error(
+          is_error = function(resp)
+            FALSE
+        ) %>%
         req_perform()
       
       if (resp_status(resp) >= 400) {
-        message("An error occurred fetching follow records: ", resp_status_desc(resp))
+        message("An error occurred fetching follow records: ",
+                resp_status_desc(resp))
         print(resp_body_string(resp))
         break
       }
@@ -634,11 +661,14 @@ unfollow_users_based_on_criteria <- function(db_path) {
   follow_records_df <- get_follow_records(session, self_did)
   
   # Get the mapping of DIDs to handles from the database
-  did_handle_map <- dbGetQuery(con, "
+  did_handle_map <- dbGetQuery(
+    con,
+    "
     SELECT did, handle
     FROM follow_relationships
     WHERE did IS NOT NULL AND handle IS NOT NULL
-  ")
+  "
+  )
   
   # Merge handles into follow_records_df
   follow_records_df <- follow_records_df %>%
@@ -659,7 +689,10 @@ unfollow_users_based_on_criteria <- function(db_path) {
           req_url_query(did = did)
         
         resp <- req %>%
-          req_error(is_error = function(resp) FALSE) %>%
+          req_error(
+            is_error = function(resp)
+              FALSE
+          ) %>%
           req_perform()
         
         if (resp_status(resp) == 200) {
@@ -679,7 +712,9 @@ unfollow_users_based_on_criteria <- function(db_path) {
     
     # Update follow_records_df with resolved handles
     follow_records_df <- follow_records_df %>%
-      left_join(resolved_map, by = "subject_did", suffix = c("", ".resolved")) %>%
+      left_join(resolved_map,
+                by = "subject_did",
+                suffix = c("", ".resolved")) %>%
       mutate(handle = coalesce(handle, handle.resolved)) %>%
       select(-handle.resolved)
   }
@@ -707,11 +742,17 @@ unfollow_users_based_on_criteria <- function(db_path) {
       ))
     
     resp <- req %>%
-      req_error(is_error = function(resp) FALSE) %>%
+      req_error(
+        is_error = function(resp)
+          FALSE
+      ) %>%
       req_perform()
     
     if (resp_status(resp) >= 400) {
-      message("Failed to unfollow rkey ", rkey, ": ", resp_status_desc(resp))
+      message("Failed to unfollow rkey ",
+              rkey,
+              ": ",
+              resp_status_desc(resp))
       print(resp_body_string(resp))
     } else {
       message("Successfully unfollowed rkey ", rkey)
@@ -738,29 +779,23 @@ unfollow_users_based_on_criteria <- function(db_path) {
 # Run the function
 unfollow_users_based_on_criteria(db_path)
 
-
 ```
 
-```{r}
-# Load necessary libraries
-library(DBI)
-library(duckdb)
-library(tidyverse)
-library(ggplot2)
-
-# Define the database path
-db_path <- "C:/Users/steph/OneDrive/warp_and_weft_data/content/blog/bsky_sentiment_index/bluesky_data.duckdb"
-
+```{r, eval=FALSE}
 # Function to create a histogram of average sentiment scores of remaining follows
 create_histogram_of_avg_sentiment <- function(db_path) {
   # Connect to the database
   con <- dbConnect(duckdb::duckdb(), db_path)
   
   # Retrieve the list of users you are currently following
-  follows_df <- dbGetQuery(con, "SELECT * FROM follow_relationships WHERE tag = 'wwd-following'")
+  follows_df <- dbGetQuery(con,
+                           "SELECT * FROM follow_relationships WHERE tag = 'wwd-following'")
   
   # Retrieve the average sentiment scores
-  avg_sentiment_df <- dbGetQuery(con, "SELECT author_handle AS handle, average_sentiment FROM wwd_following_average_sentiment")
+  avg_sentiment_df <- dbGetQuery(
+    con,
+    "SELECT author_handle AS handle, average_sentiment FROM wwd_following_average_sentiment"
+  )
   
   # Merge the data to get the average sentiment scores of your current follows
   merged_df <- follows_df %>%
@@ -777,12 +812,12 @@ create_histogram_of_avg_sentiment <- function(db_path) {
   
   # Plot the histogram
   ggplot(merged_df, aes(x = average_sentiment)) +
-    geom_histogram(binwidth = 1, fill = "steelblue", color = "black") +
-    labs(
-      title = "Histogram of Average Sentiment Scores of Remaining Follows",
-      x = "Average Sentiment Score",
-      y = "Number of Users"
+    geom_histogram(
+      binwidth = 1,
+      fill = "steelblue",
+      color = "black"
     ) +
+    labs(title = "Histogram of Average Sentiment Scores of Remaining Follows", x = "Average Sentiment Score", y = "Number of Users") +
     theme_minimal()
 }
 
