@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=4321&amp;path=livereload" data-no-instant defer></script>
+  
+                           
+     
+
+
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="generator" content="Hugo 0.136.2">
+<title>Tidy Tuesday ISO Codes | Warp and Weft Data</title>
+
+
+<meta property="twitter:site" content="@blue_pibble">
+<meta property="twitter:creator" content="@blue_pibble">
+
+
+
+
+
+
+
+  
+    
+  
+<meta name="description" content="Business Intelligence With R and Python">
+
+
+<meta property="og:site_name" content="Warp and Weft Data">
+<meta property="og:title" content="Tidy Tuesday ISO Codes | Warp and Weft Data">
+<meta property="og:description" content="Business Intelligence With R and Python" />
+<meta property="og:type" content="page" />
+<meta property="og:url" content="http://localhost:4321/blog/tt_country_codes/" />
+<meta property="og:locale" content="en">
+
+
+
+
+    
+        <meta property="og:image" content="http://localhost:4321/blog/tt_country_codes/featured.png" >
+        <meta property="twitter:card" content="summary_large_image">
+        <meta name="twitter:image" content="http://localhost:4321/blog/tt_country_codes/featured.png" >
+    
+    
+  
+  <meta itemprop="name" content="Tidy Tuesday ISO Codes">
+  <meta itemprop="description" content="It has been said that “all politics is local.” It may feel like that to national candidates and their teams but for the median guy on the street national politics can seem really far away.
+Some places in the world all politics really is local politics. In this weeks Tidy Tuesday I’ll look at the countries that don’t have ISO_3166_2 records.
+library(tidyverse) library(ISOcodes) library(janitor) library(rnaturalearth) library(showtext) font_add_google(&#34;Pirata One&#34;, &#34;pirata&#34;) showtext_auto() countries &lt;- ISO_3166_1 |&gt; as_tibble() |&gt; clean_names() country_subdivisions &lt;- ISO_3166_2 |&gt; as_tibble() |&gt; clean_names() |&gt; mutate( alpha_2 = stringr::str_extract(code, &#34;^[^-]&#43;(?=-)&#34;) ) world_data &lt;- ne_countries(scale = &#34;medium&#34;, returnclass = &#34;sf&#34;) no_sub_countries &lt;- world_data |&gt; inner_join(countries, by = c(&#34;iso_a2_eh&#34; = &#34;alpha_2&#34;)) |&gt; filter(!is.na(brk_name), !iso_a2_eh %in% country_subdivisions$alpha_2) ggplot(no_sub_countries) &#43; geom_sf(aes(fill = type)) &#43; geom_sf_text(aes(label = brk_name), size = 4, color = &#34;#332f2c&#34;, check_overlap = TRUE, fontface = &#34;italic&#34;, family = &#34;pirata&#34;) &#43; theme( plot.background = element_rect(fill = &#34;#add8e6&#34;, color = NA), plot.title = element_text(size = 20, face = &#34;bold&#34;, family = &#34;pirata&#34;, hjust = 0.5, color = &#34;#4b2e2a&#34;), plot.margin = margin(20, 20, 20, 20) ) &#43; labs(title = &#39;&#34;Countries&#34; Without Subdivisions&#39;, x = NULL, y = NULL) Looks like a bunch of these places aren’t even countries per se.">
+  <meta itemprop="datePublished" content="2024-11-11T00:00:00+00:00">
+  <meta itemprop="dateModified" content="2024-11-11T00:00:00+00:00">
+  <meta itemprop="wordCount" content="412">
+  <meta itemprop="image" content="http://localhost:4321/blog/tt_country_codes/featured.png">
+  <meta itemprop="keywords" content="Maps,R,Tidy Tuesday">
+  
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-RJ8HKRJ16Q"></script>
+      <script>
+        var doNotTrack = false;
+        if ( true ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-RJ8HKRJ16Q');
+        }
+      </script>
+  <!--[if IE]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  <link rel="shortcut icon" href="/img/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="/img/favicon.ico" type="image/x-icon">
+  
+  
+  <link rel="stylesheet" href="/style.main.min.0820a865770f259724d61d170adbb19db040647ecaa3b2023c16f04ada7fc7d2.css" integrity="sha256-CCCoZXcPJZck1h0XCtuxnbBAZH7Ko7ICPBbwStp/x9I=" media="screen">
+  
+  
+  <script src="/panelset.min.ed1ac24b6e16f4e2481e3d1d098ae66f5bc77438aef619e6e266d8ac5b00dc72.js" type="text/javascript"></script>
+  
+  
+  <script src="/main.min.f0b39b51e43cf3881368fb093708a9d3b3499e674af4b4e47e27e512a5d411e2.js" type="text/javascript"></script>
+</head>
+<body>
+      <div class="grid-container single">
+<header class="site-header pt4 pb2 mb4 bb b--transparent ph5 headroom z-max" role="banner">
+  <nav class="site-nav db dt-l w-100" role="navigation">
+    <a class="site-brand db dtc-l v-mid link no-underline w-100 w-33-l tc tl-l" href="http://localhost:4321/" title="Home">
+      <img src="/img/logo_leaf.png" class="dib db-l h2 w-auto" alt="Warp and Weft Data">
+    </a>
+    <div class="site-links db dtc-l v-mid w-100 w-47-l tc tr-l mt3 mt0-l ttu tracked">
+      
+        
+        
+        
+      <a class="link f6 f5-l dib pv1 ph2 " href="/about/" title="About Steve Ewing">About</a>
+      
+        
+        
+        
+      <a class="link f6 f5-l dib pv1 ph2 active" href="/blog/" title="Blog">Blog</a>
+      
+      
+    </div>
+  </nav>
+</header>
+
+<main class="page-main pa4" role="main">
+  <section class="page-content mw7 center">
+    <article class="post-content pa0 ph4-l">
+      <header class="post-header">
+        <h1 class="f1 lh-solid measure-narrow mb3 fw4">Tidy Tuesday ISO Codes</h1>
+        
+        <p class="f6 measure lh-copy mv1">By Steve Ewing</p>
+        <p class="f7 db mv0 ttu">November 11, 2024</p>
+
+      
+
+      </header>
+      <section class="post-body pt5 pb4">
+        <p>It has been said that &ldquo;all politics is local.&rdquo; It may feel like that to national candidates and their teams but for the median guy on the street national politics can seem really far away.</p>
+<p>Some places in the world all politics really is local politics. In this weeks Tidy Tuesday I&rsquo;ll look at the countries that don&rsquo;t have ISO_3166_2 records.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#900;font-weight:bold">library</span>(tidyverse)
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">library</span>(ISOcodes)
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">library</span>(janitor)
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">library</span>(rnaturalearth)
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">library</span>(showtext)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">font_add_google</span>(<span style="color:#d14">&#34;Pirata One&#34;</span>, <span style="color:#d14">&#34;pirata&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">showtext_auto</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>countries <span style="color:#000;font-weight:bold">&lt;-</span> ISO_3166_1 <span style="color:#000;font-weight:bold">|&gt;</span> 
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">as_tibble</span>() <span style="color:#000;font-weight:bold">|&gt;</span> 
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">clean_names</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>country_subdivisions <span style="color:#000;font-weight:bold">&lt;-</span> 
+</span></span><span style="display:flex;"><span>  ISO_3166_2 <span style="color:#000;font-weight:bold">|&gt;</span> 
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">as_tibble</span>() <span style="color:#000;font-weight:bold">|&gt;</span> 
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">clean_names</span>() <span style="color:#000;font-weight:bold">|&gt;</span> 
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">mutate</span>(
+</span></span><span style="display:flex;"><span>    alpha_2 <span style="color:#000;font-weight:bold">=</span> stringr<span style="color:#000;font-weight:bold">::</span><span style="color:#900;font-weight:bold">str_extract</span>(code, <span style="color:#d14">&#34;^[^-]+(?=-)&#34;</span>)
+</span></span><span style="display:flex;"><span>  )
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>world_data <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">ne_countries</span>(scale <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;medium&#34;</span>, returnclass <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;sf&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>no_sub_countries <span style="color:#000;font-weight:bold">&lt;-</span> world_data <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">inner_join</span>(countries, by <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">c</span>(<span style="color:#d14">&#34;iso_a2_eh&#34;</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;alpha_2&#34;</span>)) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">filter</span>(<span style="color:#000;font-weight:bold">!</span><span style="color:#900;font-weight:bold">is.na</span>(brk_name),
+</span></span><span style="display:flex;"><span>         <span style="color:#000;font-weight:bold">!</span>iso_a2_eh <span style="color:#000;font-weight:bold">%in%</span> country_subdivisions<span style="color:#000;font-weight:bold">$</span>alpha_2)  
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">ggplot</span>(no_sub_countries) <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">geom_sf</span>(<span style="color:#900;font-weight:bold">aes</span>(fill <span style="color:#000;font-weight:bold">=</span> type)) <span style="color:#000;font-weight:bold">+</span>          
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">geom_sf_text</span>(<span style="color:#900;font-weight:bold">aes</span>(label <span style="color:#000;font-weight:bold">=</span> brk_name), size <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">4</span>, color <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;#332f2c&#34;</span>, check_overlap <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">TRUE</span>, fontface <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;italic&#34;</span>, family <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;pirata&#34;</span>) <span style="color:#000;font-weight:bold">+</span> 
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">theme</span>(
+</span></span><span style="display:flex;"><span>    plot.background <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">element_rect</span>(fill <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;#add8e6&#34;</span>, color <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">NA</span>),    
+</span></span><span style="display:flex;"><span>    plot.title <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">element_text</span>(size <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">20</span>, face <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;bold&#34;</span>, family <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;pirata&#34;</span>, hjust <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">0.5</span>, color <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;#4b2e2a&#34;</span>),
+</span></span><span style="display:flex;"><span>    plot.margin <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">margin</span>(<span style="color:#099">20</span>, <span style="color:#099">20</span>, <span style="color:#099">20</span>, <span style="color:#099">20</span>)                             
+</span></span><span style="display:flex;"><span>  ) <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">labs</span>(title <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#39;&#34;Countries&#34; Without Subdivisions&#39;</span>, x <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">NULL</span>, y <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">NULL</span>)
+</span></span></code></pre></div><img src="/blog/tt_country_codes/index_files/figure-html/unnamed-chunk-1-1.png" width="672" />
+<p>Looks like a bunch of these places aren&rsquo;t even countries per se.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Calculate the count of each type</span>
+</span></span><span style="display:flex;"><span>type_counts <span style="color:#000;font-weight:bold">&lt;-</span> no_sub_countries <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">count</span>(type)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Plot the bar chart</span>
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">ggplot</span>(type_counts, <span style="color:#900;font-weight:bold">aes</span>(x <span style="color:#000;font-weight:bold">=</span> type, y <span style="color:#000;font-weight:bold">=</span> n, fill <span style="color:#000;font-weight:bold">=</span> type)) <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">geom_bar</span>(stat <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;identity&#34;</span>, color <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;#4b2e2a&#34;</span>, linewidth <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">0.3</span>) <span style="color:#000;font-weight:bold">+</span>    
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">theme_minimal</span>() <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">labs</span>(
+</span></span><span style="display:flex;"><span>    title <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;Count of Countries by Type&#34;</span>,
+</span></span><span style="display:flex;"><span>    x <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;Country Type&#34;</span>,
+</span></span><span style="display:flex;"><span>    y <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;Count&#34;</span>
+</span></span><span style="display:flex;"><span>  )
+</span></span></code></pre></div><img src="/blog/tt_country_codes/index_files/figure-html/unnamed-chunk-2-1.png" width="672" />
+<p>We want only actual countries, what&rsquo;s the list?</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>no_sub_2 <span style="color:#000;font-weight:bold">&lt;-</span> no_sub_countries <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">filter</span>(type <span style="color:#000;font-weight:bold">%in%</span> <span style="color:#900;font-weight:bold">c</span>(<span style="color:#d14">&#39;Country&#39;</span>, <span style="color:#d14">&#39;Sovereign Country&#39;</span>))
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span>no_sub_2<span style="color:#000;font-weight:bold">$</span>name_long 
+</span></span></code></pre></div><pre tabindex="0"><code>## [1] &#34;Jersey&#34;        &#34;Guernsey&#34;      &#34;Isle of Man&#34;   &#34;Aruba&#34;        
+## [5] &#34;Curaçao&#34;       &#34;Åland Islands&#34; &#34;Macao&#34;         &#34;Hong Kong&#34;    
+## [9] &#34;Sint Maarten&#34;
+</code></pre><p>Gah, those aren&rsquo;t independant. They all have soverigns!!</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>no_sub_2 <span style="color:#000;font-weight:bold">|&gt;</span> <span style="color:#900;font-weight:bold">select</span>(sovereignt, name_long) 
+</span></span></code></pre></div><pre tabindex="0"><code>## Simple feature collection with 9 features and 2 fields
+## Geometry type: MULTIPOLYGON
+## Dimension:     XY
+## Bounding box:  xmin: -70.06611 ymin: 12.04546 xmax: 114.3353 ymax: 60.40581
+## Geodetic CRS:  WGS 84
+##       sovereignt     name_long                       geometry
+## 1 United Kingdom        Jersey MULTIPOLYGON (((-2.018652 4...
+## 2 United Kingdom      Guernsey MULTIPOLYGON (((-2.512305 4...
+## 3 United Kingdom   Isle of Man MULTIPOLYGON (((-4.412061 5...
+## 4    Netherlands         Aruba MULTIPOLYGON (((-69.89912 1...
+## 5    Netherlands       Curaçao MULTIPOLYGON (((-68.75107 1...
+## 6        Finland Åland Islands MULTIPOLYGON (((19.98955 60...
+## 7          China         Macao MULTIPOLYGON (((113.4789 22...
+## 8          China     Hong Kong MULTIPOLYGON (((114.0154 22...
+## 9    Netherlands  Sint Maarten MULTIPOLYGON (((-63.12305 1...
+</code></pre><p>what next&hellip;</p>
+
+        
+        <details closed class="f6 fw7 input-reset">
+  <dl class="f6 lh-copy">
+    <dt class="fw7">Posted on:</dt>
+    <dd class="fw5 ml0">November 11, 2024</dd>
+  </dl>
+  <dl class="f6 lh-copy">
+    <dt class="fw7">Length:</dt>
+    <dd class="fw5 ml0">2 minute read, 412 words</dd>
+  </dl>
+  
+  
+  
+  <dl class="f6 lh-copy">
+    <dt class="fw7">Tags:</dt>
+    <dd class="fw5 ml0"> <a href="http://localhost:4321/tags/maps">maps</a>  <a href="http://localhost:4321/tags/r">R</a>  <a href="http://localhost:4321/tags/tidy-tuesday">tidy tuesday</a> </dd>
+  </dl>
+  
+  <dl class="f6 lh-copy">
+    <dt class="fw7">See Also:</dt>
+    
+    <dd class="fw5 ml0"><a href="/blog/tt_cbp/">Tidy Tuesday Customs and Border Protection</a></dd>
+    
+    <dd class="fw5 ml0"><a href="/blog/bsky_unfollow_negative_people/">Bluesky Unfollowing Negative Follows</a></dd>
+    
+    <dd class="fw5 ml0"><a href="/blog/bsky_sentiment_index/">Bluesky Sentiment Indexing</a></dd>
+    
+  </dl>
+</details>
+
+      </section>
+      <footer class="post-footer">
+        <div class="post-pagination dt w-100 mt4 mb2">
+  
+  
+    <a class="prev dtc pr2 tl v-top fw6"
+    href="http://localhost:4321/blog/bsky_r/">&larr; Bluesky Data in R</a>
+  
+  
+  
+    <a class="next dtc pl2 tr v-top fw6"
+    href="http://localhost:4321/blog/fedex_fuel_surcharges/">Webscraping FedEx Fuel Surcharges &rarr;</a>
+  
+</div>
+
+      </footer>
+    </article>
+    
+      <div class="post-comments pa0 pa4-l mt4">
+  
+    
+      <script src="https://utteranc.es/client.js"
+              repo="stewing-co/warp_and_weft_data"
+              issue-term="pathname"
+              theme="boxy-light"
+              label="comments :crystal_ball:"
+              crossorigin="anonymous"
+              async
+              type="text/javascript">
+      </script>
+    
+  
+</div>
+
+    
+  </section>
+</main>
+<footer class="site-footer pv4 bt b--transparent ph5" role="contentinfo">
+  <nav class="db dt-l w-100">
+    <p class="site-copyright f7 db dtc-l v-mid w-100 w-33-l tc tl-l pv2 pv0-l mv0 lh-copy">
+      &copy; 2024 Warp and Weft Data, Atlanta, GA
+      <span class="middot-divider"></span>
+      Made with <span xmlns:dct="http://purl.org/dc/terms/" property="dct:title"><a xmlns:dct="http://purl.org/dc/terms/" href="https://github.com/hugo-apero/" rel="dct:source">Hugo Apéro</a></span>.
+      <br />
+      
+Based on <span xmlns:dct="http://purl.org/dc/terms/" property="dct:title"><a xmlns:dct="http://purl.org/dc/terms/" href="https://github.com/formspree/blogophonic-hugo" rel="dct:source">Blogophonic</a></span> by <a xmlns:cc="http://creativecommons.org/ns#" href="https://formspree.io" property="cc:attributionName" rel="cc:attributionURL">Formspree</a>.
+    </p>
+    
+    <div class="site-social-links db dtc-l v-mid w-100 w-33-l tc pv2 pv0-l mv0">
+      <div class="social-icon-links" aria-hidden="true">
+  
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <a class="link dib h1 w1 ml0 mr2 f6 o-90 glow" href="https://github.com/stewing-co" title="github" target="_blank" rel="me noopener">
+      <i class="fab fa-github fa-lg fa-fw"></i>
+    </a>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <a class="link dib h1 w1 ml0 mr2 f6 o-90 glow" href="https://bsky.app/profile/warpandweftdata.com" title="bluesky" target="_blank" rel="me noopener">
+      <i class="fab fa-bluesky fa-lg fa-fw"></i>
+    </a>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <a class="link dib h1 w1 ml0 mr2 f6 o-90 glow" href="https://www.linkedin.com/in/stewing-in/" title="linkedin" target="_blank" rel="me noopener">
+      <i class="fab fa-linkedin fa-lg fa-fw"></i>
+    </a>
+  
+</div>
+
+    </div>
+    
+    <div class="site-links f6 db dtc-l v-mid w-100 w-67-l tc tr-l pv2 pv0-l mv0">
+      
+      <a class="dib pv1 ph2 link" href="/license/" title="License">License</a>
+      
+      <a class="dib pv1 ph2 link" href="/contact/" title="Contact form">Contact</a>
+      
+    </div>
+  </nav>
+  
+    <script>
+
+    var i, text, code, codes = document.getElementsByTagName('code');
+    for (let i = 0; i < codes.length;) {
+      code = codes[i];
+      if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+        text = code.textContent;
+        if (/^\$[^$]/.test(text) && /[^$]\$$/.test(text)) {
+          text = text.replace(/^\$/, '\\(').replace(/\$$/, '\\)');
+          code.textContent = text;
+        }
+        if (/^\\\((.|\s)+\\\)$/.test(text) ||
+            /^\\\[(.|\s)+\\\]$/.test(text) ||
+            /^\$(.|\s)+\$$/.test(text) ||
+            /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+          code.outerHTML = code.innerHTML;  
+          continue;
+        }
+      }
+      i++;
+    }
+</script>
+
+  
+    
+    
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.13/dist/katex.min.css" integrity="sha384-RZU/ijkSsFbcmivfdRBQDtwuwVqK7GMOw6IMvKyeWL2K5UAlyp6WonmB8m7Jd0Hn" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.13/dist/katex.min.js" integrity="sha384-pK1WpvzWVBQiP0/GjnvRxV4mOb0oxFuyRxJlk6vVw146n3egcN5C925NCP7a7BY8" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.13/dist/contrib/auto-render.min.js" integrity="sha384-vZTG03m+2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+
+
+
+    
+  
+  
+</footer>
+
+      </div>
+    </body>
+</html>

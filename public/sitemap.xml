@@ -2,6 +2,24 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
+    <loc>http://localhost:4321/blog/</loc>
+    <lastmod>2024-11-26T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:4321/tags/r/</loc>
+    <lastmod>2024-11-26T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:4321/tags/</loc>
+    <lastmod>2024-11-26T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:4321/tags/tidy-tuesday/</loc>
+    <lastmod>2024-11-26T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:4321/blog/tt_cbp/</loc>
+    <lastmod>2024-11-26T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:4321/</loc>
+    <lastmod>2024-11-26T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>http://localhost:4321/tags/bluesky/</loc>
     <lastmod>2024-11-24T00:00:00+00:00</lastmod>
   </url><url>
@@ -14,19 +32,7 @@
     <loc>http://localhost:4321/categories/</loc>
     <lastmod>2024-11-24T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>http://localhost:4321/blog/</loc>
-    <lastmod>2024-11-24T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>http://localhost:4321/tags/duckdb/</loc>
-    <lastmod>2024-11-24T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>http://localhost:4321/tags/r/</loc>
-    <lastmod>2024-11-24T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>http://localhost:4321/tags/</loc>
-    <lastmod>2024-11-24T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>http://localhost:4321/</loc>
     <lastmod>2024-11-24T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:4321/blog/bsky_sentiment_index/</loc>
@@ -59,10 +65,7 @@
     <loc>http://localhost:4321/blog/bsky_r/</loc>
     <lastmod>2024-11-13T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>http://localhost:4321/tags/tidy-tuesday/</loc>
-    <lastmod>2024-11-11T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>http://localhost:4321/blog/tt_11-11-24/</loc>
+    <loc>http://localhost:4321/blog/tt_country_codes/</loc>
     <lastmod>2024-11-11T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:4321/tags/fedex/</loc>

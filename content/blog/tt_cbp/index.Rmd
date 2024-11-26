@@ -1,0 +1,177 @@
+---
+title: "Tidy Tuesday Customs and Border Protection"
+subtitle: ""
+excerpt: ""
+date: 2024-11-26
+author: "Steve Ewing"
+draft: false
+series:
+tags: ["R", "tidy tuesday"]
+categories:
+layout: single
+---
+
+This weeks Tidy Tuesday data is from the Customs and Border Protection. The data is available from 2020 to present. The data is available from the [CBP website](https://www.cbp.gov/document/stats/nationwide-encounters). It was written up first for the [Tidy Tuesday blog](https://www.tidytuesday.com/) by
+Tony Galvan [here](https://gdatascience.github.io/us_border_patrol_encounters/us_border_patrol_encounters.html).
+
+"Encounter data includes U.S. Border Patrol Title 8 apprehensions, Office of Field Operations Title 8 inadmissibles, and all Title 42 expulsions for fiscal years 2020 to date. Data is available for the Northern Land Border, Southwest Land Border, and Nationwide (i.e., air, land, and sea modes of transportation) encounters.
+
+Data is extracted from live CBP systems and data sources. Statistical information is subject to change due to corrections, systems changes, change in data definition, additional information, or encounters pending final review. Final statistics are available at the conclusion of each fiscal year." - [CBP](https://www.cbp.gov/document/stats/nationwide-encounters)
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(janitor)
+
+cbp_resp <- bind_rows(
+  read_csv("https://www.cbp.gov/sites/default/files/assets/documents/2023-Nov/nationwide-encounters-fy20-fy23-aor.csv", show_col_types = FALSE),
+  read_csv("https://www.cbp.gov/sites/default/files/2024-10/nationwide-encounters-fy21-fy24-aor.csv", show_col_types = FALSE)
+) |>
+  janitor::clean_names() |>
+  unique()
+
+cbp_state <- bind_rows(
+  read_csv("https://www.cbp.gov/sites/default/files/assets/documents/2023-Nov/nationwide-encounters-fy20-fy23-state.csv", show_col_types = FALSE),
+  read_csv("https://www.cbp.gov/sites/default/files/2024-10/nationwide-encounters-fy21-fy24-state.csv", show_col_types = FALSE)
+) |>
+  janitor::clean_names() |>
+  unique()
+
+```
+
+## Data exploration
+
+```{r}
+cbp_resp |>
+  glimpse()
+```
+
+encounter_type (character) - The category of encounter based on Title of Authority and component (Title 8 for USBP = Apprehensions; Title 8 for OFO = Inadmissibles; Title 42 = Expulsions)
+
+```{r}
+table(cbp_resp$encounter_type)
+```
+component	(character) -	Which part of CBP was involved in the encounter ("Office of Field Operations" or "U.S. Border Patrol")
+
+```{r}
+table(cbp_resp$component)
+```
+
+title_of_authority (character) - The authority under which the noncitizen was processed (Title 8: The standard U.S. immigration law governing the processing of migrants, including deportations, asylum procedures, and penalties for unauthorized border crossings. Title 42: A public health order used during the COVID-19 pandemic to rapidly expel migrants at the border without standard immigration processing, citing health concerns.)
+
+```{r}
+table(cbp_resp$title_of_authority)
+```
+
+What is this month grouping?
+
+```{r}
+table(cbp_resp$month_grouping)
+```
+
+Who did they use the title 42 expulsion power on?
+
+```{r expulsions}
+library(kableExtra)
+
+expulsions <- cbp_resp %>%
+  filter(title_of_authority == "Title 42") %>%
+  group_by(citizenship, fiscal_year) %>%
+  summarise(total = sum(encounter_count), .groups = "drop") %>%
+  pivot_wider(names_from = fiscal_year, values_from = total, names_prefix = "FY ") %>%
+  arrange(desc(`FY 2023`)) %>%
+  mutate(across(starts_with("FY"), ~ format(., big.mark = ",", scientific = FALSE)))
+
+expulsions %>%
+  kbl(
+    caption = "Title 42 Expulsions by Citizenship and Fiscal Year",
+    format = "html",
+    digits = 0
+  ) %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    full_width = TRUE,
+    font_size = 12
+  ) %>%
+  add_header_above(c(" " = 1, "Fiscal Years" = ncol(expulsions) - 1)) %>%
+  column_spec(1, width = "10em", bold = TRUE) %>% 
+  column_spec(2:ncol(expulsions), width = "8em") 
+
+```
+
+What did the inadmissibles look like?
+
+```{r inadmissibles}
+inadmissibles <- cbp_resp |>
+  filter(title_of_authority == "Title 8", encounter_type == "Inadmissibles") |>
+  group_by(citizenship, fiscal_year) |>
+  summarise(total = sum(encounter_count), .groups = "drop") |>
+  pivot_wider(names_from = fiscal_year, values_from = total, names_prefix = "FY ") %>%
+  arrange(desc(`FY 2023`)) %>%
+  mutate(across(starts_with("FY"), ~ format(., big.mark = ",", scientific = FALSE)))
+
+inadmissibles %>%
+  kbl(
+    caption = "Title 8 Inadmissibles by Citizenship and Fiscal Year",
+    format = "html",
+    digits = 0
+  ) %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    full_width = TRUE,
+    font_size = 12
+  ) %>%
+  add_header_above(c(" " = 1, "Fiscal Years" = ncol(inadmissibles) - 1))
+
+```
+
+
+
+What did the apprehensions look like?
+
+```{r apprehensions}
+apprehensions <- cbp_resp |>
+  filter(title_of_authority == "Title 8", encounter_type == "Apprehensions") |>
+  group_by(citizenship, fiscal_year) |>
+  summarise(total = sum(encounter_count), .groups = "drop") |>
+  pivot_wider(names_from = fiscal_year, values_from = total, names_prefix = "FY ") %>%
+  arrange(desc(`FY 2023`)) %>%
+  mutate(across(starts_with("FY"), ~ format(., big.mark = ",", scientific = FALSE)))
+
+apprehensions %>%
+  kbl(
+    caption = "Title 8 Apprehensions by Citizenship and Fiscal Year",
+    format = "html",
+    digits = 0
+  ) %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    full_width = TRUE,
+    font_size = 12
+  ) %>%
+  add_header_above(c(" " = 1, "Fiscal Years" = ncol(apprehensions) - 1))
+```
+
+Make a facet plot of the data.
+
+```{r}
+plot_data <- cbp_resp %>%
+  group_by(citizenship, fiscal_year, encounter_type) %>%
+  summarise(total = sum(encounter_count, na.rm = TRUE), .groups = 'drop') %>%
+  mutate(fiscal_year = as.factor(fiscal_year))
+
+ggplot(plot_data, aes(x = fiscal_year, y = total, fill = encounter_type)) +
+  geom_bar(stat = "identity", position = "stack") +  
+  facet_wrap(~ citizenship, scales = "free_y") +     
+  labs(
+    title = "Encounters by Citizenship and Year",
+    x = "Fiscal Year",
+    y = "Total Encounters",
+    fill = "Encounter Type"
+  ) +
+  theme_minimal() +
+  theme(
+    strip.text = element_text(size = 8, face = "bold"),  
+    axis.text.x = element_text(angle = 45, hjust = 1)    
+  )
+
+```

@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=4321&amp;path=livereload" data-no-instant defer></script>
+  
+                           
+     
+
+
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="generator" content="Hugo 0.136.2">
+<title>Tidy Tuesday Customs and Border Protection | Warp and Weft Data</title>
+
+
+<meta property="twitter:site" content="@blue_pibble">
+<meta property="twitter:creator" content="@blue_pibble">
+
+
+
+
+
+
+
+  
+    
+  
+<meta name="description" content="Business Intelligence With R and Python">
+
+
+<meta property="og:site_name" content="Warp and Weft Data">
+<meta property="og:title" content="Tidy Tuesday Customs and Border Protection | Warp and Weft Data">
+<meta property="og:description" content="Business Intelligence With R and Python" />
+<meta property="og:type" content="page" />
+<meta property="og:url" content="http://localhost:4321/blog/tt_cbp/" />
+<meta property="og:locale" content="en">
+
+
+
+
+    
+        <meta property="og:image" content="http://localhost:4321/blog/tt_cbp/featured.jpg" >
+        <meta property="twitter:card" content="summary_large_image">
+        <meta name="twitter:image" content="http://localhost:4321/blog/tt_cbp/featured.jpg" >
+    
+    
+  
+  <meta itemprop="name" content="Tidy Tuesday Customs and Border Protection">
+  <meta itemprop="description" content="This weeks Tidy Tuesday data is from the Customs and Border Protection. The data is available from 2020 to present. The data is available from the CBP website. It was written up first for the Tidy Tuesday blog by Tony Galvan here.
+“Encounter data includes U.S. Border Patrol Title 8 apprehensions, Office of Field Operations Title 8 inadmissibles, and all Title 42 expulsions for fiscal years 2020 to date. Data is available for the Northern Land Border, Southwest Land Border, and Nationwide (i.e., air, land, and sea modes of transportation) encounters.">
+  <meta itemprop="datePublished" content="2024-11-26T00:00:00+00:00">
+  <meta itemprop="dateModified" content="2024-11-26T00:00:00+00:00">
+  <meta itemprop="wordCount" content="1332">
+  <meta itemprop="image" content="http://localhost:4321/blog/tt_cbp/featured.jpg">
+  <meta itemprop="keywords" content="R,Tidy Tuesday">
+  
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-RJ8HKRJ16Q"></script>
+      <script>
+        var doNotTrack = false;
+        if ( true ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-RJ8HKRJ16Q');
+        }
+      </script>
+  <!--[if IE]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  <link rel="shortcut icon" href="/img/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="/img/favicon.ico" type="image/x-icon">
+  
+  
+  <link rel="stylesheet" href="/style.main.min.0820a865770f259724d61d170adbb19db040647ecaa3b2023c16f04ada7fc7d2.css" integrity="sha256-CCCoZXcPJZck1h0XCtuxnbBAZH7Ko7ICPBbwStp/x9I=" media="screen">
+  
+  
+  <script src="/panelset.min.ed1ac24b6e16f4e2481e3d1d098ae66f5bc77438aef619e6e266d8ac5b00dc72.js" type="text/javascript"></script>
+  
+  
+  <script src="/main.min.f0b39b51e43cf3881368fb093708a9d3b3499e674af4b4e47e27e512a5d411e2.js" type="text/javascript"></script>
+</head>
+<body>
+      <div class="grid-container single">
+<header class="site-header pt4 pb2 mb4 bb b--transparent ph5 headroom z-max" role="banner">
+  <nav class="site-nav db dt-l w-100" role="navigation">
+    <a class="site-brand db dtc-l v-mid link no-underline w-100 w-33-l tc tl-l" href="http://localhost:4321/" title="Home">
+      <img src="/img/logo_leaf.png" class="dib db-l h2 w-auto" alt="Warp and Weft Data">
+    </a>
+    <div class="site-links db dtc-l v-mid w-100 w-47-l tc tr-l mt3 mt0-l ttu tracked">
+      
+        
+        
+        
+      <a class="link f6 f5-l dib pv1 ph2 " href="/about/" title="About Steve Ewing">About</a>
+      
+        
+        
+        
+      <a class="link f6 f5-l dib pv1 ph2 active" href="/blog/" title="Blog">Blog</a>
+      
+      
+    </div>
+  </nav>
+</header>
+
+<main class="page-main pa4" role="main">
+  <section class="page-content mw7 center">
+    <article class="post-content pa0 ph4-l">
+      <header class="post-header">
+        <h1 class="f1 lh-solid measure-narrow mb3 fw4">Tidy Tuesday Customs and Border Protection</h1>
+        
+        <p class="f6 measure lh-copy mv1">By Steve Ewing</p>
+        <p class="f7 db mv0 ttu">November 26, 2024</p>
+
+      
+
+      </header>
+      <section class="post-body pt5 pb4">
+        <script src="/blog/tt_cbp/index_files/kePrint/kePrint.js"></script>
+<link href="/blog/tt_cbp/index_files/lightable/lightable.css" rel="stylesheet" />
+<script src="/blog/tt_cbp/index_files/kePrint/kePrint.js"></script>
+<link href="/blog/tt_cbp/index_files/lightable/lightable.css" rel="stylesheet" />
+<script src="/blog/tt_cbp/index_files/kePrint/kePrint.js"></script>
+<link href="/blog/tt_cbp/index_files/lightable/lightable.css" rel="stylesheet" />
+<p>This weeks Tidy Tuesday data is from the Customs and Border Protection. The data is available from 2020 to present. The data is available from the 
+<a href="https://www.cbp.gov/document/stats/nationwide-encounters" target="_blank" rel="noopener">CBP website</a>. It was written up first for the 
+<a href="https://www.tidytuesday.com/" target="_blank" rel="noopener">Tidy Tuesday blog</a> by
+Tony Galvan 
+<a href="https://gdatascience.github.io/us_border_patrol_encounters/us_border_patrol_encounters.html" target="_blank" rel="noopener">here</a>.</p>
+<p>&ldquo;Encounter data includes U.S. Border Patrol Title 8 apprehensions, Office of Field Operations Title 8 inadmissibles, and all Title 42 expulsions for fiscal years 2020 to date. Data is available for the Northern Land Border, Southwest Land Border, and Nationwide (i.e., air, land, and sea modes of transportation) encounters.</p>
+<p>Data is extracted from live CBP systems and data sources. Statistical information is subject to change due to corrections, systems changes, change in data definition, additional information, or encounters pending final review. Final statistics are available at the conclusion of each fiscal year.&rdquo; - 
+<a href="https://www.cbp.gov/document/stats/nationwide-encounters" target="_blank" rel="noopener">CBP</a></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#900;font-weight:bold">library</span>(tidyverse)
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">library</span>(janitor)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>cbp_resp <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">bind_rows</span>(
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">read_csv</span>(<span style="color:#d14">&#34;https://www.cbp.gov/sites/default/files/assets/documents/2023-Nov/nationwide-encounters-fy20-fy23-aor.csv&#34;</span>, show_col_types <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">FALSE</span>),
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">read_csv</span>(<span style="color:#d14">&#34;https://www.cbp.gov/sites/default/files/2024-10/nationwide-encounters-fy21-fy24-aor.csv&#34;</span>, show_col_types <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">FALSE</span>)
+</span></span><span style="display:flex;"><span>) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>  janitor<span style="color:#000;font-weight:bold">::</span><span style="color:#900;font-weight:bold">clean_names</span>() <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">unique</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>cbp_state <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">bind_rows</span>(
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">read_csv</span>(<span style="color:#d14">&#34;https://www.cbp.gov/sites/default/files/assets/documents/2023-Nov/nationwide-encounters-fy20-fy23-state.csv&#34;</span>, show_col_types <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">FALSE</span>),
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">read_csv</span>(<span style="color:#d14">&#34;https://www.cbp.gov/sites/default/files/2024-10/nationwide-encounters-fy21-fy24-state.csv&#34;</span>, show_col_types <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">FALSE</span>)
+</span></span><span style="display:flex;"><span>) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>  janitor<span style="color:#000;font-weight:bold">::</span><span style="color:#900;font-weight:bold">clean_names</span>() <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">unique</span>()
+</span></span></code></pre></div>
+
+
+
+<h2 id="data-exploration">Data exploration
+  <a href="#data-exploration"><svg class="anchor-symbol" aria-hidden="true" height="26" width="26" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 0h24v24H0z" fill="currentColor"></path>
+      <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76.0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71.0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71.0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76.0 5-2.24 5-5s-2.24-5-5-5z"></path>
+    </svg></a>
+</h2>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>cbp_resp <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">glimpse</span>()
+</span></span></code></pre></div><pre tabindex="0"><code>## Rows: 68,815
+## Columns: 12
+## $ fiscal_year            &lt;dbl&gt; 2020, 2020, 2020, 2020, 2020, 2020, 2020, 2020,…
+## $ month_grouping         &lt;chr&gt; &#34;FYTD&#34;, &#34;FYTD&#34;, &#34;FYTD&#34;, &#34;FYTD&#34;, &#34;FYTD&#34;, &#34;FYTD&#34;,…
+## $ month_abbv             &lt;chr&gt; &#34;APR&#34;, &#34;APR&#34;, &#34;APR&#34;, &#34;APR&#34;, &#34;APR&#34;, &#34;APR&#34;, &#34;APR&#34;…
+## $ component              &lt;chr&gt; &#34;Office of Field Operations&#34;, &#34;Office of Field …
+## $ land_border_region     &lt;chr&gt; &#34;Northern Land Border&#34;, &#34;Northern Land Border&#34;,…
+## $ area_of_responsibility &lt;chr&gt; &#34;Boston Field Office&#34;, &#34;Boston Field Office&#34;, &#34;…
+## $ aor_abbv               &lt;chr&gt; &#34;Boston&#34;, &#34;Boston&#34;, &#34;Boston&#34;, &#34;Boston&#34;, &#34;Boston…
+## $ demographic            &lt;chr&gt; &#34;FMUA&#34;, &#34;FMUA&#34;, &#34;Single Adults&#34;, &#34;Single Adults…
+## $ citizenship            &lt;chr&gt; &#34;BRAZIL&#34;, &#34;CANADA&#34;, &#34;CANADA&#34;, &#34;CANADA&#34;, &#34;CHINA,…
+## $ title_of_authority     &lt;chr&gt; &#34;Title 8&#34;, &#34;Title 8&#34;, &#34;Title 42&#34;, &#34;Title 8&#34;, &#34;T…
+## $ encounter_type         &lt;chr&gt; &#34;Inadmissibles&#34;, &#34;Inadmissibles&#34;, &#34;Expulsions&#34;,…
+## $ encounter_count        &lt;dbl&gt; 3, 1, 2, 239, 1, 0, 1, 6, 1, 1, 1, 18, 52, 1, 2…
+</code></pre><p>encounter_type (character) - The category of encounter based on Title of Authority and component (Title 8 for USBP = Apprehensions; Title 8 for OFO = Inadmissibles; Title 42 = Expulsions)</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#900;font-weight:bold">table</span>(cbp_resp<span style="color:#000;font-weight:bold">$</span>encounter_type)
+</span></span></code></pre></div><pre tabindex="0"><code>## 
+## Apprehensions    Expulsions Inadmissibles 
+##         22137          9638         37040
+</code></pre><p>component	(character) -	Which part of CBP was involved in the encounter (&ldquo;Office of Field Operations&rdquo; or &ldquo;U.S. Border Patrol&rdquo;)</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#900;font-weight:bold">table</span>(cbp_resp<span style="color:#000;font-weight:bold">$</span>component)
+</span></span></code></pre></div><pre tabindex="0"><code>## 
+## Office of Field Operations         U.S. Border Patrol 
+##                      40483                      28332
+</code></pre><p>title_of_authority (character) - The authority under which the noncitizen was processed (Title 8: The standard U.S. immigration law governing the processing of migrants, including deportations, asylum procedures, and penalties for unauthorized border crossings. Title 42: A public health order used during the COVID-19 pandemic to rapidly expel migrants at the border without standard immigration processing, citing health concerns.)</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#900;font-weight:bold">table</span>(cbp_resp<span style="color:#000;font-weight:bold">$</span>title_of_authority)
+</span></span></code></pre></div><pre tabindex="0"><code>## 
+## Title 42  Title 8 
+##     9638    59177
+</code></pre><p>What is this month grouping?</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#900;font-weight:bold">table</span>(cbp_resp<span style="color:#000;font-weight:bold">$</span>month_grouping)
+</span></span></code></pre></div><pre tabindex="0"><code>## 
+##  FYTD 
+## 68815
+</code></pre><p>Who did they use the title 42 expulsion power on?</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#900;font-weight:bold">library</span>(kableExtra)
+</span></span></code></pre></div><pre tabindex="0"><code>## 
+## Attaching package: &#39;kableExtra&#39;
+</code></pre><pre tabindex="0"><code>## The following object is masked from &#39;package:dplyr&#39;:
+## 
+##     group_rows
+</code></pre><div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>expulsions <span style="color:#000;font-weight:bold">&lt;-</span> cbp_resp <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">filter</span>(title_of_authority <span style="color:#000;font-weight:bold">==</span> <span style="color:#d14">&#34;Title 42&#34;</span>) <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">group_by</span>(citizenship, fiscal_year) <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">summarise</span>(total <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">sum</span>(encounter_count), .groups <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;drop&#34;</span>) <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">pivot_wider</span>(names_from <span style="color:#000;font-weight:bold">=</span> fiscal_year, values_from <span style="color:#000;font-weight:bold">=</span> total, names_prefix <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;FY &#34;</span>) <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">arrange</span>(<span style="color:#900;font-weight:bold">desc</span>(`FY 2023`)) <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">mutate</span>(<span style="color:#900;font-weight:bold">across</span>(<span style="color:#900;font-weight:bold">starts_with</span>(<span style="color:#d14">&#34;FY&#34;</span>), <span style="color:#000;font-weight:bold">~</span> <span style="color:#900;font-weight:bold">format</span>(., big.mark <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;,&#34;</span>, scientific <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">FALSE</span>)))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>expulsions <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">kbl</span>(
+</span></span><span style="display:flex;"><span>    caption <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;Title 42 Expulsions by Citizenship and Fiscal Year&#34;</span>,
+</span></span><span style="display:flex;"><span>    format <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;html&#34;</span>,
+</span></span><span style="display:flex;"><span>    digits <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">0</span>
+</span></span><span style="display:flex;"><span>  ) <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">kable_styling</span>(
+</span></span><span style="display:flex;"><span>    bootstrap_options <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">c</span>(<span style="color:#d14">&#34;striped&#34;</span>, <span style="color:#d14">&#34;hover&#34;</span>, <span style="color:#d14">&#34;condensed&#34;</span>, <span style="color:#d14">&#34;responsive&#34;</span>),
+</span></span><span style="display:flex;"><span>    full_width <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">TRUE</span>,
+</span></span><span style="display:flex;"><span>    font_size <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">12</span>
+</span></span><span style="display:flex;"><span>  ) <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">add_header_above</span>(<span style="color:#900;font-weight:bold">c</span>(<span style="color:#d14">&#34; &#34;</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">1</span>, <span style="color:#d14">&#34;Fiscal Years&#34;</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">ncol</span>(expulsions) <span style="color:#000;font-weight:bold">-</span> <span style="color:#099">1</span>)) <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">column_spec</span>(<span style="color:#099">1</span>, width <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;10em&#34;</span>, bold <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">TRUE</span>) <span style="color:#000;font-weight:bold">%&gt;%</span> 
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">column_spec</span>(<span style="color:#099">2</span><span style="color:#000;font-weight:bold">:</span><span style="color:#900;font-weight:bold">ncol</span>(expulsions), width <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;8em&#34;</span>) 
+</span></span></code></pre></div><table class="table table-striped table-hover table-condensed table-responsive" style="font-size: 12px; margin-left: auto; margin-right: auto;">
+<caption style="font-size: initial !important;">(\#tab:expulsions)Title 42 Expulsions by Citizenship and Fiscal Year</caption>
+ <thead>
+<tr>
+<th style="empty-cells: hide;border-bottom:hidden;" colspan="1"></th>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="4"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">Fiscal Years</div></th>
+</tr>
+  <tr>
+   <th style="text-align:left;"> citizenship </th>
+   <th style="text-align:left;"> FY 2020 </th>
+   <th style="text-align:left;"> FY 2021 </th>
+   <th style="text-align:left;"> FY 2022 </th>
+   <th style="text-align:left;"> FY 2023 </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;width: 10em; font-weight: bold;"> MEXICO </td>
+   <td style="text-align:left;width: 8em; "> 157,952 </td>
+   <td style="text-align:left;width: 8em; "> 582,813 </td>
+   <td style="text-align:left;width: 8em; "> 693,044 </td>
+   <td style="text-align:left;width: 8em; "> 349,685 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 10em; font-weight: bold;"> GUATEMALA </td>
+   <td style="text-align:left;width: 8em; "> 15,161 </td>
+   <td style="text-align:left;width: 8em; "> 173,679 </td>
+   <td style="text-align:left;width: 8em; "> 154,302 </td>
+   <td style="text-align:left;width: 8em; "> 63,098 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 10em; font-weight: bold;"> HONDURAS </td>
+   <td style="text-align:left;width: 8em; "> 17,041 </td>
+   <td style="text-align:left;width: 8em; "> 167,388 </td>
+   <td style="text-align:left;width: 8em; "> 134,095 </td>
+   <td style="text-align:left;width: 8em; "> 54,452 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 10em; font-weight: bold;"> VENEZUELA </td>
+   <td style="text-align:left;width: 8em; "> 49 </td>
+   <td style="text-align:left;width: 8em; "> 1,283 </td>
+   <td style="text-align:left;width: 8em; "> 707 </td>
+   <td style="text-align:left;width: 8em; "> 38,853 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 10em; font-weight: bold;"> EL SALVADOR </td>
+   <td style="text-align:left;width: 8em; "> 5,946 </td>
+   <td style="text-align:left;width: 8em; "> 56,769 </td>
+   <td style="text-align:left;width: 8em; "> 56,322 </td>
+   <td style="text-align:left;width: 8em; "> 21,132 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 10em; font-weight: bold;"> ECUADOR </td>
+   <td style="text-align:left;width: 8em; "> 2,245 </td>
+   <td style="text-align:left;width: 8em; "> 54,683 </td>
+   <td style="text-align:left;width: 8em; "> 1,155 </td>
+   <td style="text-align:left;width: 8em; "> 14,429 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 10em; font-weight: bold;"> COLOMBIA </td>
+   <td style="text-align:left;width: 8em; "> 56 </td>
+   <td style="text-align:left;width: 8em; "> 1,069 </td>
+   <td style="text-align:left;width: 8em; "> 12,327 </td>
+   <td style="text-align:left;width: 8em; "> 13,108 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 10em; font-weight: bold;"> OTHER </td>
+   <td style="text-align:left;width: 8em; "> 1,095 </td>
+   <td style="text-align:left;width: 8em; "> 5,532 </td>
+   <td style="text-align:left;width: 8em; "> 13,567 </td>
+   <td style="text-align:left;width: 8em; "> 7,208 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 10em; font-weight: bold;"> CUBA </td>
+   <td style="text-align:left;width: 8em; "> 4,751 </td>
+   <td style="text-align:left;width: 8em; "> 7,229 </td>
+   <td style="text-align:left;width: 8em; "> 4,905 </td>
+   <td style="text-align:left;width: 8em; "> 4,085 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 10em; font-weight: bold;"> INDIA </td>
+   <td style="text-align:left;width: 8em; "> 310 </td>
+   <td style="text-align:left;width: 8em; "> 1,012 </td>
+   <td style="text-align:left;width: 8em; "> 5,133 </td>
+   <td style="text-align:left;width: 8em; "> 4,072 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 10em; font-weight: bold;"> NICARAGUA </td>
+   <td style="text-align:left;width: 8em; "> 370 </td>
+   <td style="text-align:left;width: 8em; "> 3,293 </td>
+   <td style="text-align:left;width: 8em; "> 4,158 </td>
+   <td style="text-align:left;width: 8em; "> 3,064 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 10em; font-weight: bold;"> PERU </td>
+   <td style="text-align:left;width: 8em; "> 50 </td>
+   <td style="text-align:left;width: 8em; "> 1,063 </td>
+   <td style="text-align:left;width: 8em; "> 922 </td>
+   <td style="text-align:left;width: 8em; "> 2,789 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 10em; font-weight: bold;"> CANADA </td>
+   <td style="text-align:left;width: 8em; "> 538 </td>
+   <td style="text-align:left;width: 8em; "> 1,822 </td>
+   <td style="text-align:left;width: 8em; "> 3,339 </td>
+   <td style="text-align:left;width: 8em; "> 760 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 10em; font-weight: bold;"> CHINA, PEOPLES REPUBLIC OF </td>
+   <td style="text-align:left;width: 8em; "> 95 </td>
+   <td style="text-align:left;width: 8em; "> 318 </td>
+   <td style="text-align:left;width: 8em; "> 1,401 </td>
+   <td style="text-align:left;width: 8em; "> 671 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 10em; font-weight: bold;"> BRAZIL </td>
+   <td style="text-align:left;width: 8em; "> 268 </td>
+   <td style="text-align:left;width: 8em; "> 2,587 </td>
+   <td style="text-align:left;width: 8em; "> 5,017 </td>
+   <td style="text-align:left;width: 8em; "> 484 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 10em; font-weight: bold;"> HAITI </td>
+   <td style="text-align:left;width: 8em; "> 751 </td>
+   <td style="text-align:left;width: 8em; "> 10,211 </td>
+   <td style="text-align:left;width: 8em; "> 12,358 </td>
+   <td style="text-align:left;width: 8em; "> 349 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 10em; font-weight: bold;"> PHILIPPINES </td>
+   <td style="text-align:left;width: 8em; "> 33 </td>
+   <td style="text-align:left;width: 8em; "> 107 </td>
+   <td style="text-align:left;width: 8em; "> 336 </td>
+   <td style="text-align:left;width: 8em; "> 334 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 10em; font-weight: bold;"> UKRAINE </td>
+   <td style="text-align:left;width: 8em; "> 7 </td>
+   <td style="text-align:left;width: 8em; "> 21 </td>
+   <td style="text-align:left;width: 8em; "> 390 </td>
+   <td style="text-align:left;width: 8em; "> 190 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 10em; font-weight: bold;"> RUSSIA </td>
+   <td style="text-align:left;width: 8em; "> 22 </td>
+   <td style="text-align:left;width: 8em; "> 69 </td>
+   <td style="text-align:left;width: 8em; "> 163 </td>
+   <td style="text-align:left;width: 8em; "> 129 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 10em; font-weight: bold;"> ROMANIA </td>
+   <td style="text-align:left;width: 8em; "> 40 </td>
+   <td style="text-align:left;width: 8em; "> 98 </td>
+   <td style="text-align:left;width: 8em; "> 188 </td>
+   <td style="text-align:left;width: 8em; "> 99 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 10em; font-weight: bold;"> TURKEY </td>
+   <td style="text-align:left;width: 8em; "> 3 </td>
+   <td style="text-align:left;width: 8em; "> 25 </td>
+   <td style="text-align:left;width: 8em; "> 131 </td>
+   <td style="text-align:left;width: 8em; "> 93 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 10em; font-weight: bold;"> MYANMAR (BURMA) </td>
+   <td style="text-align:left;width: 8em; "> NA </td>
+   <td style="text-align:left;width: 8em; "> 4 </td>
+   <td style="text-align:left;width: 8em; "> 6 </td>
+   <td style="text-align:left;width: 8em; "> NA </td>
+  </tr>
+</tbody>
+</table>
+<p>What did the inadmissibles look like?</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>inadmissibles <span style="color:#000;font-weight:bold">&lt;-</span> cbp_resp <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">filter</span>(title_of_authority <span style="color:#000;font-weight:bold">==</span> <span style="color:#d14">&#34;Title 8&#34;</span>, encounter_type <span style="color:#000;font-weight:bold">==</span> <span style="color:#d14">&#34;Inadmissibles&#34;</span>) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">group_by</span>(citizenship, fiscal_year) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">summarise</span>(total <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">sum</span>(encounter_count), .groups <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;drop&#34;</span>) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">pivot_wider</span>(names_from <span style="color:#000;font-weight:bold">=</span> fiscal_year, values_from <span style="color:#000;font-weight:bold">=</span> total, names_prefix <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;FY &#34;</span>) <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">arrange</span>(<span style="color:#900;font-weight:bold">desc</span>(`FY 2023`)) <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">mutate</span>(<span style="color:#900;font-weight:bold">across</span>(<span style="color:#900;font-weight:bold">starts_with</span>(<span style="color:#d14">&#34;FY&#34;</span>), <span style="color:#000;font-weight:bold">~</span> <span style="color:#900;font-weight:bold">format</span>(., big.mark <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;,&#34;</span>, scientific <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">FALSE</span>)))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>inadmissibles <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">kbl</span>(
+</span></span><span style="display:flex;"><span>    caption <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;Title 8 Inadmissibles by Citizenship and Fiscal Year&#34;</span>,
+</span></span><span style="display:flex;"><span>    format <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;html&#34;</span>,
+</span></span><span style="display:flex;"><span>    digits <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">0</span>
+</span></span><span style="display:flex;"><span>  ) <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">kable_styling</span>(
+</span></span><span style="display:flex;"><span>    bootstrap_options <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">c</span>(<span style="color:#d14">&#34;striped&#34;</span>, <span style="color:#d14">&#34;hover&#34;</span>, <span style="color:#d14">&#34;condensed&#34;</span>, <span style="color:#d14">&#34;responsive&#34;</span>),
+</span></span><span style="display:flex;"><span>    full_width <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">TRUE</span>,
+</span></span><span style="display:flex;"><span>    font_size <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">12</span>
+</span></span><span style="display:flex;"><span>  ) <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">add_header_above</span>(<span style="color:#900;font-weight:bold">c</span>(<span style="color:#d14">&#34; &#34;</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">1</span>, <span style="color:#d14">&#34;Fiscal Years&#34;</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">ncol</span>(inadmissibles) <span style="color:#000;font-weight:bold">-</span> <span style="color:#099">1</span>))
+</span></span></code></pre></div><table class="table table-striped table-hover table-condensed table-responsive" style="font-size: 12px; margin-left: auto; margin-right: auto;">
+<caption style="font-size: initial !important;">(\#tab:inadmissibles)Title 8 Inadmissibles by Citizenship and Fiscal Year</caption>
+ <thead>
+<tr>
+<th style="empty-cells: hide;border-bottom:hidden;" colspan="1"></th>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="5"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">Fiscal Years</div></th>
+</tr>
+  <tr>
+   <th style="text-align:left;"> citizenship </th>
+   <th style="text-align:left;"> FY 2020 </th>
+   <th style="text-align:left;"> FY 2021 </th>
+   <th style="text-align:left;"> FY 2022 </th>
+   <th style="text-align:left;"> FY 2023 </th>
+   <th style="text-align:left;"> FY 2024 </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> HAITI </td>
+   <td style="text-align:left;"> 739 </td>
+   <td style="text-align:left;"> 2,508 </td>
+   <td style="text-align:left;"> 25,566 </td>
+   <td style="text-align:left;"> 161,155 </td>
+   <td style="text-align:left;"> 218,007 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> OTHER </td>
+   <td style="text-align:left;"> 42,112 </td>
+   <td style="text-align:left;"> 37,392 </td>
+   <td style="text-align:left;"> 75,094 </td>
+   <td style="text-align:left;"> 142,570 </td>
+   <td style="text-align:left;"> 134,973 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> MEXICO </td>
+   <td style="text-align:left;"> 47,452 </td>
+   <td style="text-align:left;"> 44,790 </td>
+   <td style="text-align:left;"> 59,053 </td>
+   <td style="text-align:left;"> 138,236 </td>
+   <td style="text-align:left;"> 161,877 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> VENEZUELA </td>
+   <td style="text-align:left;"> 3,246 </td>
+   <td style="text-align:left;"> 2,652 </td>
+   <td style="text-align:left;"> 1,917 </td>
+   <td style="text-align:left;"> 132,880 </td>
+   <td style="text-align:left;"> 178,850 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> UKRAINE </td>
+   <td style="text-align:left;"> 7,672 </td>
+   <td style="text-align:left;"> 9,315 </td>
+   <td style="text-align:left;"> 96,396 </td>
+   <td style="text-align:left;"> 101,543 </td>
+   <td style="text-align:left;"> 78,557 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CUBA </td>
+   <td style="text-align:left;"> 4,038 </td>
+   <td style="text-align:left;"> 805 </td>
+   <td style="text-align:left;"> 1,307 </td>
+   <td style="text-align:left;"> 78,833 </td>
+   <td style="text-align:left;"> 203,929 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> PHILIPPINES </td>
+   <td style="text-align:left;"> 45,815 </td>
+   <td style="text-align:left;"> 46,235 </td>
+   <td style="text-align:left;"> 54,769 </td>
+   <td style="text-align:left;"> 51,043 </td>
+   <td style="text-align:left;"> 48,381 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> RUSSIA </td>
+   <td style="text-align:left;"> 5,895 </td>
+   <td style="text-align:left;"> 12,663 </td>
+   <td style="text-align:left;"> 30,899 </td>
+   <td style="text-align:left;"> 49,641 </td>
+   <td style="text-align:left;"> 20,526 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> INDIA </td>
+   <td style="text-align:left;"> 18,356 </td>
+   <td style="text-align:left;"> 27,088 </td>
+   <td style="text-align:left;"> 40,336 </td>
+   <td style="text-align:left;"> 49,497 </td>
+   <td style="text-align:left;"> 50,681 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CANADA </td>
+   <td style="text-align:left;"> 20,224 </td>
+   <td style="text-align:left;"> 20,504 </td>
+   <td style="text-align:left;"> 43,727 </td>
+   <td style="text-align:left;"> 43,784 </td>
+   <td style="text-align:left;"> 44,783 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> NICARAGUA </td>
+   <td style="text-align:left;"> 999 </td>
+   <td style="text-align:left;"> 837 </td>
+   <td style="text-align:left;"> 953 </td>
+   <td style="text-align:left;"> 40,846 </td>
+   <td style="text-align:left;"> 57,815 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> HONDURAS </td>
+   <td style="text-align:left;"> 2,737 </td>
+   <td style="text-align:left;"> 11,532 </td>
+   <td style="text-align:left;"> 15,231 </td>
+   <td style="text-align:left;"> 34,758 </td>
+   <td style="text-align:left;"> 32,621 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CHINA, PEOPLES REPUBLIC OF </td>
+   <td style="text-align:left;"> 17,019 </td>
+   <td style="text-align:left;"> 22,834 </td>
+   <td style="text-align:left;"> 24,376 </td>
+   <td style="text-align:left;"> 27,920 </td>
+   <td style="text-align:left;"> 40,725 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> COLOMBIA </td>
+   <td style="text-align:left;"> 2,366 </td>
+   <td style="text-align:left;"> 4,452 </td>
+   <td style="text-align:left;"> 5,536 </td>
+   <td style="text-align:left;"> 12,668 </td>
+   <td style="text-align:left;"> 22,508 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> BRAZIL </td>
+   <td style="text-align:left;"> 2,084 </td>
+   <td style="text-align:left;"> 1,166 </td>
+   <td style="text-align:left;"> 5,618 </td>
+   <td style="text-align:left;"> 10,542 </td>
+   <td style="text-align:left;"> 5,798 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> EL SALVADOR </td>
+   <td style="text-align:left;"> 1,018 </td>
+   <td style="text-align:left;"> 3,170 </td>
+   <td style="text-align:left;"> 4,352 </td>
+   <td style="text-align:left;"> 9,305 </td>
+   <td style="text-align:left;"> 11,409 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> GUATEMALA </td>
+   <td style="text-align:left;"> 1,408 </td>
+   <td style="text-align:left;"> 4,541 </td>
+   <td style="text-align:left;"> 4,174 </td>
+   <td style="text-align:left;"> 7,747 </td>
+   <td style="text-align:left;"> 10,914 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> MYANMAR (BURMA) </td>
+   <td style="text-align:left;"> 3,061 </td>
+   <td style="text-align:left;"> 3,836 </td>
+   <td style="text-align:left;"> 4,462 </td>
+   <td style="text-align:left;"> 4,253 </td>
+   <td style="text-align:left;"> 4,993 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> TURKEY </td>
+   <td style="text-align:left;"> 2,499 </td>
+   <td style="text-align:left;"> 3,597 </td>
+   <td style="text-align:left;"> 3,980 </td>
+   <td style="text-align:left;"> 3,425 </td>
+   <td style="text-align:left;"> 2,678 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> PERU </td>
+   <td style="text-align:left;"> 1,643 </td>
+   <td style="text-align:left;"> 2,012 </td>
+   <td style="text-align:left;"> 2,650 </td>
+   <td style="text-align:left;"> 3,422 </td>
+   <td style="text-align:left;"> 5,195 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> ECUADOR </td>
+   <td style="text-align:left;"> 871 </td>
+   <td style="text-align:left;"> 1,028 </td>
+   <td style="text-align:left;"> 832 </td>
+   <td style="text-align:left;"> 3,391 </td>
+   <td style="text-align:left;"> 7,584 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> ROMANIA </td>
+   <td style="text-align:left;"> 1,120 </td>
+   <td style="text-align:left;"> 1,015 </td>
+   <td style="text-align:left;"> 1,245 </td>
+   <td style="text-align:left;"> 1,187 </td>
+   <td style="text-align:left;"> 1,019 </td>
+  </tr>
+</tbody>
+</table>
+<p>What did the apprehensions look like?</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>apprehensions <span style="color:#000;font-weight:bold">&lt;-</span> cbp_resp <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">filter</span>(title_of_authority <span style="color:#000;font-weight:bold">==</span> <span style="color:#d14">&#34;Title 8&#34;</span>, encounter_type <span style="color:#000;font-weight:bold">==</span> <span style="color:#d14">&#34;Apprehensions&#34;</span>) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">group_by</span>(citizenship, fiscal_year) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">summarise</span>(total <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">sum</span>(encounter_count), .groups <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;drop&#34;</span>) <span style="color:#000;font-weight:bold">|&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">pivot_wider</span>(names_from <span style="color:#000;font-weight:bold">=</span> fiscal_year, values_from <span style="color:#000;font-weight:bold">=</span> total, names_prefix <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;FY &#34;</span>) <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">arrange</span>(<span style="color:#900;font-weight:bold">desc</span>(`FY 2023`)) <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">mutate</span>(<span style="color:#900;font-weight:bold">across</span>(<span style="color:#900;font-weight:bold">starts_with</span>(<span style="color:#d14">&#34;FY&#34;</span>), <span style="color:#000;font-weight:bold">~</span> <span style="color:#900;font-weight:bold">format</span>(., big.mark <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;,&#34;</span>, scientific <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">FALSE</span>)))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>apprehensions <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">kbl</span>(
+</span></span><span style="display:flex;"><span>    caption <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;Title 8 Apprehensions by Citizenship and Fiscal Year&#34;</span>,
+</span></span><span style="display:flex;"><span>    format <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;html&#34;</span>,
+</span></span><span style="display:flex;"><span>    digits <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">0</span>
+</span></span><span style="display:flex;"><span>  ) <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">kable_styling</span>(
+</span></span><span style="display:flex;"><span>    bootstrap_options <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">c</span>(<span style="color:#d14">&#34;striped&#34;</span>, <span style="color:#d14">&#34;hover&#34;</span>, <span style="color:#d14">&#34;condensed&#34;</span>, <span style="color:#d14">&#34;responsive&#34;</span>),
+</span></span><span style="display:flex;"><span>    full_width <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">TRUE</span>,
+</span></span><span style="display:flex;"><span>    font_size <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">12</span>
+</span></span><span style="display:flex;"><span>  ) <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">add_header_above</span>(<span style="color:#900;font-weight:bold">c</span>(<span style="color:#d14">&#34; &#34;</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">1</span>, <span style="color:#d14">&#34;Fiscal Years&#34;</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">ncol</span>(apprehensions) <span style="color:#000;font-weight:bold">-</span> <span style="color:#099">1</span>))
+</span></span></code></pre></div><table class="table table-striped table-hover table-condensed table-responsive" style="font-size: 12px; margin-left: auto; margin-right: auto;">
+<caption style="font-size: initial !important;">(\#tab:apprehensions)Title 8 Apprehensions by Citizenship and Fiscal Year</caption>
+ <thead>
+<tr>
+<th style="empty-cells: hide;border-bottom:hidden;" colspan="1"></th>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="5"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">Fiscal Years</div></th>
+</tr>
+  <tr>
+   <th style="text-align:left;"> citizenship </th>
+   <th style="text-align:left;"> FY 2020 </th>
+   <th style="text-align:left;"> FY 2021 </th>
+   <th style="text-align:left;"> FY 2022 </th>
+   <th style="text-align:left;"> FY 2023 </th>
+   <th style="text-align:left;"> FY 2024 </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> MEXICO </td>
+   <td style="text-align:left;"> 103,826 </td>
+   <td style="text-align:left;"> 47,136 </td>
+   <td style="text-align:left;"> 70,960 </td>
+   <td style="text-align:left;"> 248,016 </td>
+   <td style="text-align:left;"> 506,211 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> VENEZUELA </td>
+   <td style="text-align:left;"> 1,225 </td>
+   <td style="text-align:left;"> 46,564 </td>
+   <td style="text-align:left;"> 186,896 </td>
+   <td style="text-align:left;"> 163,181 </td>
+   <td style="text-align:left;"> 134,646 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> GUATEMALA </td>
+   <td style="text-align:left;"> 32,867 </td>
+   <td style="text-align:left;"> 106,071 </td>
+   <td style="text-align:left;"> 74,585 </td>
+   <td style="text-align:left;"> 151,004 </td>
+   <td style="text-align:left;"> 196,057 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> OTHER </td>
+   <td style="text-align:left;"> 4,266 </td>
+   <td style="text-align:left;"> 14,433 </td>
+   <td style="text-align:left;"> 48,667 </td>
+   <td style="text-align:left;"> 149,797 </td>
+   <td style="text-align:left;"> 132,602 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> COLOMBIA </td>
+   <td style="text-align:left;"> 346 </td>
+   <td style="text-align:left;"> 4,974 </td>
+   <td style="text-align:left;"> 113,108 </td>
+   <td style="text-align:left;"> 141,612 </td>
+   <td style="text-align:left;"> 112,168 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> HONDURAS </td>
+   <td style="text-align:left;"> 23,579 </td>
+   <td style="text-align:left;"> 142,229 </td>
+   <td style="text-align:left;"> 65,649 </td>
+   <td style="text-align:left;"> 126,818 </td>
+   <td style="text-align:left;"> 111,752 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CUBA </td>
+   <td style="text-align:left;"> 5,226 </td>
+   <td style="text-align:left;"> 31,269 </td>
+   <td style="text-align:left;"> 218,395 </td>
+   <td style="text-align:left;"> 117,369 </td>
+   <td style="text-align:left;"> 13,686 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> ECUADOR </td>
+   <td style="text-align:left;"> 9,776 </td>
+   <td style="text-align:left;"> 41,363 </td>
+   <td style="text-align:left;"> 22,949 </td>
+   <td style="text-align:left;"> 99,667 </td>
+   <td style="text-align:left;"> 116,439 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> NICARAGUA </td>
+   <td style="text-align:left;"> 1,795 </td>
+   <td style="text-align:left;"> 46,592 </td>
+   <td style="text-align:left;"> 159,489 </td>
+   <td style="text-align:left;"> 94,819 </td>
+   <td style="text-align:left;"> 33,234 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> PERU </td>
+   <td style="text-align:left;"> 391 </td>
+   <td style="text-align:left;"> 2,102 </td>
+   <td style="text-align:left;"> 49,616 </td>
+   <td style="text-align:left;"> 71,991 </td>
+   <td style="text-align:left;"> 34,005 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> INDIA </td>
+   <td style="text-align:left;"> 1,217 </td>
+   <td style="text-align:left;"> 2,562 </td>
+   <td style="text-align:left;"> 18,458 </td>
+   <td style="text-align:left;"> 43,348 </td>
+   <td style="text-align:left;"> 39,734 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> EL SALVADOR </td>
+   <td style="text-align:left;"> 10,749 </td>
+   <td style="text-align:left;"> 39,524 </td>
+   <td style="text-align:left;"> 37,123 </td>
+   <td style="text-align:left;"> 32,409 </td>
+   <td style="text-align:left;"> 45,798 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CHINA, PEOPLES REPUBLIC OF </td>
+   <td style="text-align:left;"> 1,281 </td>
+   <td style="text-align:left;"> 319 </td>
+   <td style="text-align:left;"> 1,979 </td>
+   <td style="text-align:left;"> 24,109 </td>
+   <td style="text-align:left;"> 37,976 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> BRAZIL </td>
+   <td style="text-align:left;"> 6,795 </td>
+   <td style="text-align:left;"> 54,306 </td>
+   <td style="text-align:left;"> 46,386 </td>
+   <td style="text-align:left;"> 21,466 </td>
+   <td style="text-align:left;"> 26,332 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> TURKEY </td>
+   <td style="text-align:left;"> 78 </td>
+   <td style="text-align:left;"> 1,367 </td>
+   <td style="text-align:left;"> 15,359 </td>
+   <td style="text-align:left;"> 15,468 </td>
+   <td style="text-align:left;"> 10,633 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> RUSSIA </td>
+   <td style="text-align:left;"> 29 </td>
+   <td style="text-align:left;"> 508 </td>
+   <td style="text-align:left;"> 5,209 </td>
+   <td style="text-align:left;"> 7,393 </td>
+   <td style="text-align:left;"> 1,365 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> ROMANIA </td>
+   <td style="text-align:left;"> 326 </td>
+   <td style="text-align:left;"> 4,046 </td>
+   <td style="text-align:left;"> 5,978 </td>
+   <td style="text-align:left;"> 2,406 </td>
+   <td style="text-align:left;"> 1,529 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> HAITI </td>
+   <td style="text-align:left;"> 3,801 </td>
+   <td style="text-align:left;"> 36,008 </td>
+   <td style="text-align:left;"> 18,672 </td>
+   <td style="text-align:left;"> 2,277 </td>
+   <td style="text-align:left;"> 2,791 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CANADA </td>
+   <td style="text-align:left;"> 75 </td>
+   <td style="text-align:left;"> 45 </td>
+   <td style="text-align:left;"> 60 </td>
+   <td style="text-align:left;"> 156 </td>
+   <td style="text-align:left;"> 262 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> UKRAINE </td>
+   <td style="text-align:left;"> 9 </td>
+   <td style="text-align:left;"> 42 </td>
+   <td style="text-align:left;"> 591 </td>
+   <td style="text-align:left;"> 82 </td>
+   <td style="text-align:left;"> 48 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> PHILIPPINES </td>
+   <td style="text-align:left;"> 7 </td>
+   <td style="text-align:left;"> 11 </td>
+   <td style="text-align:left;"> 12 </td>
+   <td style="text-align:left;"> 22 </td>
+   <td style="text-align:left;"> 40 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> MYANMAR (BURMA) </td>
+   <td style="text-align:left;"> 1 </td>
+   <td style="text-align:left;"> 1 </td>
+   <td style="text-align:left;"> 2 </td>
+   <td style="text-align:left;"> 4 </td>
+   <td style="text-align:left;"> 11 </td>
+  </tr>
+</tbody>
+</table>
+<p>Make a facet plot of the data.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>plot_data <span style="color:#000;font-weight:bold">&lt;-</span> cbp_resp <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">group_by</span>(citizenship, fiscal_year, encounter_type) <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">summarise</span>(total <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">sum</span>(encounter_count, na.rm <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">TRUE</span>), .groups <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#39;drop&#39;</span>) <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">mutate</span>(fiscal_year <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">as.factor</span>(fiscal_year))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">ggplot</span>(plot_data, <span style="color:#900;font-weight:bold">aes</span>(x <span style="color:#000;font-weight:bold">=</span> fiscal_year, y <span style="color:#000;font-weight:bold">=</span> total, fill <span style="color:#000;font-weight:bold">=</span> encounter_type)) <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">geom_bar</span>(stat <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;identity&#34;</span>, position <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;stack&#34;</span>) <span style="color:#000;font-weight:bold">+</span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">facet_wrap</span>(<span style="color:#000;font-weight:bold">~</span> citizenship, scales <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;free_y&#34;</span>) <span style="color:#000;font-weight:bold">+</span>     
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">labs</span>(
+</span></span><span style="display:flex;"><span>    title <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;Encounters by Citizenship and Year&#34;</span>,
+</span></span><span style="display:flex;"><span>    x <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;Fiscal Year&#34;</span>,
+</span></span><span style="display:flex;"><span>    y <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;Total Encounters&#34;</span>,
+</span></span><span style="display:flex;"><span>    fill <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;Encounter Type&#34;</span>
+</span></span><span style="display:flex;"><span>  ) <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">theme_minimal</span>() <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">theme</span>(
+</span></span><span style="display:flex;"><span>    strip.text <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">element_text</span>(size <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">8</span>, face <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;bold&#34;</span>),  
+</span></span><span style="display:flex;"><span>    axis.text.x <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">element_text</span>(angle <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">45</span>, hjust <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">1</span>)    
+</span></span><span style="display:flex;"><span>  )
+</span></span></code></pre></div><img src="/blog/tt_cbp/index_files/figure-html/unnamed-chunk-7-1.png" width="672" />
+
+        
+        <details closed class="f6 fw7 input-reset">
+  <dl class="f6 lh-copy">
+    <dt class="fw7">Posted on:</dt>
+    <dd class="fw5 ml0">November 26, 2024</dd>
+  </dl>
+  <dl class="f6 lh-copy">
+    <dt class="fw7">Length:</dt>
+    <dd class="fw5 ml0">7 minute read, 1332 words</dd>
+  </dl>
+  
+  
+  
+  <dl class="f6 lh-copy">
+    <dt class="fw7">Tags:</dt>
+    <dd class="fw5 ml0"> <a href="http://localhost:4321/tags/r">R</a>  <a href="http://localhost:4321/tags/tidy-tuesday">tidy tuesday</a> </dd>
+  </dl>
+  
+  <dl class="f6 lh-copy">
+    <dt class="fw7">See Also:</dt>
+    
+    <dd class="fw5 ml0"><a href="/blog/bsky_unfollow_negative_people/">Bluesky Unfollowing Negative Follows</a></dd>
+    
+    <dd class="fw5 ml0"><a href="/blog/bsky_sentiment_index/">Bluesky Sentiment Indexing</a></dd>
+    
+    <dd class="fw5 ml0"><a href="/blog/aw_bsky_bot/">Andrew Wheiss&#39;s Bluesky Bot</a></dd>
+    
+  </dl>
+</details>
+
+      </section>
+      <footer class="post-footer">
+        <div class="post-pagination dt w-100 mt4 mb2">
+  
+  
+  
+  
+    <a class="next dtc pl2 tr v-top fw6"
+    href="http://localhost:4321/blog/bsky_unfollow_negative_people/">Bluesky Unfollowing Negative Follows &rarr;</a>
+  
+</div>
+
+      </footer>
+    </article>
+    
+      <div class="post-comments pa0 pa4-l mt4">
+  
+    
+      <script src="https://utteranc.es/client.js"
+              repo="stewing-co/warp_and_weft_data"
+              issue-term="pathname"
+              theme="boxy-light"
+              label="comments :crystal_ball:"
+              crossorigin="anonymous"
+              async
+              type="text/javascript">
+      </script>
+    
+  
+</div>
+
+    
+  </section>
+</main>
+<footer class="site-footer pv4 bt b--transparent ph5" role="contentinfo">
+  <nav class="db dt-l w-100">
+    <p class="site-copyright f7 db dtc-l v-mid w-100 w-33-l tc tl-l pv2 pv0-l mv0 lh-copy">
+      &copy; 2024 Warp and Weft Data, Atlanta, GA
+      <span class="middot-divider"></span>
+      Made with <span xmlns:dct="http://purl.org/dc/terms/" property="dct:title"><a xmlns:dct="http://purl.org/dc/terms/" href="https://github.com/hugo-apero/" rel="dct:source">Hugo Apéro</a></span>.
+      <br />
+      
+Based on <span xmlns:dct="http://purl.org/dc/terms/" property="dct:title"><a xmlns:dct="http://purl.org/dc/terms/" href="https://github.com/formspree/blogophonic-hugo" rel="dct:source">Blogophonic</a></span> by <a xmlns:cc="http://creativecommons.org/ns#" href="https://formspree.io" property="cc:attributionName" rel="cc:attributionURL">Formspree</a>.
+    </p>
+    
+    <div class="site-social-links db dtc-l v-mid w-100 w-33-l tc pv2 pv0-l mv0">
+      <div class="social-icon-links" aria-hidden="true">
+  
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <a class="link dib h1 w1 ml0 mr2 f6 o-90 glow" href="https://github.com/stewing-co" title="github" target="_blank" rel="me noopener">
+      <i class="fab fa-github fa-lg fa-fw"></i>
+    </a>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <a class="link dib h1 w1 ml0 mr2 f6 o-90 glow" href="https://bsky.app/profile/warpandweftdata.com" title="bluesky" target="_blank" rel="me noopener">
+      <i class="fab fa-bluesky fa-lg fa-fw"></i>
+    </a>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <a class="link dib h1 w1 ml0 mr2 f6 o-90 glow" href="https://www.linkedin.com/in/stewing-in/" title="linkedin" target="_blank" rel="me noopener">
+      <i class="fab fa-linkedin fa-lg fa-fw"></i>
+    </a>
+  
+</div>
+
+    </div>
+    
+    <div class="site-links f6 db dtc-l v-mid w-100 w-67-l tc tr-l pv2 pv0-l mv0">
+      
+      <a class="dib pv1 ph2 link" href="/license/" title="License">License</a>
+      
+      <a class="dib pv1 ph2 link" href="/contact/" title="Contact form">Contact</a>
+      
+    </div>
+  </nav>
+  
+    <script>
+
+    var i, text, code, codes = document.getElementsByTagName('code');
+    for (let i = 0; i < codes.length;) {
+      code = codes[i];
+      if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+        text = code.textContent;
+        if (/^\$[^$]/.test(text) && /[^$]\$$/.test(text)) {
+          text = text.replace(/^\$/, '\\(').replace(/\$$/, '\\)');
+          code.textContent = text;
+        }
+        if (/^\\\((.|\s)+\\\)$/.test(text) ||
+            /^\\\[(.|\s)+\\\]$/.test(text) ||
+            /^\$(.|\s)+\$$/.test(text) ||
+            /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+          code.outerHTML = code.innerHTML;  
+          continue;
+        }
+      }
+      i++;
+    }
+</script>
+
+  
+    
+    
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.13/dist/katex.min.css" integrity="sha384-RZU/ijkSsFbcmivfdRBQDtwuwVqK7GMOw6IMvKyeWL2K5UAlyp6WonmB8m7Jd0Hn" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.13/dist/katex.min.js" integrity="sha384-pK1WpvzWVBQiP0/GjnvRxV4mOb0oxFuyRxJlk6vVw146n3egcN5C925NCP7a7BY8" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.13/dist/contrib/auto-render.min.js" integrity="sha384-vZTG03m+2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+
+
+
+    
+  
+  
+</footer>
+
+      </div>
+    </body>
+</html>

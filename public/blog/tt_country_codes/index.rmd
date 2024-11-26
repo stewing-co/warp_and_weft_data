@@ -1,0 +1,95 @@
+---
+title: "Tidy Tuesday ISO Codes"
+subtitle: ""
+excerpt: ""
+date: 2024-11-11
+author: "Steve Ewing"
+draft: false
+series:
+tags: ["maps", "R", "tidy tuesday"]
+categories:
+layout: single
+---
+
+It has been said that "all politics is local." It may feel like that to national candidates and their teams but for the median guy on the street national politics can seem really far away. 
+
+Some places in the world all politics really is local politics. In this weeks Tidy Tuesday I'll look at the countries that don't have ISO_3166_2 records.
+
+```{r, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(ISOcodes)
+library(janitor)
+library(rnaturalearth)
+library(showtext)
+
+font_add_google("Pirata One", "pirata")
+showtext_auto()
+
+countries <- ISO_3166_1 |> 
+  as_tibble() |> 
+  clean_names()
+
+country_subdivisions <- 
+  ISO_3166_2 |> 
+  as_tibble() |> 
+  clean_names() |> 
+  mutate(
+    alpha_2 = stringr::str_extract(code, "^[^-]+(?=-)")
+  )
+
+world_data <- ne_countries(scale = "medium", returnclass = "sf")
+
+no_sub_countries <- world_data |>
+  inner_join(countries, by = c("iso_a2_eh" = "alpha_2")) |>
+  filter(!is.na(brk_name),
+         !iso_a2_eh %in% country_subdivisions$alpha_2)  
+
+ggplot(no_sub_countries) +
+  geom_sf(aes(fill = type)) +          
+  geom_sf_text(aes(label = brk_name), size = 4, color = "#332f2c", check_overlap = TRUE, fontface = "italic", family = "pirata") + 
+  theme(
+    plot.background = element_rect(fill = "#add8e6", color = NA),    
+    plot.title = element_text(size = 20, face = "bold", family = "pirata", hjust = 0.5, color = "#4b2e2a"),
+    plot.margin = margin(20, 20, 20, 20)                             
+  ) +
+  labs(title = '"Countries" Without Subdivisions', x = NULL, y = NULL)
+
+
+```
+
+Looks like a bunch of these places aren't even countries per se.
+
+```{r}
+# Calculate the count of each type
+type_counts <- no_sub_countries %>%
+  count(type)
+
+# Plot the bar chart
+ggplot(type_counts, aes(x = type, y = n, fill = type)) +
+  geom_bar(stat = "identity", color = "#4b2e2a", linewidth = 0.3) +    
+  theme_minimal() +
+  labs(
+    title = "Count of Countries by Type",
+    x = "Country Type",
+    y = "Count"
+  )
+
+
+```
+
+We want only actual countries, what's the list?
+
+```{r}
+no_sub_2 <- no_sub_countries |>
+  filter(type %in% c('Country', 'Sovereign Country'))
+ 
+no_sub_2$name_long 
+```
+
+Gah, those aren't independant. They all have soverigns!!
+
+```{r}
+no_sub_2 |> select(sovereignt, name_long) 
+```
+
+what next...
