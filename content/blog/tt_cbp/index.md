@@ -7,7 +7,7 @@ author: "Steve Ewing"
 draft: false
 series:
 tags: ["R", "tidy tuesday"]
-categories:
+categories: ["tidy tuesday"]
 layout: single
 ---
 <script src="{{< blogdown/postref >}}index_files/kePrint/kePrint.js"></script>
@@ -808,3 +808,118 @@ ggplot(plot_data, aes(x = fiscal_year, y = total, fill = encounter_type)) +
 ```
 
 <img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-7-1.png" width="672" />
+
+
+``` r
+library(ggplot2)
+library(dplyr)
+library(maps)
+```
+
+```
+## 
+## Attaching package: 'maps'
+```
+
+```
+## The following object is masked from 'package:purrr':
+## 
+##     map
+```
+
+``` r
+library(grid)
+library(sf)
+```
+
+```
+## Linking to GEOS 3.12.2, GDAL 3.9.3, PROJ 9.4.1; sf_use_s2() is TRUE
+```
+
+``` r
+# Get world map data and convert to sf object
+world_map <- map_data("world")
+world_sf <- st_as_sf(map("world", plot = FALSE, fill = TRUE))
+
+# Create a data frame of unique country centroids for positioning the bar charts
+country_coords <- world_map %>%
+  group_by(region) %>%
+  summarise(
+    long = mean(range(long)),
+    lat = mean(range(lat))
+  ) %>%
+  rename(citizenship = region)
+
+# Merge plot data with country coordinates
+plot_data_coords <- plot_data %>%
+  inner_join(country_coords, by = "citizenship")
+
+# Create a base world map using ggplot2
+world_base <- ggplot() +
+  geom_sf(data = world_sf, fill = "lightgray", color = "white") +
+  theme_void() +
+  labs(
+    title = "Title 42 Encounters by Citizenship and Year",
+    subtitle = "Country-specific encounters visualized as bar charts over each country"
+  ) +
+  coord_sf()
+
+# Debugging Step: Plot text labels for each country to verify coordinates
+world_base <- world_base +
+  geom_text(
+    data = plot_data_coords,
+    aes(x = long, y = lat, label = citizenship),
+    size = 3, color = "red"
+  )
+
+# Plot the world base map with text labels to verify coordinates
+print(world_base)
+```
+
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-8-1.png" width="672" />
+
+``` r
+# After verifying coordinates, proceed with adding bar charts
+
+# Add bar charts for each country using annotation_custom()
+for (country in unique(plot_data_coords$citizenship)) {
+  
+  # Filter data for each country
+  country_data <- plot_data_coords %>% filter(citizenship == country)
+  
+  # Create a mini bar plot for each country
+  mini_bar <- ggplot(country_data, aes(x = fiscal_year, y = total, fill = encounter_type)) +
+    geom_bar(stat = "identity", position = "stack") +
+    theme_void() +
+    theme(
+      legend.position = "none",
+      axis.text = element_blank(),
+      axis.ticks = element_blank(),
+      plot.margin = margin(0, 0, 0, 0)
+    ) +
+    scale_y_continuous(limits = c(0, max(country_data$total) * 1.1))  # Scale y to be proportional
+  
+  # Convert the mini bar plot into a grob object
+  mini_bar_grob <- ggplotGrob(mini_bar)
+  
+  # Get the longitude and latitude for placing the mini bar
+  country_long <- country_data$long[1]
+  country_lat <- country_data$lat[1]
+  
+  # Add the mini bar plot to the world map
+  world_base <- world_base + 
+    annotation_custom(
+      grob = mini_bar_grob,
+      xmin = country_long - 5,
+      xmax = country_long + 5,
+      ymin = country_lat - 5,
+      ymax = country_lat + 5
+    )
+}
+
+# Print the final map with bar charts
+print(world_base)
+```
+
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-8-2.png" width="672" />
+

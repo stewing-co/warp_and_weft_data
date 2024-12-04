@@ -23,7 +23,7 @@ library(duckdb)
 con <- dbConnect(duckdb::duckdb())
 
 # Install and load the httpfs extension
-dbExecute(con, "INSTALL httpfs;")
+dbExecute(con, "INSTALL httpfs from core_nightly;")
 dbExecute(con, "LOAD httpfs;")
 
 # Set S3 Configuration Options

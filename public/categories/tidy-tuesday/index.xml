@@ -6,8 +6,15 @@
     <description>Recent content in Tidy Tuesday on Warp and Weft Data</description>
     <generator>Hugo</generator>
     <language>en</language>
-    <lastBuildDate>Mon, 18 Nov 2024 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 26 Nov 2024 00:00:00 +0000</lastBuildDate>
     <atom:link href="http://localhost:4321/categories/tidy-tuesday/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Tidy Tuesday Customs and Border Protection</title>
+      <link>http://localhost:4321/blog/tt_cbp/</link>
+      <pubDate>Tue, 26 Nov 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:4321/blog/tt_cbp/</guid>
+      <description>&lt;script src=&#34;http://localhost:4321/blog/tt_cbp/index_files/kePrint/kePrint.js&#34;&gt;&lt;/script&gt;&#xD;&#xA;&lt;link href=&#34;http://localhost:4321/blog/tt_cbp/index_files/lightable/lightable.css&#34; rel=&#34;stylesheet&#34; /&gt;&#xD;&#xA;&lt;script src=&#34;http://localhost:4321/blog/tt_cbp/index_files/kePrint/kePrint.js&#34;&gt;&lt;/script&gt;&#xD;&#xA;&lt;link href=&#34;http://localhost:4321/blog/tt_cbp/index_files/lightable/lightable.css&#34; rel=&#34;stylesheet&#34; /&gt;&#xD;&#xA;&lt;script src=&#34;http://localhost:4321/blog/tt_cbp/index_files/kePrint/kePrint.js&#34;&gt;&lt;/script&gt;&#xD;&#xA;&lt;link href=&#34;http://localhost:4321/blog/tt_cbp/index_files/lightable/lightable.css&#34; rel=&#34;stylesheet&#34; /&gt;&#xD;&#xA;&lt;p&gt;This weeks Tidy Tuesday data is from the Customs and Border Protection. The data is available from 2020 to present. The data is available from the &#xA;&lt;a href=&#34;https://www.cbp.gov/document/stats/nationwide-encounters&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CBP website&lt;/a&gt;. It was written up first for the &#xA;&lt;a href=&#34;https://www.tidytuesday.com/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Tidy Tuesday blog&lt;/a&gt; by&#xA;Tony Galvan &#xA;&lt;a href=&#34;https://gdatascience.github.io/us_border_patrol_encounters/us_border_patrol_encounters.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;&#xA;&lt;p&gt;&amp;ldquo;Encounter data includes U.S. Border Patrol Title 8 apprehensions, Office of Field Operations Title 8 inadmissibles, and all Title 42 expulsions for fiscal years 2020 to date. Data is available for the Northern Land Border, Southwest Land Border, and Nationwide (i.e., air, land, and sea modes of transportation) encounters.&lt;/p&gt;</description>
+    </item>
     <item>
       <title>Tidy Tuesday: 2024-11-19</title>
       <link>http://localhost:4321/blog/bobs_burgers/</link>

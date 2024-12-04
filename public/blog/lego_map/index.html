@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=4321&amp;path=livereload" data-no-instant defer></script>
+  
+                           
+     
+
+
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="generator" content="Hugo 0.136.2">
+<title>Benjamin Nowak&#39;s Lego Maps | Warp and Weft Data</title>
+
+
+<meta property="twitter:site" content="@blue_pibble">
+<meta property="twitter:creator" content="@blue_pibble">
+
+
+
+
+
+
+
+  
+    
+  
+<meta name="description" content="Business Intelligence With R and Python">
+
+
+<meta property="og:site_name" content="Warp and Weft Data">
+<meta property="og:title" content="Benjamin Nowak&#39;s Lego Maps | Warp and Weft Data">
+<meta property="og:description" content="Business Intelligence With R and Python" />
+<meta property="og:type" content="page" />
+<meta property="og:url" content="http://localhost:4321/blog/lego_map/" />
+<meta property="og:locale" content="en">
+
+
+
+
+    
+        <meta property="og:image" content="http://localhost:4321/blog/sidebar-listing.jpg" >
+        <meta property="twitter:card" content="summary_large_image">
+        <meta name="twitter:image" content="http://localhost:4321/blog/sidebar-listing.jpg" >
+    
+    
+  
+  <meta itemprop="name" content="Benjamin Nowak&#39;s Lego Maps">
+  <meta itemprop="description" content="library(tidyverse) ## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──## ✔ dplyr 1.1.4 ✔ readr 2.1.5## ✔ forcats 1.0.0 ✔ stringr 1.5.1## ✔ ggplot2 3.5.1 ✔ tibble 3.2.1## ✔ lubridate 1.9.3 ✔ tidyr 1.3.1## ✔ purrr 1.0.2 ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──## ✖ dplyr::filter() masks stats::filter()## ✖ dplyr::lag() masks stats::lag()## ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors library(sf) ## Linking to GEOS 3.12.2, GDAL 3.9.3, PROJ 9.4.1; sf_use_s2() is TRUE map &lt;- sf::read_sf(&#39;https://github.com/BjnNowak/lego_map/raw/main/data/france_sport.gpkg&#39;) ggplot(map, aes(fill=value))&#43; geom_sf() # Create classes clean&lt;-map%&gt;% mutate(clss=case_when( value&lt;18~&#34;1&#34;, value&lt;20~&#34;2&#34;, value&lt;22~&#34;3&#34;, value&lt;24~&#34;4&#34;, value&lt;26~&#34;5&#34;, TRUE~&#34;6&#34; )) # Set color palette pal &lt;- c(&#34;#bb3e03&#34;,&#34;#ee9b00&#34;,&#34;#e9d8a6&#34;,&#34;#94d2bd&#34;,&#34;#0a9396&#34;,&#34;#005f73&#34;) # Set color background bck &lt;- &#34;#001219&#34; # Set theme theme_custom &lt;- theme_void()&#43; theme( plot.margin = margin(1,1,10,1,&#34;pt&#34;), plot.background = element_rect(fill=bck,color=NA), legend.position = &#34;bottom&#34;, legend.title = element_text(hjust=0.5,color=&#34;white&#34;,face=&#34;bold&#34;), legend.text = element_text(color=&#34;white&#34;) ) # Make choropleth ggplot(clean, aes(fill=clss))&#43; geom_sf()&#43; labs(fill=&#34;Member of a sport association&#34;)&#43; guides( fill=guide_legend( nrow=1, title.position=&#34;top&#34;, label.position=&#34;bottom&#34; ) )&#43; scale_fill_manual( values=pal, label=c(&#34;&lt; 18 %&#34;,&#34;&lt; 20 %&#34;,&#34;&lt; 22 %&#34;,&#34;&lt; 24 %&#34;,&#34;&lt; 26 %&#34;, &#34;≥ 26 %&#34;) )&#43; theme_custom # Make grid grd&lt;-st_make_grid( clean, # map name n = c(60,60) # number of cells per longitude/latitude )%&gt;% # convert back to sf object st_sf()%&gt;% # add a unique id to each cell # (will be useful later to get back centroids data) mutate(id=row_number()) # Extract centroids cent&lt;-grd%&gt;% st_centroid() ## Warning: st_centroid assumes attributes are constant over geometries # Take a look at the results ggplot()&#43; geom_sf(grd,mapping=aes(geometry=geometry))&#43; geom_sf(cent,mapping=aes(geometry=geometry),pch=21,size=0.5)&#43; theme_void() # Intersect centroids with basemap cent_clean&lt;-cent%&gt;% st_intersection(clean) ## Warning: attribute variables are assumed to be spatially constant throughout## all geometries # Make a centroid without geom # (convert from sf object to tibble) cent_no_geom &lt;- cent_clean%&gt;% st_drop_geometry() # Join with grid thanks to id column grd_clean&lt;-grd%&gt;% #filter(id%in%sel)%&gt;% left_join(cent_no_geom) ## Joining with `by = join_by(id)` ggplot()&#43; geom_sf( # drop_na() is one way to suppress the cells outside the country grd_clean%&gt;%drop_na(), mapping=aes(geometry=geometry,fill=clss) )&#43; geom_sf(cent_clean,mapping=aes(geometry=geometry),fill=NA,pch=21,size=0.5)&#43; labs(fill=&#34;Member of a sport association&#34;)&#43; guides( fill=guide_legend( nrow=1, title.position=&#34;top&#34;, label.position=&#34;bottom&#34; ) )&#43; scale_fill_manual( values=pal, label=c(&#34;&lt; 18 %&#34;,&#34;&lt; 20 %&#34;,&#34;&lt; 22 %&#34;,&#34;&lt; 24 %&#34;,&#34;&lt; 26 %&#34;, &#34;≥ 26 %&#34;) )&#43; theme_custom # Set offset # (value here is not fixed, it depends on your map, system of coordinates, etc...) off &lt;- 2000 # Create second centroid cent_off &lt;- cent_clean%&gt;% # Extract longitude and latitude and add offset to longitude mutate( lon=st_coordinates(.)[,1]&#43;off, lat=st_coordinates(.)[,2], )%&gt;% # Drop old geometry st_drop_geometry()%&gt;% # Make new geometry based on new {lon;lat} st_as_sf(coords=c(&#39;lon&#39;,&#39;lat&#39;))%&gt;% # Specify Coordinates Reference System st_set_crs(st_crs(cent_clean)) # Make map ! ggplot()&#43; geom_sf( grd_clean%&gt;%drop_na(), mapping=aes(geometry=geometry,fill=clss) )&#43; # Centroid for shaded effect geom_sf(cent_off,mapping=aes(geometry=geometry),color=alpha(&#34;black&#34;,0.5),size=0.5)&#43; # &#39;Real&#39; centroid geom_sf(cent_clean,mapping=aes(geometry=geometry,color=clss),size=0.5)&#43; geom_sf(cent_clean,mapping=aes(geometry=geometry),fill=NA,pch=21,size=0.5)&#43; labs(fill=&#34;Member of a sport association&#34;)&#43; guides( color=&#39;none&#39;, fill=guide_legend( nrow=1, title.position=&#34;top&#34;, label.position=&#34;bottom&#34; ) )&#43; scale_fill_manual( values=pal, label=c(&#34;&lt; 18 %&#34;,&#34;&lt; 20 %&#34;,&#34;&lt; 22 %&#34;,&#34;&lt; 24 %&#34;,&#34;&lt; 26 %&#34;, &#34;≥ 26 %&#34;) )&#43; scale_color_manual(values=pal)&#43; theme_custom">
+  <meta itemprop="datePublished" content="2024-11-26T00:00:00+00:00">
+  <meta itemprop="dateModified" content="2024-11-26T00:00:00+00:00">
+  <meta itemprop="wordCount" content="463">
+  <meta itemprop="keywords" content="R,Bluesky,Maps">
+  
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-RJ8HKRJ16Q"></script>
+      <script>
+        var doNotTrack = false;
+        if ( true ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-RJ8HKRJ16Q');
+        }
+      </script>
+  <!--[if IE]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  <link rel="shortcut icon" href="/img/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="/img/favicon.ico" type="image/x-icon">
+  
+  
+  <link rel="stylesheet" href="/style.main.min.0820a865770f259724d61d170adbb19db040647ecaa3b2023c16f04ada7fc7d2.css" integrity="sha256-CCCoZXcPJZck1h0XCtuxnbBAZH7Ko7ICPBbwStp/x9I=" media="screen">
+  
+  
+  <script src="/panelset.min.ed1ac24b6e16f4e2481e3d1d098ae66f5bc77438aef619e6e266d8ac5b00dc72.js" type="text/javascript"></script>
+  
+  
+  <script src="/main.min.f0b39b51e43cf3881368fb093708a9d3b3499e674af4b4e47e27e512a5d411e2.js" type="text/javascript"></script>
+</head>
+<body>
+      <div class="grid-container single">
+<header class="site-header pt4 pb2 mb4 bb b--transparent ph5 headroom z-max" role="banner">
+  <nav class="site-nav db dt-l w-100" role="navigation">
+    <a class="site-brand db dtc-l v-mid link no-underline w-100 w-33-l tc tl-l" href="http://localhost:4321/" title="Home">
+      <img src="/img/logo_leaf.png" class="dib db-l h2 w-auto" alt="Warp and Weft Data">
+    </a>
+    <div class="site-links db dtc-l v-mid w-100 w-47-l tc tr-l mt3 mt0-l ttu tracked">
+      
+        
+        
+        
+      <a class="link f6 f5-l dib pv1 ph2 " href="/about/" title="About Steve Ewing">About</a>
+      
+        
+        
+        
+      <a class="link f6 f5-l dib pv1 ph2 active" href="/blog/" title="Blog">Blog</a>
+      
+      
+    </div>
+  </nav>
+</header>
+
+<main class="page-main pa4" role="main">
+  <section class="page-content mw7 center">
+    <article class="post-content pa0 ph4-l">
+      <header class="post-header">
+        <h1 class="f1 lh-solid measure-narrow mb3 fw4">Benjamin Nowak&#39;s Lego Maps</h1>
+        
+        <p class="f6 measure lh-copy mv1">By Benjamin Nowak</p>
+        <p class="f7 db mv0 ttu">November 26, 2024</p>
+
+      
+
+      </header>
+      <section class="post-body pt5 pb4">
+        <div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#900;font-weight:bold">library</span>(tidyverse) 
+</span></span></code></pre></div><pre tabindex="0"><code>## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+## ✔ dplyr     1.1.4     ✔ readr     2.1.5
+## ✔ forcats   1.0.0     ✔ stringr   1.5.1
+## ✔ ggplot2   3.5.1     ✔ tibble    3.2.1
+## ✔ lubridate 1.9.3     ✔ tidyr     1.3.1
+## ✔ purrr     1.0.2     
+## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()
+## ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors
+</code></pre><div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#900;font-weight:bold">library</span>(sf)
+</span></span></code></pre></div><pre tabindex="0"><code>## Linking to GEOS 3.12.2, GDAL 3.9.3, PROJ 9.4.1; sf_use_s2() is TRUE
+</code></pre><div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>map <span style="color:#000;font-weight:bold">&lt;-</span> sf<span style="color:#000;font-weight:bold">::</span><span style="color:#900;font-weight:bold">read_sf</span>(<span style="color:#d14">&#39;https://github.com/BjnNowak/lego_map/raw/main/data/france_sport.gpkg&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">ggplot</span>(map, <span style="color:#900;font-weight:bold">aes</span>(fill<span style="color:#000;font-weight:bold">=</span>value))<span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">geom_sf</span>()
+</span></span></code></pre></div><img src="/blog/lego_map/index_files/figure-html/unnamed-chunk-1-1.png" width="672" />
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Create classes</span>
+</span></span><span style="display:flex;"><span>clean<span style="color:#000;font-weight:bold">&lt;-</span>map<span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">mutate</span>(clss<span style="color:#000;font-weight:bold">=</span><span style="color:#900;font-weight:bold">case_when</span>(
+</span></span><span style="display:flex;"><span>    value<span style="color:#000;font-weight:bold">&lt;</span><span style="color:#099">18</span><span style="color:#000;font-weight:bold">~</span><span style="color:#d14">&#34;1&#34;</span>,
+</span></span><span style="display:flex;"><span>    value<span style="color:#000;font-weight:bold">&lt;</span><span style="color:#099">20</span><span style="color:#000;font-weight:bold">~</span><span style="color:#d14">&#34;2&#34;</span>,
+</span></span><span style="display:flex;"><span>    value<span style="color:#000;font-weight:bold">&lt;</span><span style="color:#099">22</span><span style="color:#000;font-weight:bold">~</span><span style="color:#d14">&#34;3&#34;</span>,
+</span></span><span style="display:flex;"><span>    value<span style="color:#000;font-weight:bold">&lt;</span><span style="color:#099">24</span><span style="color:#000;font-weight:bold">~</span><span style="color:#d14">&#34;4&#34;</span>,
+</span></span><span style="display:flex;"><span>    value<span style="color:#000;font-weight:bold">&lt;</span><span style="color:#099">26</span><span style="color:#000;font-weight:bold">~</span><span style="color:#d14">&#34;5&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">TRUE</span><span style="color:#000;font-weight:bold">~</span><span style="color:#d14">&#34;6&#34;</span>
+</span></span><span style="display:flex;"><span>  ))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Set color palette</span>
+</span></span><span style="display:flex;"><span>pal <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">c</span>(<span style="color:#d14">&#34;#bb3e03&#34;</span>,<span style="color:#d14">&#34;#ee9b00&#34;</span>,<span style="color:#d14">&#34;#e9d8a6&#34;</span>,<span style="color:#d14">&#34;#94d2bd&#34;</span>,<span style="color:#d14">&#34;#0a9396&#34;</span>,<span style="color:#d14">&#34;#005f73&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Set color background</span>
+</span></span><span style="display:flex;"><span>bck <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#d14">&#34;#001219&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Set theme </span>
+</span></span><span style="display:flex;"><span>theme_custom <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">theme_void</span>()<span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">theme</span>(
+</span></span><span style="display:flex;"><span>    plot.margin <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">margin</span>(<span style="color:#099">1</span>,<span style="color:#099">1</span>,<span style="color:#099">10</span>,<span style="color:#099">1</span>,<span style="color:#d14">&#34;pt&#34;</span>),
+</span></span><span style="display:flex;"><span>    plot.background <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">element_rect</span>(fill<span style="color:#000;font-weight:bold">=</span>bck,color<span style="color:#000;font-weight:bold">=</span><span style="color:#000;font-weight:bold">NA</span>),
+</span></span><span style="display:flex;"><span>    legend.position <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;bottom&#34;</span>,
+</span></span><span style="display:flex;"><span>    legend.title <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">element_text</span>(hjust<span style="color:#000;font-weight:bold">=</span><span style="color:#099">0.5</span>,color<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;white&#34;</span>,face<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;bold&#34;</span>),
+</span></span><span style="display:flex;"><span>    legend.text <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">element_text</span>(color<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;white&#34;</span>)
+</span></span><span style="display:flex;"><span>  )
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Make choropleth</span>
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">ggplot</span>(clean, <span style="color:#900;font-weight:bold">aes</span>(fill<span style="color:#000;font-weight:bold">=</span>clss))<span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">geom_sf</span>()<span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">labs</span>(fill<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;Member of a sport association&#34;</span>)<span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">guides</span>(
+</span></span><span style="display:flex;"><span>    fill<span style="color:#000;font-weight:bold">=</span><span style="color:#900;font-weight:bold">guide_legend</span>(
+</span></span><span style="display:flex;"><span>      nrow<span style="color:#000;font-weight:bold">=</span><span style="color:#099">1</span>,
+</span></span><span style="display:flex;"><span>      title.position<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;top&#34;</span>,
+</span></span><span style="display:flex;"><span>      label.position<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;bottom&#34;</span>
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>  )<span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">scale_fill_manual</span>(
+</span></span><span style="display:flex;"><span>    values<span style="color:#000;font-weight:bold">=</span>pal,
+</span></span><span style="display:flex;"><span>    label<span style="color:#000;font-weight:bold">=</span><span style="color:#900;font-weight:bold">c</span>(<span style="color:#d14">&#34;&lt; 18 %&#34;</span>,<span style="color:#d14">&#34;&lt; 20 %&#34;</span>,<span style="color:#d14">&#34;&lt; 22 %&#34;</span>,<span style="color:#d14">&#34;&lt; 24 %&#34;</span>,<span style="color:#d14">&#34;&lt; 26 %&#34;</span>, <span style="color:#d14">&#34;≥ 26 %&#34;</span>)
+</span></span><span style="display:flex;"><span>  )<span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  theme_custom
+</span></span></code></pre></div><img src="/blog/lego_map/index_files/figure-html/unnamed-chunk-2-1.png" width="672" />
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Make grid</span>
+</span></span><span style="display:flex;"><span>grd<span style="color:#000;font-weight:bold">&lt;-</span><span style="color:#900;font-weight:bold">st_make_grid</span>(
+</span></span><span style="display:flex;"><span>    clean, <span style="color:#998;font-style:italic"># map name </span>
+</span></span><span style="display:flex;"><span>    n <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">c</span>(<span style="color:#099">60</span>,<span style="color:#099">60</span>) <span style="color:#998;font-style:italic"># number of cells per longitude/latitude</span>
+</span></span><span style="display:flex;"><span>  )<span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># convert back to sf object</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">st_sf</span>()<span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># add a unique id to each cell </span>
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># (will be useful later to get back centroids data)</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">mutate</span>(id<span style="color:#000;font-weight:bold">=</span><span style="color:#900;font-weight:bold">row_number</span>())
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Extract centroids</span>
+</span></span><span style="display:flex;"><span>cent<span style="color:#000;font-weight:bold">&lt;-</span>grd<span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">st_centroid</span>()
+</span></span></code></pre></div><pre tabindex="0"><code>## Warning: st_centroid assumes attributes are constant over geometries
+</code></pre><div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Take a look at the results</span>
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">ggplot</span>()<span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">geom_sf</span>(grd,mapping<span style="color:#000;font-weight:bold">=</span><span style="color:#900;font-weight:bold">aes</span>(geometry<span style="color:#000;font-weight:bold">=</span>geometry))<span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">geom_sf</span>(cent,mapping<span style="color:#000;font-weight:bold">=</span><span style="color:#900;font-weight:bold">aes</span>(geometry<span style="color:#000;font-weight:bold">=</span>geometry),pch<span style="color:#000;font-weight:bold">=</span><span style="color:#099">21</span>,size<span style="color:#000;font-weight:bold">=</span><span style="color:#099">0.5</span>)<span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">theme_void</span>()
+</span></span></code></pre></div><img src="/blog/lego_map/index_files/figure-html/unnamed-chunk-3-1.png" width="672" />
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Intersect centroids with basemap</span>
+</span></span><span style="display:flex;"><span>cent_clean<span style="color:#000;font-weight:bold">&lt;-</span>cent<span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">st_intersection</span>(clean)
+</span></span></code></pre></div><pre tabindex="0"><code>## Warning: attribute variables are assumed to be spatially constant throughout
+## all geometries
+</code></pre><div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Make a centroid without geom</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># (convert from sf object to tibble)</span>
+</span></span><span style="display:flex;"><span>cent_no_geom <span style="color:#000;font-weight:bold">&lt;-</span> cent_clean<span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">st_drop_geometry</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Join with grid thanks to id column</span>
+</span></span><span style="display:flex;"><span>grd_clean<span style="color:#000;font-weight:bold">&lt;-</span>grd<span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic">#filter(id%in%sel)%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">left_join</span>(cent_no_geom)
+</span></span></code></pre></div><pre tabindex="0"><code>## Joining with `by = join_by(id)`
+</code></pre><div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#900;font-weight:bold">ggplot</span>()<span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">geom_sf</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic"># drop_na() is one way to suppress the cells outside the country</span>
+</span></span><span style="display:flex;"><span>    grd_clean<span style="color:#000;font-weight:bold">%&gt;%</span><span style="color:#900;font-weight:bold">drop_na</span>(), 
+</span></span><span style="display:flex;"><span>    mapping<span style="color:#000;font-weight:bold">=</span><span style="color:#900;font-weight:bold">aes</span>(geometry<span style="color:#000;font-weight:bold">=</span>geometry,fill<span style="color:#000;font-weight:bold">=</span>clss)
+</span></span><span style="display:flex;"><span>  )<span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">geom_sf</span>(cent_clean,mapping<span style="color:#000;font-weight:bold">=</span><span style="color:#900;font-weight:bold">aes</span>(geometry<span style="color:#000;font-weight:bold">=</span>geometry),fill<span style="color:#000;font-weight:bold">=</span><span style="color:#000;font-weight:bold">NA</span>,pch<span style="color:#000;font-weight:bold">=</span><span style="color:#099">21</span>,size<span style="color:#000;font-weight:bold">=</span><span style="color:#099">0.5</span>)<span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">labs</span>(fill<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;Member of a sport association&#34;</span>)<span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">guides</span>(
+</span></span><span style="display:flex;"><span>    fill<span style="color:#000;font-weight:bold">=</span><span style="color:#900;font-weight:bold">guide_legend</span>(
+</span></span><span style="display:flex;"><span>      nrow<span style="color:#000;font-weight:bold">=</span><span style="color:#099">1</span>,
+</span></span><span style="display:flex;"><span>      title.position<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;top&#34;</span>,
+</span></span><span style="display:flex;"><span>      label.position<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;bottom&#34;</span>
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>  )<span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">scale_fill_manual</span>(
+</span></span><span style="display:flex;"><span>    values<span style="color:#000;font-weight:bold">=</span>pal,
+</span></span><span style="display:flex;"><span>    label<span style="color:#000;font-weight:bold">=</span><span style="color:#900;font-weight:bold">c</span>(<span style="color:#d14">&#34;&lt; 18 %&#34;</span>,<span style="color:#d14">&#34;&lt; 20 %&#34;</span>,<span style="color:#d14">&#34;&lt; 22 %&#34;</span>,<span style="color:#d14">&#34;&lt; 24 %&#34;</span>,<span style="color:#d14">&#34;&lt; 26 %&#34;</span>, <span style="color:#d14">&#34;≥ 26 %&#34;</span>)
+</span></span><span style="display:flex;"><span>  )<span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  theme_custom
+</span></span></code></pre></div><img src="/blog/lego_map/index_files/figure-html/unnamed-chunk-5-1.png" width="672" />
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Set offset</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># (value here is not fixed, it depends on your map, system of coordinates, etc...)</span>
+</span></span><span style="display:flex;"><span>off <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#099">2000</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Create second centroid</span>
+</span></span><span style="display:flex;"><span>cent_off <span style="color:#000;font-weight:bold">&lt;-</span> cent_clean<span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Extract longitude and latitude and add offset to longitude</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">mutate</span>(
+</span></span><span style="display:flex;"><span>    lon<span style="color:#000;font-weight:bold">=</span><span style="color:#900;font-weight:bold">st_coordinates</span>(.)[,<span style="color:#099">1</span>]<span style="color:#000;font-weight:bold">+</span>off,
+</span></span><span style="display:flex;"><span>    lat<span style="color:#000;font-weight:bold">=</span><span style="color:#900;font-weight:bold">st_coordinates</span>(.)[,<span style="color:#099">2</span>],
+</span></span><span style="display:flex;"><span>  )<span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Drop old geometry</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">st_drop_geometry</span>()<span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Make new geometry based on new {lon;lat}</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">st_as_sf</span>(coords<span style="color:#000;font-weight:bold">=</span><span style="color:#900;font-weight:bold">c</span>(<span style="color:#d14">&#39;lon&#39;</span>,<span style="color:#d14">&#39;lat&#39;</span>))<span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Specify Coordinates Reference System</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">st_set_crs</span>(<span style="color:#900;font-weight:bold">st_crs</span>(cent_clean))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Make map !</span>
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">ggplot</span>()<span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">geom_sf</span>(
+</span></span><span style="display:flex;"><span>    grd_clean<span style="color:#000;font-weight:bold">%&gt;%</span><span style="color:#900;font-weight:bold">drop_na</span>(), 
+</span></span><span style="display:flex;"><span>    mapping<span style="color:#000;font-weight:bold">=</span><span style="color:#900;font-weight:bold">aes</span>(geometry<span style="color:#000;font-weight:bold">=</span>geometry,fill<span style="color:#000;font-weight:bold">=</span>clss)
+</span></span><span style="display:flex;"><span>  )<span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Centroid for shaded effect</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">geom_sf</span>(cent_off,mapping<span style="color:#000;font-weight:bold">=</span><span style="color:#900;font-weight:bold">aes</span>(geometry<span style="color:#000;font-weight:bold">=</span>geometry),color<span style="color:#000;font-weight:bold">=</span><span style="color:#900;font-weight:bold">alpha</span>(<span style="color:#d14">&#34;black&#34;</span>,<span style="color:#099">0.5</span>),size<span style="color:#000;font-weight:bold">=</span><span style="color:#099">0.5</span>)<span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># &#39;Real&#39; centroid</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">geom_sf</span>(cent_clean,mapping<span style="color:#000;font-weight:bold">=</span><span style="color:#900;font-weight:bold">aes</span>(geometry<span style="color:#000;font-weight:bold">=</span>geometry,color<span style="color:#000;font-weight:bold">=</span>clss),size<span style="color:#000;font-weight:bold">=</span><span style="color:#099">0.5</span>)<span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">geom_sf</span>(cent_clean,mapping<span style="color:#000;font-weight:bold">=</span><span style="color:#900;font-weight:bold">aes</span>(geometry<span style="color:#000;font-weight:bold">=</span>geometry),fill<span style="color:#000;font-weight:bold">=</span><span style="color:#000;font-weight:bold">NA</span>,pch<span style="color:#000;font-weight:bold">=</span><span style="color:#099">21</span>,size<span style="color:#000;font-weight:bold">=</span><span style="color:#099">0.5</span>)<span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">labs</span>(fill<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;Member of a sport association&#34;</span>)<span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">guides</span>(
+</span></span><span style="display:flex;"><span>    color<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#39;none&#39;</span>,
+</span></span><span style="display:flex;"><span>    fill<span style="color:#000;font-weight:bold">=</span><span style="color:#900;font-weight:bold">guide_legend</span>(
+</span></span><span style="display:flex;"><span>      nrow<span style="color:#000;font-weight:bold">=</span><span style="color:#099">1</span>,
+</span></span><span style="display:flex;"><span>      title.position<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;top&#34;</span>,
+</span></span><span style="display:flex;"><span>      label.position<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;bottom&#34;</span>
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>  )<span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">scale_fill_manual</span>(
+</span></span><span style="display:flex;"><span>    values<span style="color:#000;font-weight:bold">=</span>pal,
+</span></span><span style="display:flex;"><span>    label<span style="color:#000;font-weight:bold">=</span><span style="color:#900;font-weight:bold">c</span>(<span style="color:#d14">&#34;&lt; 18 %&#34;</span>,<span style="color:#d14">&#34;&lt; 20 %&#34;</span>,<span style="color:#d14">&#34;&lt; 22 %&#34;</span>,<span style="color:#d14">&#34;&lt; 24 %&#34;</span>,<span style="color:#d14">&#34;&lt; 26 %&#34;</span>, <span style="color:#d14">&#34;≥ 26 %&#34;</span>)
+</span></span><span style="display:flex;"><span>  )<span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">scale_color_manual</span>(values<span style="color:#000;font-weight:bold">=</span>pal)<span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  theme_custom
+</span></span></code></pre></div><img src="/blog/lego_map/index_files/figure-html/unnamed-chunk-6-1.png" width="672" />
+
+        
+        <details closed class="f6 fw7 input-reset">
+  <dl class="f6 lh-copy">
+    <dt class="fw7">Posted on:</dt>
+    <dd class="fw5 ml0">November 26, 2024</dd>
+  </dl>
+  <dl class="f6 lh-copy">
+    <dt class="fw7">Length:</dt>
+    <dd class="fw5 ml0">3 minute read, 463 words</dd>
+  </dl>
+  
+  
+  
+  <dl class="f6 lh-copy">
+    <dt class="fw7">Tags:</dt>
+    <dd class="fw5 ml0"> <a href="http://localhost:4321/tags/r">R</a>  <a href="http://localhost:4321/tags/bluesky">bluesky</a>  <a href="http://localhost:4321/tags/maps">maps</a> </dd>
+  </dl>
+  
+  <dl class="f6 lh-copy">
+    <dt class="fw7">See Also:</dt>
+    
+    <dd class="fw5 ml0"><a href="/blog/k_walker_map_2/">Another Kyle Walker Map</a></dd>
+    
+    <dd class="fw5 ml0"><a href="/blog/tt_cbp/">Tidy Tuesday Customs and Border Protection</a></dd>
+    
+    <dd class="fw5 ml0"><a href="/blog/bsky_unfollow_negative_people/">Bluesky Unfollowing Negative Follows</a></dd>
+    
+  </dl>
+</details>
+
+      </section>
+      <footer class="post-footer">
+        <div class="post-pagination dt w-100 mt4 mb2">
+  
+  
+    <a class="prev dtc pr2 tl v-top fw6"
+    href="http://localhost:4321/blog/k_walker_map_2/">&larr; Another Kyle Walker Map</a>
+  
+  
+  
+    <a class="next dtc pl2 tr v-top fw6"
+    href="http://localhost:4321/blog/tt_cbp/">Tidy Tuesday Customs and Border Protection &rarr;</a>
+  
+</div>
+
+      </footer>
+    </article>
+    
+      <div class="post-comments pa0 pa4-l mt4">
+  
+    
+      <script src="https://utteranc.es/client.js"
+              repo="stewing-co/warp_and_weft_data"
+              issue-term="pathname"
+              theme="boxy-light"
+              label="comments :crystal_ball:"
+              crossorigin="anonymous"
+              async
+              type="text/javascript">
+      </script>
+    
+  
+</div>
+
+    
+  </section>
+</main>
+<footer class="site-footer pv4 bt b--transparent ph5" role="contentinfo">
+  <nav class="db dt-l w-100">
+    <p class="site-copyright f7 db dtc-l v-mid w-100 w-33-l tc tl-l pv2 pv0-l mv0 lh-copy">
+      &copy; 2024 Warp and Weft Data, Atlanta, GA
+      <span class="middot-divider"></span>
+      Made with <span xmlns:dct="http://purl.org/dc/terms/" property="dct:title"><a xmlns:dct="http://purl.org/dc/terms/" href="https://github.com/hugo-apero/" rel="dct:source">Hugo Apéro</a></span>.
+      <br />
+      
+Based on <span xmlns:dct="http://purl.org/dc/terms/" property="dct:title"><a xmlns:dct="http://purl.org/dc/terms/" href="https://github.com/formspree/blogophonic-hugo" rel="dct:source">Blogophonic</a></span> by <a xmlns:cc="http://creativecommons.org/ns#" href="https://formspree.io" property="cc:attributionName" rel="cc:attributionURL">Formspree</a>.
+    </p>
+    
+    <div class="site-social-links db dtc-l v-mid w-100 w-33-l tc pv2 pv0-l mv0">
+      <div class="social-icon-links" aria-hidden="true">
+  
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <a class="link dib h1 w1 ml0 mr2 f6 o-90 glow" href="https://github.com/stewing-co" title="github" target="_blank" rel="me noopener">
+      <i class="fab fa-github fa-lg fa-fw"></i>
+    </a>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <a class="link dib h1 w1 ml0 mr2 f6 o-90 glow" href="https://bsky.app/profile/warpandweftdata.com" title="bluesky" target="_blank" rel="me noopener">
+      <i class="fab fa-bluesky fa-lg fa-fw"></i>
+    </a>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <a class="link dib h1 w1 ml0 mr2 f6 o-90 glow" href="https://www.linkedin.com/in/stewing-in/" title="linkedin" target="_blank" rel="me noopener">
+      <i class="fab fa-linkedin fa-lg fa-fw"></i>
+    </a>
+  
+</div>
+
+    </div>
+    
+    <div class="site-links f6 db dtc-l v-mid w-100 w-67-l tc tr-l pv2 pv0-l mv0">
+      
+      <a class="dib pv1 ph2 link" href="/license/" title="License">License</a>
+      
+      <a class="dib pv1 ph2 link" href="/contact/" title="Contact form">Contact</a>
+      
+    </div>
+  </nav>
+  
+    <script>
+
+    var i, text, code, codes = document.getElementsByTagName('code');
+    for (let i = 0; i < codes.length;) {
+      code = codes[i];
+      if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+        text = code.textContent;
+        if (/^\$[^$]/.test(text) && /[^$]\$$/.test(text)) {
+          text = text.replace(/^\$/, '\\(').replace(/\$$/, '\\)');
+          code.textContent = text;
+        }
+        if (/^\\\((.|\s)+\\\)$/.test(text) ||
+            /^\\\[(.|\s)+\\\]$/.test(text) ||
+            /^\$(.|\s)+\$$/.test(text) ||
+            /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+          code.outerHTML = code.innerHTML;  
+          continue;
+        }
+      }
+      i++;
+    }
+</script>
+
+  
+    
+    
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.13/dist/katex.min.css" integrity="sha384-RZU/ijkSsFbcmivfdRBQDtwuwVqK7GMOw6IMvKyeWL2K5UAlyp6WonmB8m7Jd0Hn" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.13/dist/katex.min.js" integrity="sha384-pK1WpvzWVBQiP0/GjnvRxV4mOb0oxFuyRxJlk6vVw146n3egcN5C925NCP7a7BY8" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.13/dist/contrib/auto-render.min.js" integrity="sha384-vZTG03m+2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+
+
+
+    
+  
+  
+</footer>
+
+      </div>
+    </body>
+</html>

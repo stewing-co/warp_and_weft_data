@@ -49,7 +49,7 @@
 “Encounter data includes U.S. Border Patrol Title 8 apprehensions, Office of Field Operations Title 8 inadmissibles, and all Title 42 expulsions for fiscal years 2020 to date. Data is available for the Northern Land Border, Southwest Land Border, and Nationwide (i.e., air, land, and sea modes of transportation) encounters.">
   <meta itemprop="datePublished" content="2024-11-26T00:00:00+00:00">
   <meta itemprop="dateModified" content="2024-11-26T00:00:00+00:00">
-  <meta itemprop="wordCount" content="1332">
+  <meta itemprop="wordCount" content="1707">
   <meta itemprop="image" content="http://localhost:4321/blog/tt_cbp/featured.jpg">
   <meta itemprop="keywords" content="R,Tidy Tuesday">
   
@@ -110,7 +110,7 @@
       <header class="post-header">
         <h1 class="f1 lh-solid measure-narrow mb3 fw4">Tidy Tuesday Customs and Border Protection</h1>
         
-        <p class="f6 measure lh-copy mv1">By Steve Ewing</p>
+        <p class="f6 measure lh-copy mv1">By Steve Ewing in <a href="http://localhost:4321/categories/tidy-tuesday">tidy tuesday</a> </p>
         <p class="f7 db mv0 ttu">November 26, 2024</p>
 
       
@@ -847,6 +847,96 @@ Tony Galvan
 </span></span><span style="display:flex;"><span>    axis.text.x <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">element_text</span>(angle <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">45</span>, hjust <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">1</span>)    
 </span></span><span style="display:flex;"><span>  )
 </span></span></code></pre></div><img src="/blog/tt_cbp/index_files/figure-html/unnamed-chunk-7-1.png" width="672" />
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#900;font-weight:bold">library</span>(ggplot2)
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">library</span>(dplyr)
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">library</span>(maps)
+</span></span></code></pre></div><pre tabindex="0"><code>## 
+## Attaching package: &#39;maps&#39;
+</code></pre><pre tabindex="0"><code>## The following object is masked from &#39;package:purrr&#39;:
+## 
+##     map
+</code></pre><div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#900;font-weight:bold">library</span>(grid)
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">library</span>(sf)
+</span></span></code></pre></div><pre tabindex="0"><code>## Linking to GEOS 3.12.2, GDAL 3.9.3, PROJ 9.4.1; sf_use_s2() is TRUE
+</code></pre><div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Get world map data and convert to sf object</span>
+</span></span><span style="display:flex;"><span>world_map <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">map_data</span>(<span style="color:#d14">&#34;world&#34;</span>)
+</span></span><span style="display:flex;"><span>world_sf <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">st_as_sf</span>(<span style="color:#900;font-weight:bold">map</span>(<span style="color:#d14">&#34;world&#34;</span>, plot <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">FALSE</span>, fill <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">TRUE</span>))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Create a data frame of unique country centroids for positioning the bar charts</span>
+</span></span><span style="display:flex;"><span>country_coords <span style="color:#000;font-weight:bold">&lt;-</span> world_map <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">group_by</span>(region) <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">summarise</span>(
+</span></span><span style="display:flex;"><span>    long <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">mean</span>(<span style="color:#900;font-weight:bold">range</span>(long)),
+</span></span><span style="display:flex;"><span>    lat <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">mean</span>(<span style="color:#900;font-weight:bold">range</span>(lat))
+</span></span><span style="display:flex;"><span>  ) <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">rename</span>(citizenship <span style="color:#000;font-weight:bold">=</span> region)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Merge plot data with country coordinates</span>
+</span></span><span style="display:flex;"><span>plot_data_coords <span style="color:#000;font-weight:bold">&lt;-</span> plot_data <span style="color:#000;font-weight:bold">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">inner_join</span>(country_coords, by <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;citizenship&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Create a base world map using ggplot2</span>
+</span></span><span style="display:flex;"><span>world_base <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">ggplot</span>() <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">geom_sf</span>(data <span style="color:#000;font-weight:bold">=</span> world_sf, fill <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;lightgray&#34;</span>, color <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;white&#34;</span>) <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">theme_void</span>() <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">labs</span>(
+</span></span><span style="display:flex;"><span>    title <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;Title 42 Encounters by Citizenship and Year&#34;</span>,
+</span></span><span style="display:flex;"><span>    subtitle <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;Country-specific encounters visualized as bar charts over each country&#34;</span>
+</span></span><span style="display:flex;"><span>  ) <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">coord_sf</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Debugging Step: Plot text labels for each country to verify coordinates</span>
+</span></span><span style="display:flex;"><span>world_base <span style="color:#000;font-weight:bold">&lt;-</span> world_base <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">geom_text</span>(
+</span></span><span style="display:flex;"><span>    data <span style="color:#000;font-weight:bold">=</span> plot_data_coords,
+</span></span><span style="display:flex;"><span>    <span style="color:#900;font-weight:bold">aes</span>(x <span style="color:#000;font-weight:bold">=</span> long, y <span style="color:#000;font-weight:bold">=</span> lat, label <span style="color:#000;font-weight:bold">=</span> citizenship),
+</span></span><span style="display:flex;"><span>    size <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">3</span>, color <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;red&#34;</span>
+</span></span><span style="display:flex;"><span>  )
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Plot the world base map with text labels to verify coordinates</span>
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">print</span>(world_base)
+</span></span></code></pre></div><img src="/blog/tt_cbp/index_files/figure-html/unnamed-chunk-8-1.png" width="672" />
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># After verifying coordinates, proceed with adding bar charts</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Add bar charts for each country using annotation_custom()</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">for</span> (country <span style="color:#000;font-weight:bold">in</span> <span style="color:#900;font-weight:bold">unique</span>(plot_data_coords<span style="color:#000;font-weight:bold">$</span>citizenship)) {
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Filter data for each country</span>
+</span></span><span style="display:flex;"><span>  country_data <span style="color:#000;font-weight:bold">&lt;-</span> plot_data_coords <span style="color:#000;font-weight:bold">%&gt;%</span> <span style="color:#900;font-weight:bold">filter</span>(citizenship <span style="color:#000;font-weight:bold">==</span> country)
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Create a mini bar plot for each country</span>
+</span></span><span style="display:flex;"><span>  mini_bar <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">ggplot</span>(country_data, <span style="color:#900;font-weight:bold">aes</span>(x <span style="color:#000;font-weight:bold">=</span> fiscal_year, y <span style="color:#000;font-weight:bold">=</span> total, fill <span style="color:#000;font-weight:bold">=</span> encounter_type)) <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#900;font-weight:bold">geom_bar</span>(stat <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;identity&#34;</span>, position <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;stack&#34;</span>) <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#900;font-weight:bold">theme_void</span>() <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#900;font-weight:bold">theme</span>(
+</span></span><span style="display:flex;"><span>      legend.position <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;none&#34;</span>,
+</span></span><span style="display:flex;"><span>      axis.text <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">element_blank</span>(),
+</span></span><span style="display:flex;"><span>      axis.ticks <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">element_blank</span>(),
+</span></span><span style="display:flex;"><span>      plot.margin <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">margin</span>(<span style="color:#099">0</span>, <span style="color:#099">0</span>, <span style="color:#099">0</span>, <span style="color:#099">0</span>)
+</span></span><span style="display:flex;"><span>    ) <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#900;font-weight:bold">scale_y_continuous</span>(limits <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">c</span>(<span style="color:#099">0</span>, <span style="color:#900;font-weight:bold">max</span>(country_data<span style="color:#000;font-weight:bold">$</span>total) <span style="color:#000;font-weight:bold">*</span> <span style="color:#099">1.1</span>))  <span style="color:#998;font-style:italic"># Scale y to be proportional</span>
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Convert the mini bar plot into a grob object</span>
+</span></span><span style="display:flex;"><span>  mini_bar_grob <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">ggplotGrob</span>(mini_bar)
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Get the longitude and latitude for placing the mini bar</span>
+</span></span><span style="display:flex;"><span>  country_long <span style="color:#000;font-weight:bold">&lt;-</span> country_data<span style="color:#000;font-weight:bold">$</span>long[1]
+</span></span><span style="display:flex;"><span>  country_lat <span style="color:#000;font-weight:bold">&lt;-</span> country_data<span style="color:#000;font-weight:bold">$</span>lat[1]
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Add the mini bar plot to the world map</span>
+</span></span><span style="display:flex;"><span>  world_base <span style="color:#000;font-weight:bold">&lt;-</span> world_base <span style="color:#000;font-weight:bold">+</span> 
+</span></span><span style="display:flex;"><span>    <span style="color:#900;font-weight:bold">annotation_custom</span>(
+</span></span><span style="display:flex;"><span>      grob <span style="color:#000;font-weight:bold">=</span> mini_bar_grob,
+</span></span><span style="display:flex;"><span>      xmin <span style="color:#000;font-weight:bold">=</span> country_long <span style="color:#000;font-weight:bold">-</span> <span style="color:#099">5</span>,
+</span></span><span style="display:flex;"><span>      xmax <span style="color:#000;font-weight:bold">=</span> country_long <span style="color:#000;font-weight:bold">+</span> <span style="color:#099">5</span>,
+</span></span><span style="display:flex;"><span>      ymin <span style="color:#000;font-weight:bold">=</span> country_lat <span style="color:#000;font-weight:bold">-</span> <span style="color:#099">5</span>,
+</span></span><span style="display:flex;"><span>      ymax <span style="color:#000;font-weight:bold">=</span> country_lat <span style="color:#000;font-weight:bold">+</span> <span style="color:#099">5</span>
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Print the final map with bar charts</span>
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">print</span>(world_base)
+</span></span></code></pre></div><img src="/blog/tt_cbp/index_files/figure-html/unnamed-chunk-8-2.png" width="672" />
 
         
         <details closed class="f6 fw7 input-reset">
@@ -856,7 +946,12 @@ Tony Galvan
   </dl>
   <dl class="f6 lh-copy">
     <dt class="fw7">Length:</dt>
-    <dd class="fw5 ml0">7 minute read, 1332 words</dd>
+    <dd class="fw5 ml0">9 minute read, 1707 words</dd>
+  </dl>
+  
+  <dl class="f6 lh-copy">
+    <dt class="fw7">Categories:</dt>
+    <dd class="fw5 ml0"> <a href="http://localhost:4321/categories/tidy-tuesday">tidy tuesday</a> </dd>
   </dl>
   
   
@@ -869,11 +964,11 @@ Tony Galvan
   <dl class="f6 lh-copy">
     <dt class="fw7">See Also:</dt>
     
+    <dd class="fw5 ml0"><a href="/blog/k_walker_map_2/">Another Kyle Walker Map</a></dd>
+    
+    <dd class="fw5 ml0"><a href="/blog/lego_map/">Benjamin Nowak&#39;s Lego Maps</a></dd>
+    
     <dd class="fw5 ml0"><a href="/blog/bsky_unfollow_negative_people/">Bluesky Unfollowing Negative Follows</a></dd>
-    
-    <dd class="fw5 ml0"><a href="/blog/bsky_sentiment_index/">Bluesky Sentiment Indexing</a></dd>
-    
-    <dd class="fw5 ml0"><a href="/blog/aw_bsky_bot/">Andrew Wheiss&#39;s Bluesky Bot</a></dd>
     
   </dl>
 </details>
@@ -882,6 +977,9 @@ Tony Galvan
       <footer class="post-footer">
         <div class="post-pagination dt w-100 mt4 mb2">
   
+  
+    <a class="prev dtc pr2 tl v-top fw6"
+    href="http://localhost:4321/blog/lego_map/">&larr; Benjamin Nowak&#39;s Lego Maps</a>
   
   
   
