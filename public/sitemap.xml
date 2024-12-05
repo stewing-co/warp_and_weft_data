@@ -2,26 +2,35 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
+    <loc>http://localhost:4321/blog/</loc>
+    <lastmod>2024-12-05T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:4321/tags/ggplot2/</loc>
+    <lastmod>2024-12-05T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:4321/tags/r/</loc>
+    <lastmod>2024-12-05T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:4321/tags/</loc>
+    <lastmod>2024-12-05T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:4321/blog/teun_brand_half_geom/</loc>
+    <lastmod>2024-12-05T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:4321/</loc>
+    <lastmod>2024-12-05T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>http://localhost:4321/blog/k_walker_map_2/</loc>
     <lastmod>2024-12-04T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:4321/tags/bluesky/</loc>
     <lastmod>2024-12-04T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>http://localhost:4321/blog/</loc>
-    <lastmod>2024-12-04T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>http://localhost:4321/tags/maps/</loc>
     <lastmod>2024-12-04T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>http://localhost:4321/tags/r/</loc>
-    <lastmod>2024-12-04T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>http://localhost:4321/tags/</loc>
-    <lastmod>2024-12-04T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>http://localhost:4321/</loc>
-    <lastmod>2024-12-04T00:00:00+00:00</lastmod>
+    <loc>http://localhost:4321/blog/lego_map/</loc>
+    <lastmod>2024-11-26T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:4321/categories/</loc>
     <lastmod>2024-11-26T00:00:00+00:00</lastmod>

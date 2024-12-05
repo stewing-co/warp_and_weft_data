@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=4321&amp;path=livereload" data-no-instant defer></script>
+  
+                           
+     
+
+
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="generator" content="Hugo 0.136.2">
+<title>Teun van den Brand&#39;s Plots | Warp and Weft Data</title>
+
+
+<meta property="twitter:site" content="@blue_pibble">
+<meta property="twitter:creator" content="@blue_pibble">
+
+
+
+
+
+
+
+  
+    
+  
+<meta name="description" content="A collection of plots from Teun van den Brand&#39;s github">
+
+
+<meta property="og:site_name" content="Warp and Weft Data">
+<meta property="og:title" content="Teun van den Brand&#39;s Plots | Warp and Weft Data">
+<meta property="og:description" content="A collection of plots from Teun van den Brand&#39;s github" />
+<meta property="og:type" content="page" />
+<meta property="og:url" content="http://localhost:4321/blog/teun_brand_half_geom/" />
+<meta property="og:locale" content="en">
+
+
+
+
+    
+        <meta property="og:image" content="http://localhost:4321/blog/teun_brand_half_geom/featured.jpg" >
+        <meta property="twitter:card" content="summary_large_image">
+        <meta name="twitter:image" content="http://localhost:4321/blog/teun_brand_half_geom/featured.jpg" >
+    
+    
+  
+  <meta itemprop="name" content="Teun van den Brand&#39;s Plots">
+  <meta itemprop="description" content="Here’s the source
+library(ggplot2) library(scales) theme_set( # Pick a starting theme theme_gray() &#43; # Add your favourite elements theme( axis.line = element_line(), panel.background = element_rect(fill = &#34;white&#34;), panel.grid.major = element_line(&#34;grey95&#34;, linewidth = 0.25), legend.key = element_rect(fill = NA) ) ) my_mapping &lt;- aes(x = foo, y = bar) aes(colour = qux, !!!my_mapping) ## Aesthetic mapping: ## * `x` -&gt; `foo`## * `y` -&gt; `bar`## * `colour` -&gt; `qux` #&gt; Aesthetic mapping: #&gt; * `x` -&gt; `foo` #&gt; * `y` -&gt; `bar` #&gt; * `colour` -&gt; `qux` my_fill &lt;- aes(fill = after_scale(alpha(colour, 0.3))) ggplot(mpg, aes(displ, hwy)) &#43; geom_point(aes(colour = factor(cyl), !!!my_fill), shape = 21) contrast &lt;- function(colour) { out &lt;- rep(&#34;black&#34;, length(colour)) light &lt;- farver::get_channel(colour, &#34;l&#34;, space = &#34;hcl&#34;) out[light &lt; 50] &lt;- &#34;white&#34; out } autocontrast &lt;- aes(colour = after_scale(contrast(fill))) cors &lt;- cor(mtcars) # Melt matrix df &lt;- data.frame( col = colnames(cors)[as.vector(col(cors))], row = rownames(cors)[as.vector(row(cors))], value = as.vector(cors) ) # Basic plot p &lt;- ggplot(df, aes(row, col, fill = value)) &#43; geom_raster() &#43; geom_text(aes(label = round(value, 2), !!!autocontrast)) &#43; coord_equal() p &#43; scale_fill_viridis_c(direction = 1) p &#43; scale_fill_viridis_c(direction = -1) # A basic plot to reuse for examples p &lt;- ggplot(mpg, aes(class, displ, colour = class, !!!my_fill)) &#43; guides(colour = &#34;none&#34;, fill = &#34;none&#34;) &#43; labs(y = &#34;Engine Displacement [L]&#34;, x = &#34;Type of car&#34;) p &#43; geom_boxplot(aes(xmin = after_scale(x))) p &#43; geom_errorbar( stat = &#34;summary&#34;, fun.data = mean_se, aes(xmin = after_scale(x)) ) update_geom_defaults(&#34;violin&#34;, list(xmin = NULL)) p &#43; geom_violin(aes(xmin = after_scale(x))) # A small nudge offset offset &lt;- 0.025 # We can pre-specify the mappings if we plan on recycling some right_nudge &lt;- aes( xmin = after_scale(x), x = stage(class, after_stat = x &#43; offset) ) left_nudge &lt;- aes( xmax = after_scale(x), x = stage(class, after_stat = x - offset) ) # Combining p &#43; geom_violin(right_nudge) &#43; geom_boxplot(left_nudge) &#43; geom_errorbar(left_nudge, stat = &#34;boxplot&#34;, width = 0.3) set.seed(0) df &lt;- USArrests[sample(nrow(USArrests), 5), ] df$state &lt;- rownames(df) q &lt;- ggplot(df, aes(Murder, Rape, label = state)) &#43; geom_point() q &#43; geom_text() q &#43; geom_label( aes( label = gsub(&#34; &#34;, &#34;\n&#34;, state), hjust = Murder &gt; mean(Murder), vjust = Rape &gt; mean(Rape) ), label.padding = unit(5, &#34;pt&#34;), label.size = NA, fill = NA )">
+  <meta itemprop="datePublished" content="2024-12-05T00:00:00+00:00">
+  <meta itemprop="dateModified" content="2024-12-05T00:00:00+00:00">
+  <meta itemprop="wordCount" content="363">
+  <meta itemprop="image" content="http://localhost:4321/blog/teun_brand_half_geom/featured.jpg">
+  <meta itemprop="keywords" content="R,Ggplot2">
+  
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-RJ8HKRJ16Q"></script>
+      <script>
+        var doNotTrack = false;
+        if ( true ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-RJ8HKRJ16Q');
+        }
+      </script>
+  <!--[if IE]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  <link rel="shortcut icon" href="/img/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="/img/favicon.ico" type="image/x-icon">
+  
+  
+  <link rel="stylesheet" href="/style.main.min.0820a865770f259724d61d170adbb19db040647ecaa3b2023c16f04ada7fc7d2.css" integrity="sha256-CCCoZXcPJZck1h0XCtuxnbBAZH7Ko7ICPBbwStp/x9I=" media="screen">
+  
+  
+  <script src="/panelset.min.ed1ac24b6e16f4e2481e3d1d098ae66f5bc77438aef619e6e266d8ac5b00dc72.js" type="text/javascript"></script>
+  
+  
+  <script src="/main.min.f0b39b51e43cf3881368fb093708a9d3b3499e674af4b4e47e27e512a5d411e2.js" type="text/javascript"></script>
+</head>
+<body>
+      <div class="grid-container single">
+<header class="site-header pt4 pb2 mb4 bb b--transparent ph5 headroom z-max" role="banner">
+  <nav class="site-nav db dt-l w-100" role="navigation">
+    <a class="site-brand db dtc-l v-mid link no-underline w-100 w-33-l tc tl-l" href="http://localhost:4321/" title="Home">
+      <img src="/img/logo_leaf.png" class="dib db-l h2 w-auto" alt="Warp and Weft Data">
+    </a>
+    <div class="site-links db dtc-l v-mid w-100 w-47-l tc tr-l mt3 mt0-l ttu tracked">
+      
+        
+        
+        
+      <a class="link f6 f5-l dib pv1 ph2 " href="/about/" title="About Steve Ewing">About</a>
+      
+        
+        
+        
+      <a class="link f6 f5-l dib pv1 ph2 active" href="/blog/" title="Blog">Blog</a>
+      
+      
+    </div>
+  </nav>
+</header>
+
+<main class="page-main pa4" role="main">
+  <section class="page-content mw7 center">
+    <article class="post-content pa0 ph4-l">
+      <header class="post-header">
+        <h1 class="f1 lh-solid measure-narrow mb3 fw4">Teun van den Brand&#39;s Plots</h1>
+        <h4 class="f4 mt0 mb4 lh-title measure">A collection of plots from Teun van den Brand&#39;s github</h4>
+        <p class="f6 measure lh-copy mv1">By Teun van den Brand</p>
+        <p class="f7 db mv0 ttu">December 5, 2024</p>
+
+      
+
+      </header>
+      <section class="post-body pt5 pb4">
+        <p>
+<a href="https://github.com/teunbrand/ggplot_tricks" target="_blank" rel="noopener">Here&rsquo;s the source</a></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#900;font-weight:bold">library</span>(ggplot2)
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">library</span>(scales)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">theme_set</span>(
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Pick a starting theme</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">theme_gray</span>() <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic"># Add your favourite elements</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">theme</span>(
+</span></span><span style="display:flex;"><span>    axis.line        <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">element_line</span>(),
+</span></span><span style="display:flex;"><span>    panel.background <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">element_rect</span>(fill <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;white&#34;</span>),
+</span></span><span style="display:flex;"><span>    panel.grid.major <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">element_line</span>(<span style="color:#d14">&#34;grey95&#34;</span>, linewidth <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">0.25</span>),
+</span></span><span style="display:flex;"><span>    legend.key       <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">element_rect</span>(fill <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">NA</span>) 
+</span></span><span style="display:flex;"><span>  )
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>my_mapping <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">aes</span>(x <span style="color:#000;font-weight:bold">=</span> foo, y <span style="color:#000;font-weight:bold">=</span> bar)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">aes</span>(colour <span style="color:#000;font-weight:bold">=</span> qux, <span style="color:#000;font-weight:bold">!!!</span>my_mapping)
+</span></span></code></pre></div><pre tabindex="0"><code>## Aesthetic mapping: 
+## * `x`      -&gt; `foo`
+## * `y`      -&gt; `bar`
+## * `colour` -&gt; `qux`
+</code></pre><div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic">#&gt; Aesthetic mapping: </span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#&gt; * `x`      -&gt; `foo`</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#&gt; * `y`      -&gt; `bar`</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#&gt; * `colour` -&gt; `qux`</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>my_fill <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">aes</span>(fill <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">after_scale</span>(<span style="color:#900;font-weight:bold">alpha</span>(colour, <span style="color:#099">0.3</span>)))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">ggplot</span>(mpg, <span style="color:#900;font-weight:bold">aes</span>(displ, hwy)) <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">geom_point</span>(<span style="color:#900;font-weight:bold">aes</span>(colour <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">factor</span>(cyl), <span style="color:#000;font-weight:bold">!!!</span>my_fill), shape <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">21</span>)
+</span></span></code></pre></div><img src="/blog/teun_brand_half_geom/index_files/figure-html/unnamed-chunk-1-1.png" width="672" />
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>contrast <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#000;font-weight:bold">function</span>(colour) {
+</span></span><span style="display:flex;"><span>  out   <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">rep</span>(<span style="color:#d14">&#34;black&#34;</span>, <span style="color:#900;font-weight:bold">length</span>(colour))
+</span></span><span style="display:flex;"><span>  light <span style="color:#000;font-weight:bold">&lt;-</span> farver<span style="color:#000;font-weight:bold">::</span><span style="color:#900;font-weight:bold">get_channel</span>(colour, <span style="color:#d14">&#34;l&#34;</span>, space <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;hcl&#34;</span>)
+</span></span><span style="display:flex;"><span>  out[light <span style="color:#000;font-weight:bold">&lt;</span> <span style="color:#099">50</span>] <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#d14">&#34;white&#34;</span>
+</span></span><span style="display:flex;"><span>  out
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>autocontrast <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">aes</span>(colour <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">after_scale</span>(<span style="color:#900;font-weight:bold">contrast</span>(fill)))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>cors <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">cor</span>(mtcars)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Melt matrix</span>
+</span></span><span style="display:flex;"><span>df <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">data.frame</span>(
+</span></span><span style="display:flex;"><span>  col <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">colnames</span>(cors)<span style="color:#900;font-weight:bold">[as.vector</span>(<span style="color:#900;font-weight:bold">col</span>(cors))],
+</span></span><span style="display:flex;"><span>  row <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">rownames</span>(cors)<span style="color:#900;font-weight:bold">[as.vector</span>(<span style="color:#900;font-weight:bold">row</span>(cors))],
+</span></span><span style="display:flex;"><span>  value <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">as.vector</span>(cors)
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Basic plot</span>
+</span></span><span style="display:flex;"><span>p <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">ggplot</span>(df, <span style="color:#900;font-weight:bold">aes</span>(row, col, fill <span style="color:#000;font-weight:bold">=</span> value)) <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">geom_raster</span>() <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">geom_text</span>(<span style="color:#900;font-weight:bold">aes</span>(label <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">round</span>(value, <span style="color:#099">2</span>), <span style="color:#000;font-weight:bold">!!!</span>autocontrast)) <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">coord_equal</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>p <span style="color:#000;font-weight:bold">+</span> <span style="color:#900;font-weight:bold">scale_fill_viridis_c</span>(direction <span style="color:#000;font-weight:bold">=</span>  <span style="color:#099">1</span>)
+</span></span></code></pre></div><img src="/blog/teun_brand_half_geom/index_files/figure-html/unnamed-chunk-2-1.png" width="672" />
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>p <span style="color:#000;font-weight:bold">+</span> <span style="color:#900;font-weight:bold">scale_fill_viridis_c</span>(direction <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">-1</span>)
+</span></span></code></pre></div><img src="/blog/teun_brand_half_geom/index_files/figure-html/unnamed-chunk-2-2.png" width="672" />
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># A basic plot to reuse for examples</span>
+</span></span><span style="display:flex;"><span>p <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">ggplot</span>(mpg, <span style="color:#900;font-weight:bold">aes</span>(class, displ, colour <span style="color:#000;font-weight:bold">=</span> class, <span style="color:#000;font-weight:bold">!!!</span>my_fill)) <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">guides</span>(colour <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;none&#34;</span>, fill <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;none&#34;</span>) <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">labs</span>(y <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;Engine Displacement [L]&#34;</span>, x <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;Type of car&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>p <span style="color:#000;font-weight:bold">+</span> <span style="color:#900;font-weight:bold">geom_boxplot</span>(<span style="color:#900;font-weight:bold">aes</span>(xmin <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">after_scale</span>(x)))
+</span></span></code></pre></div><img src="/blog/teun_brand_half_geom/index_files/figure-html/unnamed-chunk-3-1.png" width="672" />
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>p <span style="color:#000;font-weight:bold">+</span> <span style="color:#900;font-weight:bold">geom_errorbar</span>(
+</span></span><span style="display:flex;"><span>  stat <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;summary&#34;</span>,
+</span></span><span style="display:flex;"><span>  fun.data <span style="color:#000;font-weight:bold">=</span> mean_se,
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">aes</span>(xmin <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">after_scale</span>(x))
+</span></span><span style="display:flex;"><span>)
+</span></span></code></pre></div><img src="/blog/teun_brand_half_geom/index_files/figure-html/unnamed-chunk-4-1.png" width="672" />
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#900;font-weight:bold">update_geom_defaults</span>(<span style="color:#d14">&#34;violin&#34;</span>, <span style="color:#900;font-weight:bold">list</span>(xmin <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">NULL</span>))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>p <span style="color:#000;font-weight:bold">+</span> <span style="color:#900;font-weight:bold">geom_violin</span>(<span style="color:#900;font-weight:bold">aes</span>(xmin <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">after_scale</span>(x)))
+</span></span></code></pre></div><img src="/blog/teun_brand_half_geom/index_files/figure-html/unnamed-chunk-5-1.png" width="672" />
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># A small nudge offset</span>
+</span></span><span style="display:flex;"><span>offset <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#099">0.025</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># We can pre-specify the mappings if we plan on recycling some</span>
+</span></span><span style="display:flex;"><span>right_nudge <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">aes</span>(
+</span></span><span style="display:flex;"><span>  xmin <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">after_scale</span>(x), 
+</span></span><span style="display:flex;"><span>  x <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">stage</span>(class, after_stat <span style="color:#000;font-weight:bold">=</span> x <span style="color:#000;font-weight:bold">+</span> offset)
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>left_nudge  <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">aes</span>(
+</span></span><span style="display:flex;"><span>  xmax <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">after_scale</span>(x),
+</span></span><span style="display:flex;"><span>  x <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">stage</span>(class, after_stat <span style="color:#000;font-weight:bold">=</span> x <span style="color:#000;font-weight:bold">-</span> offset)
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Combining</span>
+</span></span><span style="display:flex;"><span>p <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">geom_violin</span>(right_nudge) <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">geom_boxplot</span>(left_nudge) <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">geom_errorbar</span>(left_nudge, stat <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;boxplot&#34;</span>, width <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">0.3</span>)
+</span></span></code></pre></div><img src="/blog/teun_brand_half_geom/index_files/figure-html/unnamed-chunk-6-1.png" width="672" />
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#900;font-weight:bold">set.seed</span>(<span style="color:#099">0</span>)
+</span></span><span style="display:flex;"><span>df <span style="color:#000;font-weight:bold">&lt;-</span> USArrests<span style="color:#900;font-weight:bold">[sample</span>(<span style="color:#900;font-weight:bold">nrow</span>(USArrests), <span style="color:#099">5</span>), ]
+</span></span><span style="display:flex;"><span>df<span style="color:#000;font-weight:bold">$</span>state <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">rownames</span>(df)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>q <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#900;font-weight:bold">ggplot</span>(df, <span style="color:#900;font-weight:bold">aes</span>(Murder, Rape, label <span style="color:#000;font-weight:bold">=</span> state)) <span style="color:#000;font-weight:bold">+</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">geom_point</span>()
+</span></span><span style="display:flex;"><span>q <span style="color:#000;font-weight:bold">+</span> <span style="color:#900;font-weight:bold">geom_text</span>()
+</span></span></code></pre></div><img src="/blog/teun_brand_half_geom/index_files/figure-html/unnamed-chunk-7-1.png" width="672" />
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>q <span style="color:#000;font-weight:bold">+</span> <span style="color:#900;font-weight:bold">geom_label</span>(
+</span></span><span style="display:flex;"><span>  <span style="color:#900;font-weight:bold">aes</span>(
+</span></span><span style="display:flex;"><span>    label <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">gsub</span>(<span style="color:#d14">&#34; &#34;</span>, <span style="color:#d14">&#34;\n&#34;</span>, state),
+</span></span><span style="display:flex;"><span>    hjust <span style="color:#000;font-weight:bold">=</span> Murder <span style="color:#000;font-weight:bold">&gt;</span> <span style="color:#900;font-weight:bold">mean</span>(Murder),
+</span></span><span style="display:flex;"><span>    vjust <span style="color:#000;font-weight:bold">=</span> Rape <span style="color:#000;font-weight:bold">&gt;</span> <span style="color:#900;font-weight:bold">mean</span>(Rape)
+</span></span><span style="display:flex;"><span>  ),
+</span></span><span style="display:flex;"><span>  label.padding <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">unit</span>(<span style="color:#099">5</span>, <span style="color:#d14">&#34;pt&#34;</span>),
+</span></span><span style="display:flex;"><span>  label.size <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">NA</span>, fill <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">NA</span>
+</span></span><span style="display:flex;"><span>)
+</span></span></code></pre></div><img src="/blog/teun_brand_half_geom/index_files/figure-html/unnamed-chunk-8-1.png" width="672" />
+
+        
+        <details closed class="f6 fw7 input-reset">
+  <dl class="f6 lh-copy">
+    <dt class="fw7">Posted on:</dt>
+    <dd class="fw5 ml0">December 5, 2024</dd>
+  </dl>
+  <dl class="f6 lh-copy">
+    <dt class="fw7">Length:</dt>
+    <dd class="fw5 ml0">2 minute read, 363 words</dd>
+  </dl>
+  
+  
+  
+  <dl class="f6 lh-copy">
+    <dt class="fw7">Tags:</dt>
+    <dd class="fw5 ml0"> <a href="http://localhost:4321/tags/r">R</a>  <a href="http://localhost:4321/tags/ggplot2">ggplot2</a> </dd>
+  </dl>
+  
+  <dl class="f6 lh-copy">
+    <dt class="fw7">See Also:</dt>
+    
+    <dd class="fw5 ml0"><a href="/blog/k_walker_map_2/">Another Kyle Walker Map</a></dd>
+    
+    <dd class="fw5 ml0"><a href="/blog/tt_cbp/">Tidy Tuesday Customs and Border Protection</a></dd>
+    
+    <dd class="fw5 ml0"><a href="/blog/lego_map/">Benjamin Nowak&#39;s Lego Maps</a></dd>
+    
+  </dl>
+</details>
+
+      </section>
+      <footer class="post-footer">
+        <div class="post-pagination dt w-100 mt4 mb2">
+  
+  
+  
+  
+    <a class="next dtc pl2 tr v-top fw6"
+    href="http://localhost:4321/blog/k_walker_map_2/">Another Kyle Walker Map &rarr;</a>
+  
+</div>
+
+      </footer>
+    </article>
+    
+      <div class="post-comments pa0 pa4-l mt4">
+  
+    
+      <script src="https://utteranc.es/client.js"
+              repo="stewing-co/warp_and_weft_data"
+              issue-term="pathname"
+              theme="boxy-light"
+              label="comments :crystal_ball:"
+              crossorigin="anonymous"
+              async
+              type="text/javascript">
+      </script>
+    
+  
+</div>
+
+    
+  </section>
+</main>
+<footer class="site-footer pv4 bt b--transparent ph5" role="contentinfo">
+  <nav class="db dt-l w-100">
+    <p class="site-copyright f7 db dtc-l v-mid w-100 w-33-l tc tl-l pv2 pv0-l mv0 lh-copy">
+      &copy; 2024 Warp and Weft Data, Atlanta, GA
+      <span class="middot-divider"></span>
+      Made with <span xmlns:dct="http://purl.org/dc/terms/" property="dct:title"><a xmlns:dct="http://purl.org/dc/terms/" href="https://github.com/hugo-apero/" rel="dct:source">Hugo Apéro</a></span>.
+      <br />
+      
+Based on <span xmlns:dct="http://purl.org/dc/terms/" property="dct:title"><a xmlns:dct="http://purl.org/dc/terms/" href="https://github.com/formspree/blogophonic-hugo" rel="dct:source">Blogophonic</a></span> by <a xmlns:cc="http://creativecommons.org/ns#" href="https://formspree.io" property="cc:attributionName" rel="cc:attributionURL">Formspree</a>.
+    </p>
+    
+    <div class="site-social-links db dtc-l v-mid w-100 w-33-l tc pv2 pv0-l mv0">
+      <div class="social-icon-links" aria-hidden="true">
+  
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <a class="link dib h1 w1 ml0 mr2 f6 o-90 glow" href="https://github.com/stewing-co" title="github" target="_blank" rel="me noopener">
+      <i class="fab fa-github fa-lg fa-fw"></i>
+    </a>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <a class="link dib h1 w1 ml0 mr2 f6 o-90 glow" href="https://bsky.app/profile/warpandweftdata.com" title="bluesky" target="_blank" rel="me noopener">
+      <i class="fab fa-bluesky fa-lg fa-fw"></i>
+    </a>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <a class="link dib h1 w1 ml0 mr2 f6 o-90 glow" href="https://www.linkedin.com/in/stewing-in/" title="linkedin" target="_blank" rel="me noopener">
+      <i class="fab fa-linkedin fa-lg fa-fw"></i>
+    </a>
+  
+</div>
+
+    </div>
+    
+    <div class="site-links f6 db dtc-l v-mid w-100 w-67-l tc tr-l pv2 pv0-l mv0">
+      
+      <a class="dib pv1 ph2 link" href="/license/" title="License">License</a>
+      
+      <a class="dib pv1 ph2 link" href="/contact/" title="Contact form">Contact</a>
+      
+    </div>
+  </nav>
+  
+    <script>
+
+    var i, text, code, codes = document.getElementsByTagName('code');
+    for (let i = 0; i < codes.length;) {
+      code = codes[i];
+      if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+        text = code.textContent;
+        if (/^\$[^$]/.test(text) && /[^$]\$$/.test(text)) {
+          text = text.replace(/^\$/, '\\(').replace(/\$$/, '\\)');
+          code.textContent = text;
+        }
+        if (/^\\\((.|\s)+\\\)$/.test(text) ||
+            /^\\\[(.|\s)+\\\]$/.test(text) ||
+            /^\$(.|\s)+\$$/.test(text) ||
+            /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+          code.outerHTML = code.innerHTML;  
+          continue;
+        }
+      }
+      i++;
+    }
+</script>
+
+  
+    
+    
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.13/dist/katex.min.css" integrity="sha384-RZU/ijkSsFbcmivfdRBQDtwuwVqK7GMOw6IMvKyeWL2K5UAlyp6WonmB8m7Jd0Hn" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.13/dist/katex.min.js" integrity="sha384-pK1WpvzWVBQiP0/GjnvRxV4mOb0oxFuyRxJlk6vVw146n3egcN5C925NCP7a7BY8" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.13/dist/contrib/auto-render.min.js" integrity="sha384-vZTG03m+2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+
+
+
+    
+  
+  
+</footer>
+
+      </div>
+    </body>
+</html>

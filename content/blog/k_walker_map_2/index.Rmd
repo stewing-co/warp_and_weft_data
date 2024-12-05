@@ -3,7 +3,7 @@ title: "Another Kyle Walker Map"
 subtitle: ""
 excerpt: ""
 date: 2024-12-04
-author: "Steve Ewing"
+author: "Kyle Walker"
 draft: false
 series:
 tags: ["R", "bluesky", "maps"]
