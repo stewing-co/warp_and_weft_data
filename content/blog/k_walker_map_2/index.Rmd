@@ -107,3 +107,19 @@ ftw_map |>
   ) 
 ```
 
+```{r}
+library(tidycensus)
+library(mapview)
+
+get_acs(
+  geography = "tract",
+  variables = "B19013_001",
+  state = "GA",
+  county = "Gwinnett",
+  year = 2023,
+  geometry = TRUE
+) |> 
+  mapview(zcol = "estimate",
+          layer.name = "Median HH income<br>2019-2023 ACS") 
+```
+
